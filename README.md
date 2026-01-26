@@ -104,6 +104,8 @@ git push --follow-tags
 
 Pushing a tag like `v1.2.3` triggers GitHub Actions to build and publish.
 
+Note: Trusted Publishing is enabled for this package.
+
 ## How it Works
 
 1.  **`src/lib/context.ts`**: Holds the `AsyncLocalStorage`.
