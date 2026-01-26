@@ -116,7 +116,10 @@ describe.sequential('Implicit Transactions (Integration)', () => {
 
         // 2. Read (FindUnique)
         const found = await service.userRepo.findUnique({ where: { id: user.id } });
-        expect(found).toBeDefined();
+        expect(found).not.toBeNull();
+        if (!found) {
+            throw new Error('Expected user to exist');
+        }
         expect(found.email).toBe(email);
 
         // 3. Update
