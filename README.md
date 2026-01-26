@@ -93,6 +93,17 @@ Avoid using it inside transactional flows, or you will bypass ALS and lose the i
 
 See `examples/implicit-transaction-demo.ts` for a runnable demo.
 
+## Release (Tag-Based)
+
+We use a tag-based release flow:
+
+```bash
+npm version patch   # or minor/major
+git push --follow-tags
+```
+
+Pushing a tag like `v1.2.3` triggers GitHub Actions to build and publish.
+
 ## How it Works
 
 1.  **`src/lib/context.ts`**: Holds the `AsyncLocalStorage`.
