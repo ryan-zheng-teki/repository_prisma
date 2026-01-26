@@ -2,6 +2,14 @@
   "name": "repository_prisma",
   "version": "1.0.1",
   "description": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ryan-zheng-teki/repository_prisma.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ryan-zheng-teki/repository_prisma/issues"
+  },
+  "homepage": "https://github.com/ryan-zheng-teki/repository_prisma#readme",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
