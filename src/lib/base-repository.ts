@@ -6,6 +6,17 @@ import { getPrismaClient } from './prisma-manager';
 export type Delegate<T extends Prisma.ModelName> = PrismaClient[Uncapitalize<T>];
 
 export abstract class BaseRepository<M extends Prisma.ModelName> {
+  static forModel<M extends Prisma.ModelName>(modelName: M) {
+    const delegateName = (modelName.charAt(0).toLowerCase() +
+      modelName.slice(1)) as Uncapitalize<M>;
+
+    return class extends BaseRepository<M> {
+      constructor() {
+        super(delegateName);
+      }
+    };
+  }
+
   // OPTIONAL: Define it if class name doesn't match convention
   protected modelName?: Uncapitalize<M>;
 

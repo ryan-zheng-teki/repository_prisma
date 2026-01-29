@@ -1,14 +1,14 @@
-import { BaseRepository, Transactional, runInTransaction } from '../src';
+import { BaseRepository, Transactional, runInTransaction, Models } from '../src';
 
 // --- Repositories ---
 
 // Clean Inheritance!
-class UserRepository extends BaseRepository<'User'> {
-  // Infer "user" from "UserRepository"
+class UserRepository extends BaseRepository.forModel(Models.User) {
+  // No string literal needed
 }
 
-class PostRepository extends BaseRepository<'Post'> {
-  // Infer "post" from "PostRepository"
+class PostRepository extends BaseRepository.forModel(Models.Post) {
+  // No string literal needed
 }
 
 // --- Service ---

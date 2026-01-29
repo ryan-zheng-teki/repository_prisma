@@ -93,6 +93,19 @@ Avoid using it inside transactional flows, or you will bypass ALS and lose the i
 
 See `examples/implicit-transaction-demo.ts` for a runnable demo.
 
+## Optional: No-Quote Repository Helper
+
+If you prefer to avoid string literals like `'User'`, you can use `BaseRepository.forModel`:
+
+```typescript
+import { BaseRepository, Models } from 'repository_prisma';
+
+export class UserRepository extends BaseRepository.forModel(Models.User) {}
+export class PostRepository extends BaseRepository.forModel(Models.Post) {}
+```
+
+`defineRepository` is still available as a short alias if you prefer it.
+
 ## Release (Tag-Based)
 
 We use a tag-based release flow:

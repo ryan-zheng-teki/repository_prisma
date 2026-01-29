@@ -153,11 +153,11 @@ Here is how the end-user (developer) uses this library. Note the clean separatio
 
 ```typescript
 // user.repository.ts
-import { BaseRepository } from "./lib/base-repository";
+import { BaseRepository, Models } from "repository_prisma";
 
-// STRICT TYPING: Just pass the Model Name!
-export class UserRepository extends BaseRepository<"User"> {
-  // Model name inferred from class "UserRepository" -> "user"
+// STRICT TYPING: No string literal needed.
+export class UserRepository extends BaseRepository.forModel(Models.User) {
+  // Model name mapped from Models.User -> "user"
 }
 ```
 
