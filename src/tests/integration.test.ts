@@ -1,6 +1,4 @@
 import { describe, it, expect, beforeEach, beforeAll, afterAll } from 'vitest';
-import { execSync } from 'node:child_process';
-import path from 'node:path';
 import { BaseRepository } from '../lib/base-repository';
 import { Models } from '../lib/models';
 import { Transactional } from '../lib/decorators';
@@ -41,12 +39,6 @@ describe.sequential('Implicit Transactions (Integration)', () => {
     const service = new UserService();
 
     beforeAll(async () => {
-        const repoRoot = path.resolve(__dirname, '..', '..');
-        const npxCmd = process.platform === 'win32' ? 'npx.cmd' : 'npx';
-        execSync(`${npxCmd} prisma db push --skip-generate`, {
-            cwd: repoRoot,
-            stdio: 'inherit',
-        });
         await initializePrisma({ enableWAL: true });
     });
 
