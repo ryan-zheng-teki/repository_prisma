@@ -16,8 +16,7 @@
   "scripts": {
     "build": "tsup",
     "typecheck": "tsc -p tsconfig.json",
-    "pretest": "npx prisma db push --skip-generate",
-    "test": "vitest",
+    "test": "node scripts/run-tests.js",
     "prepublishOnly": "npm run build"
   },
   "exports": {

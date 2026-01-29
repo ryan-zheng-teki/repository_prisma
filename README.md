@@ -106,6 +106,11 @@ export class PostRepository extends BaseRepository.forModel(Models.Post) {}
 
 `defineRepository` is still available as a short alias if you prefer it.
 
+## Testing
+
+`npm test` automatically syncs the Prisma schema to a dedicated SQLite file (`test.db`).
+You can override it by setting `DATABASE_URL_TEST`.
+
 ## Release (Tag-Based)
 
 We use a tag-based release flow:
