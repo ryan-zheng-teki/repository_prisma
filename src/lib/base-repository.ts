@@ -18,13 +18,13 @@ export abstract class BaseRepository<M extends Prisma.ModelName> {
   }
 
   // OPTIONAL: Define it if class name doesn't match convention
-  protected modelName?: Uncapitalize<M>;
+  modelName?: Uncapitalize<M>;
 
   constructor(modelName?: Uncapitalize<M>) {
     this.modelName = modelName;
   }
 
-  private resolveModelName(): Uncapitalize<M> {
+  resolveModelName(): Uncapitalize<M> {
     if (this.modelName) {
       return this.modelName;
     }
@@ -38,7 +38,7 @@ export abstract class BaseRepository<M extends Prisma.ModelName> {
     return camelCased as Uncapitalize<M>;
   }
 
-  protected get delegate(): Delegate<M> {
+  get delegate(): Delegate<M> {
     const client = getPrismaClient() as PrismaClient;
     
     const modelName = this.resolveModelName();
@@ -69,10 +69,22 @@ export abstract class BaseRepository<M extends Prisma.ModelName> {
     return (this.delegate as any).findUnique(args);
   }
 
+  findFirst(
+    args?: Parameters<Delegate<M>['findFirst']>[0]
+  ): ReturnType<Delegate<M>['findFirst']> {
+    return (this.delegate as any).findFirst(args);
+  }
+
   findMany(
     args?: Parameters<Delegate<M>['findMany']>[0]
   ): ReturnType<Delegate<M>['findMany']> {
     return (this.delegate as any).findMany(args);
+  }
+
+  count(
+    args?: Parameters<Delegate<M>['count']>[0]
+  ): ReturnType<Delegate<M>['count']> {
+    return (this.delegate as any).count(args);
   }
 
   update(
@@ -81,9 +93,33 @@ export abstract class BaseRepository<M extends Prisma.ModelName> {
     return (this.delegate as any).update(args);
   }
 
+  updateMany(
+    args: Parameters<Delegate<M>['updateMany']>[0]
+  ): ReturnType<Delegate<M>['updateMany']> {
+    return (this.delegate as any).updateMany(args);
+  }
+
+  upsert(
+    args: Parameters<Delegate<M>['upsert']>[0]
+  ): ReturnType<Delegate<M>['upsert']> {
+    return (this.delegate as any).upsert(args);
+  }
+
   delete(
     args: Parameters<Delegate<M>['delete']>[0]
   ): ReturnType<Delegate<M>['delete']> {
     return (this.delegate as any).delete(args);
+  }
+
+  deleteMany(
+    args?: Parameters<Delegate<M>['deleteMany']>[0]
+  ): ReturnType<Delegate<M>['deleteMany']> {
+    return (this.delegate as any).deleteMany(args);
+  }
+
+  createMany(
+    args: Parameters<Delegate<M>['createMany']>[0]
+  ): ReturnType<Delegate<M>['createMany']> {
+    return (this.delegate as any).createMany(args);
   }
 }

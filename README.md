@@ -106,6 +106,26 @@ export class PostRepository extends BaseRepository.forModel(Models.Post) {}
 
 `defineRepository` is still available as a short alias if you prefer it.
 
+## Case-Insensitive Filters (SQLite-Safe)
+
+SQLite does **not** support Prisma's `mode: "insensitive"` string filters. Use the helpers below
+to avoid runtime errors and optionally apply a fallback in memory.
+
+```typescript
+import { buildContainsFilter, filterContainsCaseInsensitive, supportsCaseInsensitiveMode } from 'repository_prisma';
+
+const where = { name: buildContainsFilter("Alice", { caseInsensitive: true }) };
+const rows = await repo.findMany({ where });
+
+// If you need true case-insensitive behavior on SQLite, apply in-memory fallback:
+const filtered = supportsCaseInsensitiveMode()
+  ? rows
+  : filterContainsCaseInsensitive(rows, "Alice", (row) => row.name);
+```
+
+If you want explicit provider selection, set `PRISMA_DATASOURCE_PROVIDER=sqlite|postgresql|mysql|...`
+to override auto-detection (which uses `DATABASE_URL`).
+
 ## Testing
 
 `npm test` automatically syncs the Prisma schema to a dedicated SQLite file (`test.db`).

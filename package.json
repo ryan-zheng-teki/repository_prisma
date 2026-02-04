@@ -36,9 +36,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^5.22.0",
     "dotenv": "^17.2.3",
     "uuid": "^13.0.0"
+  },
+  "peerDependencies": {
+    "@prisma/client": "^5.22.0"
   },
   "devDependencies": {
     "@types/node": "^25.0.10",

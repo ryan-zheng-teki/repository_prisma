@@ -6,5 +6,7 @@ export { prisma } from './lib/prisma-proxy';
 export { initializePrisma, shutdownPrisma, rootPrismaClient } from './lib/client';
 export { defineRepository } from './lib/repository-factory';
 export { Models } from './lib/models';
+export { detectDatabaseProvider, getDatabaseUrl, isSqliteProvider, supportsCaseInsensitiveMode } from './lib/database';
+export { buildContainsFilter, filterContainsCaseInsensitive } from './lib/filters';
 export type { Delegate } from './lib/base-repository';
 export type { ModelName } from './lib/models';
