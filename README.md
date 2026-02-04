@@ -133,16 +133,22 @@ You can override it by setting `DATABASE_URL_TEST`.
 
 ## Release (Tag-Based)
 
-We use a tag-based release flow:
+We use a tag-based release flow. Create a version tag and push it:
 
 ```bash
-npm version patch   # or minor/major
-git push --follow-tags
+npm version patch -m "1.0.6"   # or minor/major
+git push origin main --follow-tags
+```
+
+If you prefer to tag manually (or via a Git UI), create an annotated tag:
+
+```bash
+git tag -a v1.0.6 -m "1.0.6"
+git push origin main --tags
 ```
 
 Pushing a tag like `v1.2.3` triggers GitHub Actions to build and publish.
-
-Note: Trusted Publishing is enabled for this package.
+Trusted Publishing is enabled for this package.
 
 ## How it Works
 
