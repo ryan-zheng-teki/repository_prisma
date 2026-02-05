@@ -128,7 +128,7 @@ to override auto-detection (which uses `DATABASE_URL`).
 
 ## Testing
 
-`npm test` automatically syncs the Prisma schema to a dedicated SQLite file (`test.db`)
+Install dependencies first (`pnpm install` or `npm install`). Then `npm test` automatically syncs the Prisma schema to a dedicated SQLite file (`test.db`)
 and runs `prisma generate` to ensure the correct client is used for this repo.
 You can override it by setting `DATABASE_URL_TEST`.
 
