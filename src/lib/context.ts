@@ -26,7 +26,7 @@ export const runInTransaction = <T>(callback: () => Promise<T>): Promise<T> => {
   }
 
   // Use the standard client to start a tx
-  return rootPrismaClient.$transaction((tx) => {
+  return rootPrismaClient.$transaction((tx: Prisma.TransactionClient) => {
     // Inside the tx callback, we set the ALS context
     return runInTransactionContext(tx, callback);
   });
