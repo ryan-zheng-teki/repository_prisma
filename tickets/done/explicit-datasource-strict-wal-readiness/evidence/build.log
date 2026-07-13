@@ -1,0 +1,24 @@
+
+> repository_prisma@1.0.7 build
+> tsup
+
+CLI Building entry: src/index.ts
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.1
+CLI Using tsup config: /Users/ryan-zheng/autobyteus-org/repository_prisma/.worktrees/explicit-datasource-strict-wal-readiness/tsup.config.ts
+CLI Target: es2018
+CLI Cleaning output folder
+CJS Build start
+ESM Build start
+CJS You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+ESM You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+ESM dist/index.mjs     24.84 KB
+ESM dist/index.mjs.map 51.79 KB
+ESM ⚡️ Build success in 35ms
+CJS dist/index.js     27.39 KB
+CJS dist/index.js.map 52.93 KB
+CJS ⚡️ Build success in 36ms
+DTS Build start
+DTS ⚡️ Build success in 1673ms
+DTS dist/index.d.ts  8.71 KB
+DTS dist/index.d.mts 8.71 KB

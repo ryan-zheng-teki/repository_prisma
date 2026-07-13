@@ -1,57 +1,28 @@
-import { PrismaClient } from '@prisma/client';
+import type { PrismaClient } from '@prisma/client';
 import 'dotenv/config';
+import { createForwardingPrismaProxy } from './forwarding-proxy';
+import { PrismaClientLifecycle } from './client/lifecycle';
+import type { InitializePrismaOptions } from './client/initialization-error';
 
-let rootClient: PrismaClient | null = null;
+export { PrismaInitializationError } from './client/initialization-error';
+export type {
+  InitializePrismaOptions,
+  PrismaInitializationDiagnostic,
+  PrismaInitializationErrorCode,
+} from './client/initialization-error';
 
-const getOrCreateRootClient = (): PrismaClient => {
-  if (!rootClient) {
-    rootClient = new PrismaClient({
-      log: ['query', 'info', 'warn', 'error'],
-    });
-  }
-  return rootClient;
-};
+const lifecycle = new PrismaClientLifecycle();
 
-// Global instance (singleton-like), but lazily created to avoid env timing issues.
-export const rootPrismaClient = new Proxy({} as PrismaClient, {
-  get(_target, prop) {
-    const client = getOrCreateRootClient();
-    const value = (client as any)[prop];
-    if (typeof value === 'function') {
-      return value.bind(client);
-    }
-    return value;
-  },
-});
-
-export type InitializePrismaOptions = {
-  enableWAL?: boolean;
-};
-
-export const initializePrisma = async (
+export const initializePrisma = (
   options: InitializePrismaOptions = {}
-): Promise<void> => {
-  const { enableWAL = false } = options;
+): Promise<void> => lifecycle.initialize(options);
 
-  const client = getOrCreateRootClient();
-  await client.$connect();
+export const shutdownPrisma = (): Promise<void> => lifecycle.shutdown();
 
-  if (!enableWAL) {
-    return;
+export const rootPrismaClient = createForwardingPrismaProxy<PrismaClient>(
+  () => lifecycle.getClientForOperation(),
+  {
+    $connect: initializePrisma,
+    $disconnect: shutdownPrisma,
   }
-
-  try {
-    await client.$queryRawUnsafe('PRAGMA journal_mode = WAL;');
-  } catch (error) {
-    // Best-effort for SQLite-only optimization.
-    console.warn('Failed to enable WAL mode:', error);
-  }
-};
-
-export const shutdownPrisma = async (): Promise<void> => {
-  if (!rootClient) {
-    return;
-  }
-  await rootClient.$disconnect();
-  rootClient = null;
-};
+);

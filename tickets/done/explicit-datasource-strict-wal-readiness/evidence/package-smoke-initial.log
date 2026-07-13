@@ -1,0 +1,43 @@
+
+> repository_prisma@1.0.7 test:package
+> node scripts/run-package-smoke.js
+
+
+added 3 packages in 568ms
+/Users/ryan-zheng/autobyteus-org/repository_prisma/.worktrees/explicit-datasource-strict-wal-readiness/scripts/run-package-smoke.js:27
+    throw new Error(
+    ^
+
+Error: Command failed (/usr/local/Cellar/node/24.4.1/bin/node cjs-smoke.cjs):
+prisma:info Starting a sqlite pool with 9 connections.
+prisma:query PRAGMA database_list;
+prisma:query PRAGMA journal_mode = WAL;
+prisma:query PRAGMA journal_mode;
+prisma:query PRAGMA database_list;
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
++ actual - expected
+
++ '/private/var/folders/_r/s63mv8pd2p59y0vtl6p796200000gn/T/repository-prisma-package-smoke-2b4ZCg/consumer-cjs.db'
+- '/var/folders/_r/s63mv8pd2p59y0vtl6p796200000gn/T/repository-prisma-package-smoke-2b4ZCg/consumer-cjs.db'
+
+    at /private/var/folders/_r/s63mv8pd2p59y0vtl6p796200000gn/T/repository-prisma-package-smoke-2b4ZCg/consumer/cjs-smoke.cjs:13:10 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: '/private/var/folders/_r/s63mv8pd2p59y0vtl6p796200000gn/T/repository-prisma-package-smoke-2b4ZCg/consumer-cjs.db',
+  expected: '/var/folders/_r/s63mv8pd2p59y0vtl6p796200000gn/T/repository-prisma-package-smoke-2b4ZCg/consumer-cjs.db',
+  operator: 'strictEqual'
+}
+
+    at run (/Users/ryan-zheng/autobyteus-org/repository_prisma/.worktrees/explicit-datasource-strict-wal-readiness/scripts/run-package-smoke.js:27:11)
+    at Object.<anonymous> (/Users/ryan-zheng/autobyteus-org/repository_prisma/.worktrees/explicit-datasource-strict-wal-readiness/scripts/run-package-smoke.js:128:21)
+    at Module._compile (node:internal/modules/cjs/loader:1692:14)
+    at Object..js (node:internal/modules/cjs/loader:1824:10)
+    at Module.load (node:internal/modules/cjs/loader:1427:32)
+    at Module._load (node:internal/modules/cjs/loader:1250:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:152:5)
+    at node:internal/main/run_main_module:33:47
+
+Node.js v24.4.1

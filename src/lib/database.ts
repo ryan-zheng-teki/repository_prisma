@@ -30,7 +30,7 @@ const normalizeProvider = (value: string): DatabaseProvider => {
   }
 };
 
-const inferProviderFromUrl = (url?: string): DatabaseProvider => {
+export const inferDatabaseProviderFromUrl = (url?: string): DatabaseProvider => {
   if (!url) {
     return 'unknown';
   }
@@ -56,11 +56,21 @@ const inferProviderFromUrl = (url?: string): DatabaseProvider => {
   return 'unknown';
 };
 
-export const getDatabaseUrl = (): string | undefined => {
-  if (process.env.NODE_ENV === 'test' && process.env.DATABASE_URL_TEST) {
-    return process.env.DATABASE_URL_TEST;
+const nonEmptyEnvironmentValue = (value?: string): string | undefined => {
+  if (value === undefined || value.trim().length === 0) {
+    return undefined;
   }
-  return process.env.DATABASE_URL ?? process.env.DATABASE_URL_TEST;
+  return value;
+};
+
+export const getDatabaseUrl = (): string | undefined => {
+  const testUrl = nonEmptyEnvironmentValue(process.env.DATABASE_URL_TEST);
+  const defaultUrl = nonEmptyEnvironmentValue(process.env.DATABASE_URL);
+
+  if (process.env.NODE_ENV === 'test' && testUrl) {
+    return testUrl;
+  }
+  return defaultUrl ?? testUrl;
 };
 
 export const detectDatabaseProvider = (): DatabaseProvider => {
@@ -68,7 +78,7 @@ export const detectDatabaseProvider = (): DatabaseProvider => {
   if (envProvider) {
     return normalizeProvider(envProvider);
   }
-  return inferProviderFromUrl(getDatabaseUrl());
+  return inferDatabaseProviderFromUrl(getDatabaseUrl());
 };
 
 export const isSqliteProvider = (): boolean => detectDatabaseProvider() === 'sqlite';

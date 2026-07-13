@@ -14,7 +14,10 @@
 
 ## 2. File Responsibilities & Architecture
 
-We will structure the library core into four main files to separate concerns.
+The library has two cooperating authorities: `AsyncLocalStorage` owns the active transaction client,
+and `PrismaClientLifecycle` owns the one raw non-transaction root client. Callers above these
+boundaries use the exported forwarding surfaces rather than combining a facade with lifecycle
+internals.
 
 ### A. `src/lib/context.ts` (The State Manager)
 
@@ -30,11 +33,11 @@ We will structure the library core into four main files to separate concerns.
 **Responsibility**: The gateway for obtaining the _correct_ Prisma Client.
 
 - **Key Components**:
-  - `getPrisma()`: The static accessor used by Repositories.
+  - `getPrismaClient()`: The accessor used by repositories.
     - **Logic**:
       1. Check `context.getTransactionClient()`.
       2. If exists -> Return it (We are inside a `@Transactional` block).
-      3. If null -> Return the global `rootPrismaClient`.
+      3. If null -> Return the lifecycle-backed `rootPrismaClient` forwarding boundary.
 
 ### C. `src/lib/decorators.ts` (The API Surface)
 
@@ -62,9 +65,79 @@ We will structure the library core into four main files to separate concerns.
     - `update(args)`
     - `delete(args)`
 
+### E. `src/lib/client.ts` and `src/lib/client/lifecycle.ts` (Root Lifecycle)
+
+**Responsibility**: `client.ts` is the thin public facade; `PrismaClientLifecycle` is the sole raw
+root-client and lifecycle owner.
+
+- Resolve one explicit datasource target and pass it through `PrismaClient({ datasourceUrl })`.
+- Construct and disconnect the raw root client only inside the lifecycle owner.
+- Track lifecycle state as one discriminated union: `Idle`, `LazyBound`, `Initializing`, `Ready`,
+  `Failed`, or `ShuttingDown`.
+- Keep a candidate private until connection and required SQLite checks pass.
+- Reject access during initialization, failure, or shutdown with `CLIENT_NOT_READY`.
+- Share an identical in-flight initialization request; reject different target/readiness requests.
+- Clear target, client, readiness, failure, and in-flight authority after shutdown even if disconnect
+  itself fails.
+
+The related internal files remain subordinate to this owner:
+
+- `client/datasource-target.ts` selects, classifies, and normalizes the target. Physical SQLite
+  relative paths are `process.cwd()`-relative.
+- `client/sqlite-readiness.ts` owns `PRAGMA database_list`, WAL activation, and the independent
+  journal-mode verification. It cannot publish or disconnect a client.
+- `client/initialization-error.ts` owns safe stable codes/messages and guarded opt-in diagnostics. It
+  does not log raw causes.
+
+### F. `src/lib/forwarding-proxy.ts` and `src/lib/prisma-proxy.ts` (Access Routing)
+
+**Responsibility**: Preserve Prisma-shaped public access without leaking a retained raw root or ALS
+delegate.
+
+Property inspection may resolve the current surface, but returned model-delegate and method handles
+are forwarding wrappers. When called, a wrapper resolves the current root/transaction owner again and
+uses `Reflect.apply` with that owner as `this`. The proxy is explicitly non-thenable. Root `$connect`
+and `$disconnect` route to lifecycle initialization and shutdown.
+
+Prisma APIs that return caller-owned client-like surfaces (for example `$extends`) and already-invoked
+Prisma promises are outside revocation scope; the lifecycle guarantee applies to the exported
+forwarding boundaries and pre-invocation handles captured from them.
+
 ---
 
-## 3. Simulation: The Execution Flow
+## 3. Execution Flows
+
+### Root Initialization and SQLite Readiness
+
+```mermaid
+sequenceDiagram
+    participant App
+    participant Facade as client.ts
+    participant Lifecycle as PrismaClientLifecycle
+    participant Target as Datasource Target Resolver
+    participant Prisma as Raw PrismaClient
+    participant SQLite as SQLite Readiness
+
+    App->>Facade: initializePrisma(options)
+    Facade->>Lifecycle: initialize(options)
+    Lifecycle->>Target: resolve once
+    Target-->>Lifecycle: normalized target
+    Lifecycle->>Prisma: construct with datasourceUrl
+    Lifecycle->>Prisma: $connect()
+    Lifecycle->>SQLite: verify main identity (physical SQLite)
+    opt enableWAL
+      Lifecycle->>SQLite: activate WAL
+      Lifecycle->>SQLite: independently verify wal
+    end
+    Lifecycle-->>Facade: publish Ready only after checks
+    Facade-->>App: resolve or safe classified rejection
+```
+
+`enableWAL: true` is fail-closed. A connection, identity, activation, or verification failure
+disconnects the candidate, moves the lifecycle to `Failed`, invokes only explicitly registered
+diagnostic callbacks with the raw cause, and rejects with a safe `PrismaInitializationError`.
+
+### Transaction Routing
 
 **Scenario**: A `RegistrationService` creates a `User` and a `WelcomePost` atomically.
 
@@ -123,10 +196,14 @@ This matches the Python `repository-sqlalchemy` design: "Implicitly atomic by de
 
 ### Q: Do I need to initialize Prisma explicitly?
 
-**Only if you want eager connection or SQLite WAL mode.**
+**Only if you want eager connection, verified SQLite identity, or strict SQLite WAL readiness.**
 
 - By default, Prisma connects lazily on first query.
-- If you want to force a connection or enable WAL, call `initializePrisma({ enableWAL: true })` during app startup.
+- If you want startup proof, call `initializePrisma(...)` and await it before serving traffic.
+- A non-empty `datasourceUrl` is authoritative. Otherwise the documented environment precedence is
+  resolved once and still passed explicitly to Prisma.
+- `enableWAL: true` supports only physical SQLite and resolves only after WAL is verified.
+- Switching a bound target requires `await shutdownPrisma()` first.
 
 ### Q: How does `@Transactional` work in Node.js?
 

@@ -1,0 +1,311 @@
+
+> repository_prisma@1.0.7 test
+> node scripts/run-tests.js
+
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "test.db" at "file:///Users/ryan-zheng/autobyteus-org/repository_prisma/.worktrees/explicit-datasource-strict-wal-readiness/test.db"
+
+The database is already in sync with the Prisma schema.
+
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 155ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Want to react to database changes in your app as they happen? Discover how with Pulse: https://pris.ly/tip-1-pulse
+
+
+ RUN  v4.0.18 /Users/ryan-zheng/autobyteus-org/repository_prisma/.worktrees/explicit-datasource-strict-wal-readiness
+
+ ✓ src/tests/forwarding-proxy.test.ts (3 tests) 7ms
+ ✓ src/tests/database-filter.test.ts (11 tests) 8ms
+ ✓ src/tests/datasource-readiness.test.ts (18 tests) 28ms
+ ✓ src/tests/client-lifecycle.test.ts (14 tests) 199ms
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration)
+prisma:info Starting a sqlite pool with 9 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > opens DATABASE_URL_TEST under test and leaves DATABASE_URL untouched
+prisma:info Starting a sqlite pool with 9 connections.
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration)
+prisma:query PRAGMA database_list;
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > opens DATABASE_URL_TEST under test and leaves DATABASE_URL untouched
+prisma:query PRAGMA database_list;
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > opens DATABASE_URL_TEST under test and leaves DATABASE_URL untouched
+prisma:query PRAGMA database_list;
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration)
+prisma:query PRAGMA journal_mode = WAL;
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration)
+prisma:query PRAGMA journal_mode;
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should commit transaction correctly (Decorator)
+prisma:query DELETE FROM `main`.`Post` WHERE 1=1
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should commit transaction correctly (Decorator)
+prisma:query DELETE FROM `main`.`User` WHERE 1=1
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should commit transaction correctly (Decorator)
+prisma:query BEGIN IMMEDIATE
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should commit transaction correctly (Decorator)
+prisma:query INSERT INTO `main`.`User` (`email`) VALUES (?) RETURNING `id` AS `id`, `email` AS `email`
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should commit transaction correctly (Decorator)
+prisma:query INSERT INTO `main`.`Post` (`title`, `authorId`) VALUES (?,?) RETURNING `id` AS `id`, `title` AS `title`, `authorId` AS `authorId`
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > lets a non-empty explicit datasource win and treats whitespace as omitted
+prisma:info Starting a sqlite pool with 9 connections.
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should commit transaction correctly (Decorator)
+prisma:query COMMIT
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > lets a non-empty explicit datasource win and treats whitespace as omitted
+prisma:query PRAGMA database_list;
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should commit transaction correctly (Decorator)
+prisma:query SELECT `main`.`User`.`id`, `main`.`User`.`email` FROM `main`.`User` WHERE (`main`.`User`.`email` = ? AND 1=1) LIMIT ? OFFSET ?
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > lets a non-empty explicit datasource win and treats whitespace as omitted
+prisma:query PRAGMA database_list;
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should commit transaction correctly (Decorator)
+prisma:query SELECT `main`.`Post`.`id`, `main`.`Post`.`title`, `main`.`Post`.`authorId` FROM `main`.`Post` WHERE `main`.`Post`.`authorId` = ? LIMIT ? OFFSET ?
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should rollback transaction on error (Decorator)
+prisma:query DELETE FROM `main`.`Post` WHERE 1=1
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should rollback transaction on error (Decorator)
+prisma:query DELETE FROM `main`.`User` WHERE 1=1
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should rollback transaction on error (Decorator)
+prisma:query BEGIN IMMEDIATE
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should rollback transaction on error (Decorator)
+prisma:query INSERT INTO `main`.`User` (`email`) VALUES (?) RETURNING `id` AS `id`, `email` AS `email`
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should rollback transaction on error (Decorator)
+prisma:query ROLLBACK
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > lets a non-empty explicit datasource win and treats whitespace as omitted
+prisma:info Starting a sqlite pool with 9 connections.
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should rollback transaction on error (Decorator)
+prisma:query SELECT `main`.`User`.`id`, `main`.`User`.`email` FROM `main`.`User` WHERE (`main`.`User`.`email` = ? AND 1=1) LIMIT ? OFFSET ?
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > lets a non-empty explicit datasource win and treats whitespace as omitted
+prisma:query PRAGMA database_list;
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should commit transaction correctly (HOF)
+prisma:query DELETE FROM `main`.`Post` WHERE 1=1
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should commit transaction correctly (HOF)
+prisma:query DELETE FROM `main`.`User` WHERE 1=1
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > lets a non-empty explicit datasource win and treats whitespace as omitted
+prisma:query PRAGMA database_list;
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should commit transaction correctly (HOF)
+prisma:query BEGIN IMMEDIATE
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should commit transaction correctly (HOF)
+prisma:query INSERT INTO `main`.`User` (`email`) VALUES (?) RETURNING `id` AS `id`, `email` AS `email`
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should commit transaction correctly (HOF)
+prisma:query INSERT INTO `main`.`Post` (`title`, `authorId`) VALUES (?,?) RETURNING `id` AS `id`, `title` AS `title`, `authorId` AS `authorId`
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should commit transaction correctly (HOF)
+prisma:query COMMIT
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should commit transaction correctly (HOF)
+prisma:query SELECT `main`.`User`.`id`, `main`.`User`.`email` FROM `main`.`User` WHERE (`main`.`User`.`email` = ? AND 1=1) LIMIT ? OFFSET ?
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should rollback transaction on error (HOF)
+prisma:query DELETE FROM `main`.`Post` WHERE 1=1
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should rollback transaction on error (HOF)
+prisma:query DELETE FROM `main`.`User` WHERE 1=1
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should rollback transaction on error (HOF)
+prisma:query BEGIN IMMEDIATE
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should rollback transaction on error (HOF)
+prisma:query INSERT INTO `main`.`User` (`email`) VALUES (?) RETURNING `id` AS `id`, `email` AS `email`
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should rollback transaction on error (HOF)
+prisma:query ROLLBACK
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should rollback transaction on error (HOF)
+prisma:query SELECT `main`.`User`.`id`, `main`.`User`.`email` FROM `main`.`User` WHERE (`main`.`User`.`email` = ? AND 1=1) LIMIT ? OFFSET ?
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should persist single operation WITHOUT transaction decorator (Implicit Atomic)
+prisma:query DELETE FROM `main`.`Post` WHERE 1=1
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should persist single operation WITHOUT transaction decorator (Implicit Atomic)
+prisma:query DELETE FROM `main`.`User` WHERE 1=1
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > normalizes cwd-relative paths with spaces, literal percent spelling, and query parameters
+prisma:info Starting a sqlite pool with 1 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > normalizes cwd-relative paths with spaces, literal percent spelling, and query parameters
+prisma:query PRAGMA database_list;
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should persist single operation WITHOUT transaction decorator (Implicit Atomic)
+prisma:query INSERT INTO `main`.`User` (`email`) VALUES (?) RETURNING `id` AS `id`, `email` AS `email`
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should persist single operation WITHOUT transaction decorator (Implicit Atomic)
+prisma:query SELECT `main`.`User`.`id`, `main`.`User`.`email` FROM `main`.`User` WHERE (`main`.`User`.`email` = ? AND 1=1) LIMIT ? OFFSET ?
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > normalizes cwd-relative paths with spaces, literal percent spelling, and query parameters
+prisma:query PRAGMA database_list;
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should perform full CRUD operations correctly
+prisma:query DELETE FROM `main`.`Post` WHERE 1=1
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should perform full CRUD operations correctly
+prisma:query DELETE FROM `main`.`User` WHERE 1=1
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should perform full CRUD operations correctly
+prisma:query INSERT INTO `main`.`User` (`email`) VALUES (?) RETURNING `id` AS `id`, `email` AS `email`
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should perform full CRUD operations correctly
+prisma:query SELECT `main`.`User`.`id`, `main`.`User`.`email` FROM `main`.`User` WHERE (`main`.`User`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should perform full CRUD operations correctly
+prisma:query UPDATE `main`.`User` SET `email` = ? WHERE (`main`.`User`.`id` = ? AND 1=1) RETURNING `id` AS `id`, `email` AS `email`
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should perform full CRUD operations correctly
+prisma:query SELECT `main`.`User`.`id`, `main`.`User`.`email` FROM `main`.`User` WHERE `main`.`User`.`id` = ? LIMIT ? OFFSET ?
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should perform full CRUD operations correctly
+prisma:query DELETE FROM `main`.`User` WHERE (`main`.`User`.`id` = ? AND 1=1) RETURNING `id` AS `id`, `email` AS `email`
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should perform full CRUD operations correctly
+prisma:query SELECT `main`.`User`.`id`, `main`.`User`.`email` FROM `main`.`User` WHERE (`main`.`User`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should handle nested transactions by flattening them
+prisma:query DELETE FROM `main`.`Post` WHERE 1=1
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should handle nested transactions by flattening them
+prisma:query DELETE FROM `main`.`User` WHERE 1=1
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should handle nested transactions by flattening them
+prisma:query BEGIN IMMEDIATE
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should handle nested transactions by flattening them
+prisma:query INSERT INTO `main`.`User` (`email`) VALUES (?) RETURNING `id` AS `id`, `email` AS `email`
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should handle nested transactions by flattening them
+prisma:query INSERT INTO `main`.`Post` (`title`, `authorId`) VALUES (?,?) RETURNING `id` AS `id`, `title` AS `title`, `authorId` AS `authorId`
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > accepts a symlink spelling when canonical physical identity is the same
+prisma:info Starting a sqlite pool with 1 connections.
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should handle nested transactions by flattening them
+prisma:query COMMIT
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration) > should handle nested transactions by flattening them
+prisma:query SELECT `main`.`User`.`id`, `main`.`User`.`email` FROM `main`.`User` WHERE (`main`.`User`.`email` = ? AND 1=1) LIMIT ? OFFSET ?
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > accepts a symlink spelling when canonical physical identity is the same
+prisma:query PRAGMA database_list;
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > accepts a symlink spelling when canonical physical identity is the same
+prisma:query PRAGMA database_list;
+
+ ✓ src/tests/integration.test.ts (7 tests) 717ms
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > preserves delete mode without WAL, then upgrades and independently verifies WAL
+prisma:info Starting a sqlite pool with 9 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > preserves delete mode without WAL, then upgrades and independently verifies WAL
+prisma:query PRAGMA database_list;
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > preserves delete mode without WAL, then upgrades and independently verifies WAL
+prisma:query PRAGMA journal_mode;
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > preserves delete mode without WAL, then upgrades and independently verifies WAL
+prisma:query PRAGMA database_list;
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > preserves delete mode without WAL, then upgrades and independently verifies WAL
+prisma:query PRAGMA journal_mode = WAL;
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > preserves delete mode without WAL, then upgrades and independently verifies WAL
+prisma:query PRAGMA journal_mode;
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > preserves delete mode without WAL, then upgrades and independently verifies WAL
+prisma:query PRAGMA journal_mode;
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > blocks access after a safe missing-target failure and permits corrected explicit retry
+prisma:info Starting a sqlite pool with 9 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > blocks access after a safe missing-target failure and permits corrected explicit retry
+prisma:query PRAGMA database_list;
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > blocks access after a safe missing-target failure and permits corrected explicit retry
+prisma:query PRAGMA database_list;
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > rejects a lazy-bound target switch without opening the second file, then rebinds captured methods after shutdown
+prisma:info Starting a sqlite pool with 9 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > rejects a lazy-bound target switch without opening the second file, then rebinds captured methods after shutdown
+prisma:query PRAGMA database_list;
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > rejects a lazy-bound target switch without opening the second file, then rebinds captured methods after shutdown
+prisma:query PRAGMA database_list;
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > rejects a lazy-bound target switch without opening the second file, then rebinds captured methods after shutdown
+prisma:info Starting a sqlite pool with 9 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > rejects a lazy-bound target switch without opening the second file, then rebinds captured methods after shutdown
+prisma:query PRAGMA database_list;
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > rejects a lazy-bound target switch without opening the second file, then rebinds captured methods after shutdown
+prisma:query PRAGMA database_list;
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > reads representative existing data directly without schema migration
+prisma:info Starting a sqlite pool with 9 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > reads representative existing data directly without schema migration
+prisma:query PRAGMA database_list;
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > reads representative existing data directly without schema migration
+prisma:query SELECT id, value FROM existing_probe;
+
+stdout | src/tests/public-initialization.test.ts > context-aware public forwarding with the current Prisma schema > uses a captured context method inside ALS and the root owner after ALS exits
+prisma:info Starting a sqlite pool with 9 connections.
+
+stdout | src/tests/public-initialization.test.ts > context-aware public forwarding with the current Prisma schema > uses a captured context method inside ALS and the root owner after ALS exits
+prisma:query PRAGMA database_list;
+
+stdout | src/tests/public-initialization.test.ts > context-aware public forwarding with the current Prisma schema > uses a captured context method inside ALS and the root owner after ALS exits
+prisma:query BEGIN IMMEDIATE
+
+stdout | src/tests/public-initialization.test.ts > context-aware public forwarding with the current Prisma schema > uses a captured context method inside ALS and the root owner after ALS exits
+prisma:query INSERT INTO `main`.`User` (`email`) VALUES (?) RETURNING `id` AS `id`, `email` AS `email`
+
+stdout | src/tests/public-initialization.test.ts > context-aware public forwarding with the current Prisma schema > uses a captured context method inside ALS and the root owner after ALS exits
+prisma:query ROLLBACK
+
+stdout | src/tests/public-initialization.test.ts > context-aware public forwarding with the current Prisma schema > uses a captured context method inside ALS and the root owner after ALS exits
+prisma:query SELECT `main`.`User`.`id`, `main`.`User`.`email` FROM `main`.`User` WHERE (`main`.`User`.`email` = ? AND 1=1) LIMIT ? OFFSET ?
+
+stdout | src/tests/public-initialization.test.ts > context-aware public forwarding with the current Prisma schema > uses a captured context method inside ALS and the root owner after ALS exits
+prisma:query INSERT INTO `main`.`User` (`email`) VALUES (?) RETURNING `id` AS `id`, `email` AS `email`
+
+stdout | src/tests/public-initialization.test.ts > context-aware public forwarding with the current Prisma schema > uses a captured context method inside ALS and the root owner after ALS exits
+prisma:query SELECT `main`.`User`.`id`, `main`.`User`.`email` FROM `main`.`User` WHERE (`main`.`User`.`email` = ? AND 1=1) LIMIT ? OFFSET ?
+
+stdout | src/tests/public-initialization.test.ts > context-aware public forwarding with the current Prisma schema > uses a captured context method inside ALS and the root owner after ALS exits
+prisma:query DELETE FROM `main`.`User` WHERE (`main`.`User`.`email` = ? AND 1=1) RETURNING `id` AS `id`, `email` AS `email`
+
+ ✓ src/tests/public-initialization.test.ts (9 tests) 864ms
+     ✓ opens DATABASE_URL_TEST under test and leaves DATABASE_URL untouched  707ms
+
+ Test Files  6 passed (6)
+      Tests  62 passed (62)
+   Start at  09:10:26
+   Duration  1.48s (transform 632ms, setup 0ms, import 1.11s, tests 1.82s, environment 1ms)
