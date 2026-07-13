@@ -6,9 +6,9 @@ Finalize the reviewed, API/E2E-passed ticket and publish `repository_prisma@1.0.
 
 ## Handoff Summary
 
-- Handoff summary artifact: `/Users/ryan-zheng/autobyteus-org/repository_prisma/.worktrees/explicit-datasource-strict-wal-readiness/tickets/done/explicit-datasource-strict-wal-readiness/handoff-summary.md`
+- Handoff summary artifact: `/Users/ryan-zheng/autobyteus-org/repository_prisma/tickets/done/explicit-datasource-strict-wal-readiness/handoff-summary.md`
 - Handoff summary status: `Updated`
-- Notes: Records the exact integrated base, validated behavior, evidence, documentation, residual risk, authorization boundary, and verification hold.
+- Notes: Records the exact integrated base, validated behavior, evidence, documentation, residual risk, user authorization, repository finalization, release, and cleanup outcome.
 
 ## Initial Delivery Integration Refresh
 
@@ -36,7 +36,7 @@ Finalize the reviewed, API/E2E-passed ticket and publish `repository_prisma@1.0.
 
 ## Docs Sync Result
 
-- Docs sync artifact: `/Users/ryan-zheng/autobyteus-org/repository_prisma/.worktrees/explicit-datasource-strict-wal-readiness/tickets/done/explicit-datasource-strict-wal-readiness/docs-sync-report.md`
+- Docs sync artifact: `/Users/ryan-zheng/autobyteus-org/repository_prisma/tickets/done/explicit-datasource-strict-wal-readiness/docs-sync-report.md`
 - Docs sync result: `Updated`
 - Docs updated: `README.md`, `DESIGN.md`
 - No-impact rationale (if applicable): `N/A`
@@ -48,48 +48,48 @@ Finalize the reviewed, API/E2E-passed ticket and publish `repository_prisma@1.0.
 
 ## Version / Tag / Release Commit
 
-The package already carries source version `1.0.7`, while npm `latest` and the newest remote tag remain `1.0.6` / `v1.0.6`. No additional version bump is needed. The authorized release tag is `v1.0.7`; tag creation and publication verification are pending repository finalization.
+The package already carried source version `1.0.7`, while npm `latest` and the newest remote tag were `1.0.6` / `v1.0.6`, so no additional version bump was needed. Annotated tag `v1.0.7` was created at merge commit `f825e51d465d8a50a2f49b64993ce0c1bdd4b0f5` and pushed to `origin`. The triggered publication succeeded and npm `latest` now resolves to `1.0.7`.
 
 ## Repository Finalization
 
 - Bootstrap context source: `tickets/done/explicit-datasource-strict-wal-readiness/investigation-notes.md`
 - Ticket branch: `codex/explicit-datasource-strict-wal-readiness`
-- Ticket branch commit result: `Pending explicit user verification`
-- Ticket branch push result: `Pending explicit user verification`
+- Ticket branch commit result: `Completed — f54acef62a5e2cce34d5c8f14ddf603078e7f0c1`
+- Ticket branch push result: `Completed — origin/codex/explicit-datasource-strict-wal-readiness`
 - Finalization target remote: `origin`
 - Finalization target branch: `main`
 - Target advanced after user verification: `No`
 - Delivery-owned edits protected before re-integration: `Not needed`
 - Re-integration before final merge result: `Not needed — origin/main remained unchanged at cc58bca56f561f828d7afc16b7892cc9231c5030`
-- Target branch update result: `Pending explicit user verification`
-- Merge into target result: `Pending explicit user verification`
-- Push target branch result: `Pending explicit user verification`
-- Repository finalization status: `In progress after explicit user verification`
+- Target branch update result: `Completed — git pull --ff-only confirmed origin/main remained cc58bca56f561f828d7afc16b7892cc9231c5030 before merge`
+- Merge into target result: `Completed — no-conflict merge commit f825e51d465d8a50a2f49b64993ce0c1bdd4b0f5`
+- Push target branch result: `Completed — origin/main advanced to f825e51d465d8a50a2f49b64993ce0c1bdd4b0f5`
+- Repository finalization status: `Completed`
 - Blocker (if applicable): `N/A`
 
 ## Release / Publication / Deployment
 
 - Applicable: `Yes`
-- Method: `Git Tag Method` (repository policy, only if separately authorized later)
+- Method: `Git Tag Method`
 - Method reference / command: `README.md`, section `Release (Tag-Based)`; annotated tag `v1.0.7` pushed to `origin`, triggering `.github/workflows/release.yml`
-- Release/publication/deployment result: `Pending repository finalization`
-- Release notes handoff result: `Pending archival and tag publication`
+- Release/publication/deployment result: `Completed — Release workflow run 29234052396 succeeded; npm latest is repository_prisma@1.0.7`
+- Release notes handoff result: `Used`
 - Blocker (if applicable): `N/A`
 
 ## Post-Finalization Cleanup
 
 - Dedicated ticket worktree path: `/Users/ryan-zheng/autobyteus-org/repository_prisma/.worktrees/explicit-datasource-strict-wal-readiness`
-- Worktree cleanup result: `Pending repository finalization`
-- Worktree prune result: `Pending repository finalization`
-- Local ticket branch cleanup result: `Pending repository finalization`
-- Remote branch cleanup result: `Not required unless the ticket branch is later pushed and repository policy/user direction calls for removal`
+- Worktree cleanup result: `Completed`
+- Worktree prune result: `Completed`
+- Local ticket branch cleanup result: `Completed`
+- Remote branch cleanup result: `Completed`
 - Blocker (if applicable): `N/A`
 
 ## Escalation / Reroute (Use Only If Final Handoff Cannot Complete)
 
 - Classification: `N/A`
 - Recommended recipient: `N/A`
-- Why final handoff could not complete: `N/A — the candidate is ready for the required user-verification hold.`
+- Why final handoff could not complete: `N/A — finalization and release completed successfully.`
 
 ## Release Notes Summary
 
@@ -99,7 +99,7 @@ The package already carries source version `1.0.7`, while npm `latest` and the n
 
 ## Deployment Steps
 
-Push annotated tag `v1.0.7` after repository finalization, monitor the GitHub Actions `Release` workflow, and verify npm `latest` resolves to `1.0.7`. There is no separate runtime deployment.
+Pushed annotated tag `v1.0.7` at `f825e51d465d8a50a2f49b64993ce0c1bdd4b0f5`, monitored GitHub Actions Release run `29234052396` to success, and verified npm `latest` plus the published tarball metadata resolve to `1.0.7`. There is no separate runtime deployment.
 
 ## Environment Or Persisted-Data Transition Notes
 
@@ -121,11 +121,15 @@ Push annotated tag `v1.0.7` after repository finalization, monitor the GitHub Ac
 - Post-verification `npm test` — 62/62 passed after ticket archival (`evidence/finalization-npm-test.log`).
 - Post-verification `npm run typecheck` — passed after ticket archival (`evidence/finalization-typecheck.log`).
 - Post-verification `npm run test:package` — fresh CJS/ESM/declaration build plus packed installed-consumer/live SQLite smoke passed after ticket archival (`evidence/finalization-package-smoke.log`).
+- Main CI run `29234034424` — passed at merge commit `f825e51d465d8a50a2f49b64993ce0c1bdd4b0f5`.
+- Release workflow run `29234052396` — build and `npm publish --provenance --access public` passed at annotated tag `v1.0.7`.
+- npm registry verification — `repository_prisma@1.0.7` exists, `latest` is `1.0.7`, and the published integrity is `sha512-TDp7vpicJl/TKTZH3Q31ApSJOI+enm1JakZoDqehNnMmJvtBCcSiZtIdzBRJNQ4IJipoPAG1UQxcWj2OTrtSzw==`.
+- Release/publication and cleanup evidence: `evidence/release-publication.log`.
 
 ## Rollback Criteria
 
-No remote repository or release state has changed, so rollback is currently limited to retaining or revising the local ticket worktree. If user verification fails, do not finalize; route the specific issue to its owning specialist while preserving evidence. Any future finalized merge should be reverted if datasource binding, SQLite identity/WAL readiness, safe failure, or lifecycle forwarding regresses; no database migration rollback is applicable.
+Remote repository and npm release state are now live. If datasource binding, SQLite identity/WAL readiness, safe failure, or lifecycle forwarding regresses, revert the merge on `main`, deprecate `repository_prisma@1.0.7` if warranted, direct consumers back to `1.0.6`, and publish a corrected new patch version rather than moving or reusing tag `v1.0.7`. No database migration rollback is applicable.
 
 ## Final Status
 
-`User verified; repository finalization and the authorized v1.0.7 release are in progress.`
+`Completed — repository finalized, v1.0.7 published, registry and CI verified, and ticket worktree/branches cleaned up.`

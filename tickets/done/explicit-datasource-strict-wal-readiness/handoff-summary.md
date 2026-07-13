@@ -2,13 +2,13 @@
 
 ## Status
 
-`User verified; finalization and release authorized` on 2026-07-13.
+`Finalized and released` on 2026-07-13.
 
 ## Candidate
 
-- Worktree: `/Users/ryan-zheng/autobyteus-org/repository_prisma/.worktrees/explicit-datasource-strict-wal-readiness`
-- Ticket branch: `codex/explicit-datasource-strict-wal-readiness`
-- Finalization target: `origin/main` / local `main`
+- Former worktree: `/Users/ryan-zheng/autobyteus-org/repository_prisma/.worktrees/explicit-datasource-strict-wal-readiness` (removed after finalization)
+- Former ticket branch: `codex/explicit-datasource-strict-wal-readiness` (local and remote refs removed after merge)
+- Finalization target: `origin/main` / local `main` at merge commit `f825e51d465d8a50a2f49b64993ce0c1bdd4b0f5`
 - Bootstrap base: `origin/main@cc58bca56f561f828d7afc16b7892cc9231c5030`
 - Latest tracked base checked: `origin/main@cc58bca56f561f828d7afc16b7892cc9231c5030`
 - Integration method: `Already current`; fetch and merge-base checks confirmed that no new base commits required integration.
@@ -51,6 +51,9 @@
 
 - Explicit verification and release authorization: user message on 2026-07-13 — `task done. finalize and release.`
 - The mandatory post-verification `git fetch --prune origin` confirmed that `origin/main` remains `cc58bca56f561f828d7afc16b7892cc9231c5030`; the verified candidate did not require re-integration or renewed verification.
-- Release target: `repository_prisma@1.0.7` via annotated tag `v1.0.7`, following README's tag-based GitHub Actions publication flow.
+- Ticket commit: `f54acef62a5e2cce34d5c8f14ddf603078e7f0c1`; pushed before merge and removed from remote after safe cleanup.
+- Main merge: `f825e51d465d8a50a2f49b64993ce0c1bdd4b0f5`; pushed to `origin/main`.
+- Release: annotated tag `v1.0.7` points to the merge commit; the GitHub Actions release run succeeded and npm `latest` is `repository_prisma@1.0.7`.
+- Release workflow: `https://github.com/ryan-zheng-teki/repository_prisma/actions/runs/29234052396`.
 - Release notes: `tickets/done/explicit-datasource-strict-wal-readiness/release-notes.md` after archival.
 - Schema, migration, destructive SQL, dependency, and consumer-data operations remain unauthorized and unnecessary.

@@ -1,0 +1,43 @@
+Release publication evidence — 2026-07-13
+
+$ git rev-parse main origin/main v1.0.7^{}
+f825e51d465d8a50a2f49b64993ce0c1bdd4b0f5
+f825e51d465d8a50a2f49b64993ce0c1bdd4b0f5
+f825e51d465d8a50a2f49b64993ce0c1bdd4b0f5
+
+$ git ls-remote origin refs/heads/main refs/tags/v1.0.7 refs/tags/v1.0.7^{}
+f825e51d465d8a50a2f49b64993ce0c1bdd4b0f5	refs/heads/main
+bde4fc17aad3c3a4151bd02c5b5aaea68b2878d7	refs/tags/v1.0.7
+f825e51d465d8a50a2f49b64993ce0c1bdd4b0f5	refs/tags/v1.0.7^{}
+
+$ gh run view 29234052396 --json databaseId,headBranch,headSha,status,conclusion,url,jobs
+{"conclusion":"success","databaseId":29234052396,"headBranch":"v1.0.7","headSha":"f825e51d465d8a50a2f49b64993ce0c1bdd4b0f5","jobs":[{"completedAt":"2026-07-13T08:03:26Z","conclusion":"success","databaseId":86764527653,"name":"publish","startedAt":"2026-07-13T08:02:57Z","status":"completed","steps":[{"completedAt":"2026-07-13T08:02:59Z","conclusion":"success","name":"Set up job","number":1,"startedAt":"2026-07-13T08:02:58Z","status":"completed"},{"completedAt":"2026-07-13T08:03:00Z","conclusion":"success","name":"Run actions/checkout@v4","number":2,"startedAt":"2026-07-13T08:02:59Z","status":"completed"},{"completedAt":"2026-07-13T08:03:04Z","conclusion":"success","name":"Run actions/setup-node@v4","number":3,"startedAt":"2026-07-13T08:03:00Z","status":"completed"},{"completedAt":"2026-07-13T08:03:08Z","conclusion":"success","name":"Ensure npm >= 11.5.1","number":4,"startedAt":"2026-07-13T08:03:04Z","status":"completed"},{"completedAt":"2026-07-13T08:03:12Z","conclusion":"success","name":"Run npm ci","number":5,"startedAt":"2026-07-13T08:03:08Z","status":"completed"},{"completedAt":"2026-07-13T08:03:15Z","conclusion":"success","name":"Run npm run build","number":6,"startedAt":"2026-07-13T08:03:12Z","status":"completed"},{"completedAt":"2026-07-13T08:03:22Z","conclusion":"success","name":"Run npm publish --provenance --access public","number":7,"startedAt":"2026-07-13T08:03:15Z","status":"completed"},{"completedAt":"2026-07-13T08:03:22Z","conclusion":"success","name":"Post Run actions/setup-node@v4","number":13,"startedAt":"2026-07-13T08:03:22Z","status":"completed"},{"completedAt":"2026-07-13T08:03:23Z","conclusion":"success","name":"Post Run actions/checkout@v4","number":14,"startedAt":"2026-07-13T08:03:22Z","status":"completed"},{"completedAt":"2026-07-13T08:03:23Z","conclusion":"success","name":"Complete job","number":15,"startedAt":"2026-07-13T08:03:23Z","status":"completed"}],"url":"https://github.com/ryan-zheng-teki/repository_prisma/actions/runs/29234052396/job/86764527653"}],"status":"completed","url":"https://github.com/ryan-zheng-teki/repository_prisma/actions/runs/29234052396"}
+
+$ gh run view 29234034424 --json databaseId,headBranch,headSha,status,conclusion,url
+{"conclusion":"success","databaseId":29234034424,"headBranch":"main","headSha":"f825e51d465d8a50a2f49b64993ce0c1bdd4b0f5","status":"completed","url":"https://github.com/ryan-zheng-teki/repository_prisma/actions/runs/29234034424"}
+
+$ npm view repository_prisma version dist-tags --json
+{
+  "version": "1.0.7",
+  "dist-tags": {
+    "latest": "1.0.7"
+  }
+}
+
+$ npm view repository_prisma@1.0.7 name version dist.integrity dist.tarball --json
+{
+  "name": "repository_prisma",
+  "version": "1.0.7",
+  "dist.integrity": "sha512-TDp7vpicJl/TKTZH3Q31ApSJOI+enm1JakZoDqehNnMmJvtBCcSiZtIdzBRJNQ4IJipoPAG1UQxcWj2OTrtSzw==",
+  "dist.tarball": "https://registry.npmjs.org/repository_prisma/-/repository_prisma-1.0.7.tgz"
+}
+
+$ git worktree list --porcelain
+worktree /Users/ryan-zheng/autobyteus-org/repository_prisma
+HEAD f825e51d465d8a50a2f49b64993ce0c1bdd4b0f5
+branch refs/heads/main
+
+$ local and remote ticket branch checks
+PASS: local ticket branch removed
+PASS: remote ticket branch removed
+PASS: ticket worktree removed
