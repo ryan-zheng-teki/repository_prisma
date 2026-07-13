@@ -1,0 +1,8 @@
+$ git diff --cached --check
+PASS: the complete staged implementation, documentation, archived ticket package, release notes, and evidence diff has no whitespace errors.
+
+$ verify delivery artifact final newlines
+PASS: tickets/done/explicit-datasource-strict-wal-readiness/docs-sync-report.md
+PASS: tickets/done/explicit-datasource-strict-wal-readiness/handoff-summary.md
+PASS: tickets/done/explicit-datasource-strict-wal-readiness/release-deployment-report.md
+PASS: tickets/done/explicit-datasource-strict-wal-readiness/release-notes.md

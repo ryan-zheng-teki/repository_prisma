@@ -1,0 +1,59 @@
+
+ RUN  v4.0.18 /Users/ryan-zheng/autobyteus-org/repository_prisma/.worktrees/explicit-datasource-strict-wal-readiness
+
+ ✓ src/tests/forwarding-proxy.test.ts (3 tests) 7ms
+ ✓ src/tests/database-filter.test.ts (11 tests) 8ms
+ ❯ src/tests/datasource-readiness.test.ts (18 tests | 1 failed) 35ms
+     × preserves physical SQLite spelling and query parameters while resolving against cwd 14ms
+     ✓ classifies file::memory: as SQLite memory 1ms
+     ✓ classifies file:?mode=memory&cache=shared as SQLite memory 0ms
+     ✓ classifies file:shared?mode=MEMORY as SQLite memory 0ms
+     ✓ classifies non-SQLite targets without issuing or inventing physical identity 0ms
+     ✓ case-folds Windows drive and UNC binding paths while preserving Prisma client spelling 7ms
+     ✓ accepts a symlink alias when expected and reported paths resolve to the same file 7ms
+     ✓ rejects a non-array database_list response 1ms
+     ✓ rejects a missing main database_list response 0ms
+     ✓ rejects a multiple main rows database_list response 0ms
+     ✓ rejects a missing main file database_list response 0ms
+     ✓ uses separate activation and case-insensitive verification queries 0ms
+     ✓ rejects a non-array journal-mode verification response 0ms
+     ✓ rejects a zero rows journal-mode verification response 0ms
+     ✓ rejects a multiple rows journal-mode verification response 0ms
+     ✓ rejects a multiple fields journal-mode verification response 0ms
+     ✓ rejects a non-string journal-mode verification response 0ms
+     ✓ rejects a non-WAL journal-mode verification response 0ms
+ ✓ src/tests/client-lifecycle.test.ts (10 tests) 33ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/tests/datasource-readiness.test.ts > datasource target normalization > preserves physical SQLite spelling and query parameters while resolving against cwd
+AssertionError: expected { kind: 'sqlite-file', …(3) } to deeply equal { kind: 'sqlite-file', …(3) }
+
+- Expected
++ Received
+
+  {
+-   "bindingKey": "file:/var/folders/_r/s63mv8pd2p59y0vtl6p796200000gn/T/repository-prisma-target-I9Djgf/nested/literal%20 space.db?connection_limit=1",
+-   "clientUrl": "file:/var/folders/_r/s63mv8pd2p59y0vtl6p796200000gn/T/repository-prisma-target-I9Djgf/nested/literal%20 space.db?connection_limit=1",
+-   "expectedPath": "/var/folders/_r/s63mv8pd2p59y0vtl6p796200000gn/T/repository-prisma-target-I9Djgf/nested/literal%20 space.db",
++   "bindingKey": "file:/private/var/folders/_r/s63mv8pd2p59y0vtl6p796200000gn/T/repository-prisma-target-I9Djgf/nested/literal%20 space.db?connection_limit=1",
++   "clientUrl": "file:/private/var/folders/_r/s63mv8pd2p59y0vtl6p796200000gn/T/repository-prisma-target-I9Djgf/nested/literal%20 space.db?connection_limit=1",
++   "expectedPath": "/private/var/folders/_r/s63mv8pd2p59y0vtl6p796200000gn/T/repository-prisma-target-I9Djgf/nested/literal%20 space.db",
+    "kind": "sqlite-file",
+  }
+
+ ❯ src/tests/datasource-readiness.test.ts:39:20
+     37|     );
+     38|
+     39|     expect(target).toEqual({
+       |                    ^
+     40|       kind: 'sqlite-file',
+     41|       clientUrl: `file:${path.join(directory, 'nested/literal%20 space…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  1 failed | 41 passed (42)
+   Start at  09:02:54
+   Duration  522ms (transform 728ms, setup 0ms, import 869ms, tests 83ms, environment 1ms)

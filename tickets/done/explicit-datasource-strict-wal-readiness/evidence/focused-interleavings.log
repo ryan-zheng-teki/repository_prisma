@@ -1,0 +1,10 @@
+
+ RUN  v4.0.18 /Users/ryan-zheng/autobyteus-org/repository_prisma/.worktrees/explicit-datasource-strict-wal-readiness
+
+ ✓ src/tests/datasource-readiness.test.ts (18 tests) 29ms
+ ✓ src/tests/client-lifecycle.test.ts (13 tests) 194ms
+
+ Test Files  2 passed (2)
+      Tests  31 passed (31)
+   Start at  09:07:51
+   Duration  620ms (transform 308ms, setup 0ms, import 393ms, tests 223ms, environment 0ms)
