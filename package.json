@@ -1,6 +1,6 @@
 {
   "name": "repository_prisma",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "",
   "repository": {
     "type": "git",
@@ -31,13 +31,13 @@
   "files": [
     "dist",
     "README.md",
-    "DESIGN.md"
+    "DESIGN.md",
+    "CHANGELOG.md"
   ],
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "dotenv": "^17.2.3",
     "uuid": "^13.0.0"
   },
   "peerDependencies": {

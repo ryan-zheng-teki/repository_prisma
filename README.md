@@ -88,6 +88,27 @@ await initializePrisma({
 });
 ```
 
+Package imports do not load `.env` files or mutate `process.env`. Applications and
+command invocations must preload or provide their environment explicitly before
+initialization; importing the package does not require a datasource.
+
+Query logging is off by default. To temporarily enable Prisma query logs, either set
+`PRISMA_LOG_QUERIES` to `1`, `true`, `yes`, or `on` (case-insensitive, with surrounding
+whitespace ignored), or pass the typed option:
+
+```typescript
+await initializePrisma({
+  datasourceUrl: 'file:./runtime/app.db',
+  logQueries: true,
+});
+```
+
+The typed `logQueries` option takes precedence over `PRISMA_LOG_QUERIES`; `false` is an
+explicit opt-out. Query logs can contain SQL text and sensitive values, so enable them
+only temporarily and use the application's appropriate redaction and retention controls.
+When a root client was created lazily, a later differing typed policy is rejected with
+`LOGGING_POLICY_CONFLICT`; call and await `shutdownPrisma()` before rebinding a new policy.
+
 `datasourceUrl` is optional. A non-empty explicit value wins. Otherwise the library selects one
 environment value in this order:
 
@@ -147,6 +168,7 @@ Available codes are:
 - `WAL_UNSUPPORTED_PROVIDER`
 - `WAL_ACTIVATION_FAILED`
 - `WAL_VERIFICATION_FAILED`
+- `LOGGING_POLICY_CONFLICT`
 - `CLIENT_NOT_READY`
 
 The library does not print caught initialization causes. `onDiagnostic` is the only opt-in raw-cause
@@ -154,6 +176,9 @@ channel in this API, and callback failures do not replace the stable initializat
 readiness attempt blocks root/repository access until a corrected explicit initialization succeeds
 or `shutdownPrisma()` clears the lifecycle. Initializing a different target while one is bound
 rejects with `DATASOURCE_CONFLICT`; call and await `shutdownPrisma()` before rebinding.
+
+This behavior-only release does not change the Prisma schema, migrations, or persisted
+data, so no data migration is required.
 
 ## Advanced: Root Client Access (Use Carefully)
 
@@ -208,7 +233,7 @@ to override auto-detection (which uses `DATABASE_URL`).
 
 ## Testing
 
-Install dependencies first (`pnpm install` or `npm install`). Then `npm test` automatically syncs the Prisma schema to a dedicated SQLite file (`test.db`)
+Install dependencies first (`npm install`). Then `npm test` automatically syncs the Prisma schema to a dedicated SQLite file (`test.db`)
 and runs `prisma generate` to ensure the correct client is used for this repo.
 You can override it by setting `DATABASE_URL_TEST`. If you set a SQLite file URL, prefer an absolute path
 (`file:/...`). On macOS, Prisma's schema engine can fail on relative `file:./...` URLs, while Linux often accepts them.
@@ -216,17 +241,19 @@ The test script normalizes relative `file:` URLs to absolute paths for cross-pla
 
 ## Release (Tag-Based)
 
-We use a tag-based release flow. Create a version tag and push it:
+We use a tag-based release flow. For this already-versioned 1.0.8 release, do not run
+`npm version patch`, because it would advance the package to 1.0.9. Create and push the
+explicit release tag instead:
 
 ```bash
-npm version patch -m "1.0.6"   # or minor/major
+git tag -a v1.0.8 -m "1.0.8"
 git push origin main --follow-tags
 ```
 
-If you prefer to tag manually (or via a Git UI), create an annotated tag:
+If you prefer to tag manually via a Git UI, create the same annotated `v1.0.8` tag and
+push it with the repository's normal tag workflow:
 
 ```bash
-git tag -a v1.0.6 -m "1.0.6"
 git push origin main --tags
 ```
 

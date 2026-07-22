@@ -6,6 +6,7 @@ export type PrismaInitializationErrorCode =
   | 'WAL_UNSUPPORTED_PROVIDER'
   | 'WAL_ACTIVATION_FAILED'
   | 'WAL_VERIFICATION_FAILED'
+  | 'LOGGING_POLICY_CONFLICT'
   | 'CLIENT_NOT_READY';
 
 export type PrismaInitializationDiagnostic = {
@@ -20,6 +21,7 @@ export type PrismaInitializationDiagnosticListener = (
 export type InitializePrismaOptions = {
   datasourceUrl?: string;
   enableWAL?: boolean;
+  logQueries?: boolean;
   onDiagnostic?: PrismaInitializationDiagnosticListener;
 };
 
@@ -31,6 +33,8 @@ const SAFE_ERROR_MESSAGES: Record<PrismaInitializationErrorCode, string> = {
   WAL_UNSUPPORTED_PROVIDER: 'Strict WAL readiness requires a physical SQLite datasource.',
   WAL_ACTIVATION_FAILED: 'SQLite WAL mode could not be activated.',
   WAL_VERIFICATION_FAILED: 'SQLite WAL mode could not be verified.',
+  LOGGING_POLICY_CONFLICT:
+    'The requested query logging policy differs from the bound Prisma client.',
   CLIENT_NOT_READY: 'The Prisma client is not ready for operations.',
 };
 

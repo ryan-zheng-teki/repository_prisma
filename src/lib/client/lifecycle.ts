@@ -14,17 +14,20 @@ import {
   verifySqliteIdentity,
   verifySqliteWal,
 } from './sqlite-readiness';
+import { queryLogLevels, resolveQueryLoggingPolicy } from './logging-policy';
 
 type IdleState = { kind: 'idle' };
 type LazyBoundState = {
   kind: 'lazy-bound';
   target: ResolvedDatasourceTarget;
   client: PrismaClient;
+  logQueries: boolean;
 };
 type InitializingState = {
   kind: 'initializing';
   target: ResolvedDatasourceTarget;
   client: PrismaClient;
+  logQueries: boolean;
   enableWAL: boolean;
   diagnosticListeners: Set<PrismaInitializationDiagnosticListener>;
   task: Promise<void>;
@@ -35,6 +38,7 @@ type ReadyState = {
   kind: 'ready';
   target: ResolvedDatasourceTarget;
   client: PrismaClient;
+  logQueries: boolean;
   walReady: boolean;
 };
 type FailedState = { kind: 'failed' };
@@ -52,12 +56,15 @@ type LifecycleState =
   | FailedState
   | ShuttingDownState;
 
-export type PrismaClientFactory = (target: ResolvedDatasourceTarget) => PrismaClient;
+export type PrismaClientFactory = (
+  target: ResolvedDatasourceTarget,
+  logQueries: boolean
+) => PrismaClient;
 
-const defaultClientFactory: PrismaClientFactory = (target) =>
+const defaultClientFactory: PrismaClientFactory = (target, logQueries) =>
   new PrismaClient({
     datasourceUrl: target.clientUrl,
-    log: ['query', 'info', 'warn'],
+    log: queryLogLevels(logQueries),
   });
 
 const failureFrom = (
@@ -113,14 +120,23 @@ export class PrismaClientLifecycle {
     switch (this.state.kind) {
       case 'idle':
       case 'failed':
-        return this.initializeNewClient(target, enableWAL, options.onDiagnostic);
+        return this.initializeNewClient(
+          target,
+          enableWAL,
+          resolveQueryLoggingPolicy(options.logQueries),
+          options.onDiagnostic
+        );
       case 'lazy-bound':
         if (!this.hasSameTarget(this.state.target, target)) {
           return this.rejectConflict(options.onDiagnostic);
         }
+        if (this.hasLoggingPolicyConflict(this.state.logQueries, options.logQueries)) {
+          return this.rejectLoggingPolicyConflict(options.onDiagnostic);
+        }
         return this.startInitialization(
           target,
           this.state.client,
+          this.state.logQueries,
           enableWAL,
           false,
           options.onDiagnostic
@@ -129,12 +145,16 @@ export class PrismaClientLifecycle {
         if (!this.hasSameTarget(this.state.target, target)) {
           return this.rejectConflict(options.onDiagnostic);
         }
+        if (this.hasLoggingPolicyConflict(this.state.logQueries, options.logQueries)) {
+          return this.rejectLoggingPolicyConflict(options.onDiagnostic);
+        }
         if (!enableWAL || this.state.walReady) {
           return Promise.resolve();
         }
         return this.startInitialization(
           target,
           this.state.client,
+          this.state.logQueries,
           true,
           this.state.walReady,
           options.onDiagnostic
@@ -149,6 +169,9 @@ export class PrismaClientLifecycle {
         }
         if (!this.hasSameTarget(this.state.target, target)) {
           return this.rejectConflict(options.onDiagnostic);
+        }
+        if (this.hasLoggingPolicyConflict(this.state.logQueries, options.logQueries)) {
+          return this.rejectLoggingPolicyConflict(options.onDiagnostic);
         }
         if (this.state.enableWAL !== enableWAL) {
           return this.rejectRequest(
@@ -192,8 +215,9 @@ export class PrismaClientLifecycle {
     }
 
     try {
-      const client = this.clientFactory(target);
-      this.state = { kind: 'lazy-bound', target, client };
+      const logQueries = resolveQueryLoggingPolicy();
+      const client = this.clientFactory(target, logQueries);
+      this.state = { kind: 'lazy-bound', target, client, logQueries };
       return client;
     } catch {
       this.state = { kind: 'failed' };
@@ -204,21 +228,23 @@ export class PrismaClientLifecycle {
   private initializeNewClient(
     target: ResolvedDatasourceTarget,
     enableWAL: boolean,
+    logQueries: boolean,
     listener?: PrismaInitializationDiagnosticListener
   ): Promise<void> {
     let client: PrismaClient;
     try {
-      client = this.clientFactory(target);
+      client = this.clientFactory(target, logQueries);
     } catch (cause) {
       this.state = { kind: 'failed' };
       return this.rejectRequest('CONNECTION_FAILED', cause, listener);
     }
-    return this.startInitialization(target, client, enableWAL, false, listener);
+    return this.startInitialization(target, client, logQueries, enableWAL, false, listener);
   }
 
   private startInitialization(
     target: ResolvedDatasourceTarget,
     client: PrismaClient,
+    logQueries: boolean,
     enableWAL: boolean,
     previousWalReady: boolean,
     listener?: PrismaInitializationDiagnosticListener
@@ -236,6 +262,7 @@ export class PrismaClientLifecycle {
       kind: 'initializing',
       target,
       client,
+      logQueries,
       enableWAL,
       diagnosticListeners,
       task,
@@ -295,6 +322,7 @@ export class PrismaClientLifecycle {
         kind: 'ready',
         target: request.target,
         client: request.client,
+        logQueries: request.logQueries,
         walReady: previousWalReady || request.enableWAL,
       };
     } catch (error) {
@@ -368,12 +396,29 @@ export class PrismaClientLifecycle {
     return current.bindingKey === requested.bindingKey;
   }
 
+  private hasLoggingPolicyConflict(
+    current: boolean,
+    requested: boolean | undefined
+  ): boolean {
+    return requested !== undefined && requested !== current;
+  }
+
   private rejectConflict(
     listener?: PrismaInitializationDiagnosticListener
   ): Promise<void> {
     return this.rejectRequest(
       'DATASOURCE_CONFLICT',
       new Error('The requested datasource differs from the bound datasource.'),
+      listener
+    );
+  }
+
+  private rejectLoggingPolicyConflict(
+    listener?: PrismaInitializationDiagnosticListener
+  ): Promise<void> {
+    return this.rejectRequest(
+      'LOGGING_POLICY_CONFLICT',
+      new Error('The requested query logging policy differs from the bound client.'),
       listener
     );
   }
