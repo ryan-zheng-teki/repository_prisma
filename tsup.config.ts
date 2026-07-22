@@ -8,5 +8,5 @@ export default defineConfig({
   clean: true,
   target: 'es2018',
   platform: 'node',
-  external: ['@prisma/client', 'dotenv', 'uuid'],
+  external: ['@prisma/client', 'uuid'],
 });

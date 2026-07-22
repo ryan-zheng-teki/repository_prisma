@@ -72,6 +72,13 @@ root-client and lifecycle owner.
 
 - Resolve one explicit datasource target and pass it through `PrismaClient({ datasourceUrl })`.
 - Construct and disconnect the raw root client only inside the lifecycle owner.
+- Resolve query logging at construction through `src/lib/client/logging-policy.ts`.
+  The default levels are `info`, `warn`, and `error`; `query` is appended only when
+  `PRISMA_LOG_QUERIES` is explicitly truthy or `initializePrisma({ logQueries: true })`
+  is supplied. The typed option takes precedence over the environment flag.
+- Capture the effective logging policy in every lifecycle state carrying the raw root
+  client. A differing later typed policy rejects with `LOGGING_POLICY_CONFLICT` until
+  `shutdownPrisma()` establishes a new binding boundary.
 - Track lifecycle state as one discriminated union: `Idle`, `LazyBound`, `Initializing`, `Ready`,
   `Failed`, or `ShuttingDown`.
 - Keep a candidate private until connection and required SQLite checks pass.
@@ -88,6 +95,12 @@ The related internal files remain subordinate to this owner:
   journal-mode verification. It cannot publish or disconnect a client.
 - `client/initialization-error.ts` owns safe stable codes/messages and guarded opt-in diagnostics. It
   does not log raw causes.
+
+The package facade and Prisma CLI configuration do not import `dotenv/config` or load
+`.env` files. Applications, scripts, and CI own environment provisioning; the library
+reads already-present values only when resolving a datasource or constructing a client.
+This behavior-only hardening changes no schema, migration, or persisted-data
+representation, so existing consumer databases are directly usable without migration.
 
 ### F. `src/lib/forwarding-proxy.ts` and `src/lib/prisma-proxy.ts` (Access Routing)
 

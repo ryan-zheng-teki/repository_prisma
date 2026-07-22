@@ -1,5 +1,4 @@
 import type { PrismaClient } from '@prisma/client';
-import 'dotenv/config';
 import { createForwardingPrismaProxy } from './forwarding-proxy';
 import { PrismaClientLifecycle } from './client/lifecycle';
 import type { InitializePrismaOptions } from './client/initialization-error';
