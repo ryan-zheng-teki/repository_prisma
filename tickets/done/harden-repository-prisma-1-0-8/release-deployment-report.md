@@ -62,7 +62,7 @@ Package metadata is `1.0.8`. No version bump was needed. Release merge commit: `
 - Target advanced after user verification: `No` — the finalization refresh still resolved to the bootstrap `origin/main` revision before merge.
 - Delivery-owned edits protected before re-integration: `Completed` — archived delivery commit `495f242`.
 - Re-integration before final merge result: `Completed` — merge commit `2dd4c2a`.
-- Target branch update result: `Completed` — `origin/main@2dd4c2a264c188954019108feafd896915c27371`.
+- Target branch update result: `Completed` — final `origin/main@821f1b2` includes the release evidence record; release code is tagged at `2dd4c2a264c188954019108feafd896915c27371`.
 - Merge into target result: `Completed` — `codex/harden-repository-prisma-1-0-8` merged into `main`.
 - Push target branch result: `Completed` — `main` pushed to `origin`.
 - Repository finalization status: `Completed`.
@@ -80,10 +80,10 @@ Package metadata is `1.0.8`. No version bump was needed. Release merge commit: `
 ## Post-Finalization Cleanup
 
 - Dedicated ticket worktree path: `/Users/normy/autobyteus_org/repository_prisma-1-0-8`
-- Worktree cleanup result: `Pending` — scheduled after the final evidence commit is integrated.
-- Worktree prune result: `Pending` — scheduled after the final evidence commit is integrated.
-- Local ticket branch cleanup result: `Pending` — scheduled after the final evidence commit is integrated.
-- Remote branch cleanup result: `Pending` — scheduled after the final evidence commit is integrated.
+- Worktree cleanup result: `Completed` — `/Users/normy/autobyteus_org/repository_prisma-1-0-8` removed after finalization.
+- Worktree prune result: `Completed`.
+- Local ticket branch cleanup result: `Completed` — `codex/harden-repository-prisma-1-0-8` deleted after merge.
+- Remote branch cleanup result: `Completed` — `origin/codex/harden-repository-prisma-1-0-8` deleted after merge.
 - Blocker (if applicable): None.
 
 ## Escalation / Reroute (Use Only If Final Handoff Cannot Complete)
@@ -129,4 +129,4 @@ Rollback criteria: a critical regression in the finalized package or published a
 
 ## Final Status
 
-`Finalized and released: main updated, v1.0.8 tag pushed, and npm registry publication verified; cleanup remains to be recorded after execution.`
+`Finalized and released: main updated, v1.0.8 tag pushed, npm registry publication verified, and ticket cleanup completed.`

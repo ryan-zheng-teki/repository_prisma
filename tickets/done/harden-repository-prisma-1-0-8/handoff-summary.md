@@ -37,6 +37,7 @@
 - Release notes: `release-notes.md` prepared before verification hold.
 - README, DESIGN, and CHANGELOG are aligned with the reviewed implementation.
 - Release/tag/publication/provenance/deployment were authorized and completed through the documented tag workflow; registry verification confirmed `repository_prisma@1.0.8`.
+- Dedicated ticket worktree and local/remote ticket branches were cleaned up after finalization.
 
 ## Verification Hold
 
