@@ -62,7 +62,7 @@ Package metadata is `1.0.8`. No version bump was needed. Release merge commit: `
 - Target advanced after user verification: `No` — the finalization refresh still resolved to the bootstrap `origin/main` revision before merge.
 - Delivery-owned edits protected before re-integration: `Completed` — archived delivery commit `495f242`.
 - Re-integration before final merge result: `Completed` — merge commit `2dd4c2a`.
-- Target branch update result: `Completed` — final `origin/main@821f1b2` includes the release evidence record; release code is tagged at `2dd4c2a264c188954019108feafd896915c27371`.
+- Target branch update result: `Completed` — `main` finalized at release merge `2dd4c2a264c188954019108feafd896915c27371`; subsequent release-evidence and cleanup records were pushed to `origin/main`.
 - Merge into target result: `Completed` — `codex/harden-repository-prisma-1-0-8` merged into `main`.
 - Push target branch result: `Completed` — `main` pushed to `origin`.
 - Repository finalization status: `Completed`.
