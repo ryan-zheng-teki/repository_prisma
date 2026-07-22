@@ -2,14 +2,14 @@
 
 ## Execution Round Meta
 
-- Requirements Doc: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/requirements.md`
-- Investigation Notes: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/investigation-notes.md`
-- Design Spec: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/design-spec.md`
+- Requirements Doc: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/requirements.md`
+- Investigation Notes: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/investigation-notes.md`
+- Design Spec: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/design-spec.md`
 - Supplemental Task Artifacts: None
-- Design Review Report: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/design-review-report.md`
-- Implementation Handoff: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/implementation-handoff.md`
-- Code Review Report: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/code-review-report.md`
-- Coverage Investigation: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/api-e2e-coverage-investigation.md`
+- Design Review Report: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/design-review-report.md`
+- Implementation Handoff: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/implementation-handoff.md`
+- Code Review Report: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/code-review-report.md`
+- Coverage Investigation: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/api-e2e-coverage-investigation.md`
 - Current Execution Round: 1
 - Trigger: Implementation-source review Round 2 passed; packed/API/E2E execution opened.
 - Prior Round Reviewed: None — downstream entry point.
@@ -23,7 +23,7 @@
 
 ## Investigation And Execution Basis
 
-- Coverage investigation artifact: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/api-e2e-coverage-investigation.md`
+- Coverage investigation artifact: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/api-e2e-coverage-investigation.md`
 - Investigation completed before durable coverage changes or final execution: `Yes`
 - Investigation plan followed: `Yes` — the prepared package harness was extended only for missing packed logging, inherited-environment, declaration, and safe-output assertions; source regressions and existing real SQLite smoke were retained.
 - Existing coverage decisions revised during execution, with evidence: The package smoke harness was `Needs Update` before execution and is now `Updated`/`Pass`; no stale coverage was removed.

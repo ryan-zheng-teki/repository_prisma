@@ -2,13 +2,13 @@
 
 ## Investigation Meta
 
-- Requirements Doc: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/requirements.md`
-- Investigation Notes: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/investigation-notes.md`
-- Design Spec: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/design-spec.md`
+- Requirements Doc: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/requirements.md`
+- Investigation Notes: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/investigation-notes.md`
+- Design Spec: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/design-spec.md`
 - Supplemental Task Artifacts: None
-- Design Review Report: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/design-review-report.md`
-- Implementation Handoff: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/implementation-handoff.md`
-- Code Review Report: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/code-review-report.md`
+- Design Review Report: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/design-review-report.md`
+- Implementation Handoff: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/implementation-handoff.md`
+- Code Review Report: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/code-review-report.md`
 - Current Investigation Round: 1
 - Trigger: Code-reviewer implementation-source review Round 2 passed; API/E2E stage opened.
 - Prior Investigation Reviewed: None — downstream entry point.

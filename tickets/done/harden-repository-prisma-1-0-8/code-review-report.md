@@ -3,16 +3,16 @@
 ## Review Round Meta
 
 - Review Entry Point: `Implementation Review`
-- Requirements Doc Reviewed As Context: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/requirements.md`
+- Requirements Doc Reviewed As Context: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/requirements.md`
 - Supplemental Task Artifacts Reviewed As Context: `None`
 - Current Review Round: `2`
 - Trigger: Local-fix handoff from `implementation_engineer` resolving CR-001
 - Prior Review Round Reviewed: `1`
 - Latest Authoritative Round: `2`
-- Investigation Notes Reviewed As Context: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/investigation-notes.md`
-- Design Spec Reviewed As Context: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/design-spec.md`
-- Design Review Report Reviewed As Context: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/design-review-report.md`
-- Implementation Handoff Reviewed As Context: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/implementation-handoff.md`
+- Investigation Notes Reviewed As Context: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/investigation-notes.md`
+- Design Spec Reviewed As Context: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/design-spec.md`
+- Design Review Report Reviewed As Context: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/design-review-report.md`
+- Implementation Handoff Reviewed As Context: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/implementation-handoff.md`
 - Coverage Investigation Reviewed: `N/A — downstream entry point`
 - Execution Coverage Report Reviewed: `N/A — downstream entry point`
 - Failing Scenario IDs: `N/A`
