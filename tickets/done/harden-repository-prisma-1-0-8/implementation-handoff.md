@@ -2,11 +2,11 @@
 
 ## Upstream Artifact Package
 
-- Requirements doc: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/requirements.md`
-- Investigation notes: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/investigation-notes.md`
-- Design spec: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/design-spec.md`
+- Requirements doc: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/requirements.md`
+- Investigation notes: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/investigation-notes.md`
+- Design spec: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/design-spec.md`
 - Supplemental task artifacts: None.
-- Design review report: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/design-review-report.md`
+- Design review report: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/design-review-report.md`
 
 ## What Changed
 
@@ -20,7 +20,7 @@
 
 ### Local Fix After Implementation Review
 
-- Resolved `CR-001` from `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/code-review-report.md`.
+- Resolved `CR-001` from `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/code-review-report.md`.
 - Corrected the README release guide so the already-bumped `1.0.8` package is tagged explicitly as `v1.0.8`; it no longer suggests `npm version patch`, which would incorrectly advance metadata to `1.0.9`.
 - No release, tag, or publication command was performed.
 

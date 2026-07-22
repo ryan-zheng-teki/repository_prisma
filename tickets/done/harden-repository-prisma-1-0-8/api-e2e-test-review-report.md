@@ -4,11 +4,11 @@
 
 - Review Round: `1`
 - Trigger: Successful API/E2E execution handoff from `api_e2e_engineer`
-- Requirements Doc Reviewed As Context: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/requirements.md`
+- Requirements Doc Reviewed As Context: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/requirements.md`
 - Supplemental Task Artifacts Reviewed As Context: `None`
-- Original Code Review Report: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/code-review-report.md`
-- Coverage Investigation: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/api-e2e-coverage-investigation.md`
-- Execution Coverage Report: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/api-e2e-execution-coverage-report.md`
+- Original Code Review Report: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/code-review-report.md`
+- Coverage Investigation: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/api-e2e-coverage-investigation.md`
+- Execution Coverage Report: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/api-e2e-execution-coverage-report.md`
 - API/E2E Result: `Pass`
 - Final Validation Confidence: `96.2%`
 - Prior unresolved test-review findings rechecked: `N/A — first test-code review round`

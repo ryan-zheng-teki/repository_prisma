@@ -36,10 +36,10 @@
 - Docs sync report: `docs-sync-report.md` — `Pass`.
 - Release notes: `release-notes.md` prepared before verification hold.
 - README, DESIGN, and CHANGELOG are aligned with the reviewed implementation.
-- Release/tag/publication/provenance/deployment are unauthorized and unperformed.
+- Release/tag/publication/provenance/deployment were authorized and completed through the documented tag workflow; registry verification confirmed `repository_prisma@1.0.8`.
 
 ## Verification Hold
 
 Explicit user verification and authorization were received in the user message: “now finalize and release”.
 Ticket archival, branch finalization, tag push, and the documented publication workflow are now authorized.
-Execution results are recorded in `release-deployment-report.md` as each delivery step completes.
+Execution results are recorded in `release-deployment-report.md`.

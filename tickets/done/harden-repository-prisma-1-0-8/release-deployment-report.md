@@ -2,15 +2,15 @@
 
 ## Release / Publication / Deployment Scope
 
-Repository delivery preparation for `harden-repository-prisma-1-0-8`. Source integration,
-documentation synchronization, and user-verification handoff are in scope. Release tag,
-publication, provenance, and deployment are separately unauthorized and remain out of scope.
+Repository delivery for `harden-repository-prisma-1-0-8`. Source integration, documentation
+synchronization, ticket archival, finalization, and the explicitly authorized tag-based release
+are recorded here. No separate application deployment was required.
 
 ## Handoff Summary
 
-- Handoff summary artifact: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/handoff-summary.md`
+- Handoff summary artifact: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/handoff-summary.md`
 - Handoff summary status: `Updated`
-- Notes: Ready for explicit user verification; final repository and release actions remain held.
+- Notes: User verification was received; finalization and the documented tag-based release completed.
 
 ## Initial Delivery Integration Refresh
 
@@ -37,70 +37,70 @@ publication, provenance, and deployment are separately unauthorized and remain o
 
 ## Docs Sync Result
 
-- Docs sync artifact: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/docs-sync-report.md`
+- Docs sync artifact: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/docs-sync-report.md`
 - Docs sync result: `Updated`
 - Docs updated: `README.md`, `DESIGN.md`, `CHANGELOG.md` were reviewed and are aligned with the integrated implementation.
 - No-impact rationale (if applicable): Not applicable.
 
 ## Ticket State Transition
 
-- Ticket moved to `tickets/done/<ticket-name>`: `No`
-- Archived ticket path: Pending explicit user verification.
+- Ticket moved to `tickets/done/<ticket-name>`: `Yes`
+- Archived ticket path: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8`
 
 ## Version / Tag / Release Commit
 
-Package metadata is `1.0.8`. No version bump, release commit, annotated tag, or tag push was performed.
+Package metadata is `1.0.8`. No version bump was needed. Release merge commit: `2dd4c2a`; annotated tag `v1.0.8` was pushed successfully.
 
 ## Repository Finalization
 
-- Bootstrap context source: `tickets/in-progress/harden-repository-prisma-1-0-8/investigation-notes.md`
+- Bootstrap context source: `tickets/done/harden-repository-prisma-1-0-8/investigation-notes.md`
 - Ticket branch: `codex/harden-repository-prisma-1-0-8`
-- Ticket branch commit result: `Pending explicit user verification` (checkpoint `edcdcca` exists locally).
-- Ticket branch push result: `Pending explicit user verification`.
+- Ticket branch commit result: `Completed` — archived delivery commit `495f242` after checkpoint `edcdcca`.
+- Ticket branch push result: `Completed` — `origin/codex/harden-repository-prisma-1-0-8`.
 - Finalization target remote: `origin`
 - Finalization target branch: `main`
-- Target advanced after user verification: `Pending verification`
-- Delivery-owned edits protected before re-integration: `Pending verification`
-- Re-integration before final merge result: `Pending verification`
-- Target branch update result: `Pending explicit user verification`
-- Merge into target result: `Pending explicit user verification`
-- Push target branch result: `Pending explicit user verification`
-- Repository finalization status: `In progress`
-- Blocker (if applicable): None; authorized delivery actions are being executed.
+- Target advanced after user verification: `No` — the finalization refresh still resolved to the bootstrap `origin/main` revision before merge.
+- Delivery-owned edits protected before re-integration: `Completed` — archived delivery commit `495f242`.
+- Re-integration before final merge result: `Completed` — merge commit `2dd4c2a`.
+- Target branch update result: `Completed` — `origin/main@2dd4c2a264c188954019108feafd896915c27371`.
+- Merge into target result: `Completed` — `codex/harden-repository-prisma-1-0-8` merged into `main`.
+- Push target branch result: `Completed` — `main` pushed to `origin`.
+- Repository finalization status: `Completed`.
+- Blocker (if applicable): None.
 
 ## Release / Publication / Deployment
 
 - Applicable: `Yes` — explicitly authorized by the user.
 - Method: `Git Tag Method`
 - Method reference / command: README.md `Release (Tag-Based)` section; explicit `v1.0.8` tag flow.
-- Release/publication/deployment result: `In progress`.
-- Release notes handoff result: `Used` — notes are prepared at `tickets/in-progress/harden-repository-prisma-1-0-8/release-notes.md` and will travel with the archived ticket.
+- Release/publication/deployment result: `Completed` — annotated `v1.0.8` tag pushed; the tag-triggered GitHub Actions workflow published the package.
+- Release notes handoff result: `Used` — archived notes at `tickets/done/harden-repository-prisma-1-0-8/release-notes.md`.
 - Blocker (if applicable): None.
 
 ## Post-Finalization Cleanup
 
 - Dedicated ticket worktree path: `/Users/normy/autobyteus_org/repository_prisma-1-0-8`
-- Worktree cleanup result: `Pending explicit user verification and repository finalization`
-- Worktree prune result: `Pending explicit user verification and repository finalization`
-- Local ticket branch cleanup result: `Pending explicit user verification and repository finalization`
-- Remote branch cleanup result: `Not required` at this stage
-- Blocker (if applicable): Cleanup is deferred until finalization is authorized and complete.
+- Worktree cleanup result: `Pending` — scheduled after the final evidence commit is integrated.
+- Worktree prune result: `Pending` — scheduled after the final evidence commit is integrated.
+- Local ticket branch cleanup result: `Pending` — scheduled after the final evidence commit is integrated.
+- Remote branch cleanup result: `Pending` — scheduled after the final evidence commit is integrated.
+- Blocker (if applicable): None.
 
 ## Escalation / Reroute (Use Only If Final Handoff Cannot Complete)
 
 - Classification: None.
 - Recommended recipient: None.
-- Why final handoff could not complete: Final repository actions are intentionally held for explicit user verification, not blocked by an implementation or test issue.
+- Why final handoff could not complete: N/A; finalization and release completed.
 
 ## Release Notes Summary
 
-- Release notes artifact created before verification: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8/release-notes.md`
-- Archived release notes artifact used for release/publication: Not yet applicable.
+- Release notes artifact created before verification: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/release-notes.md`
+- Archived release notes artifact used for release/publication: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8/release-notes.md`
 - Release notes status: `Updated`
 
 ## Deployment Steps
 
-None performed. If later authorized, follow the repository's tag-based release flow in `README.md`; no application deployment path is defined for this library change.
+No application deployment was required. Release followed the repository's documented tag-based flow in `README.md`.
 
 ## Environment Or Persisted-Data Transition Notes
 
@@ -114,17 +114,19 @@ None performed. If later authorized, follow the repository's tag-based release f
 - `git fetch origin` — passed; `origin/main` remained `176a393392c4fe5b1f7ac7b28e85f4bfe12f89fc`.
 - `git merge-base HEAD origin/main` — matched `origin/main`; no base commits required integration.
 - `npm test` at delivery checkpoint `edcdcca` — passed; 7 files / 76 tests.
+- `npm test` on finalized `main` before push — passed; 7 files / 76 tests.
 - Upstream `npm run build` — passed; ESM/CJS/declarations generated.
 - Upstream `npm run typecheck` — passed.
 - Upstream `npm run test:package` and packed import/consumer checks — passed.
 - Upstream API/E2E execution — passed at 96.2% confidence.
 - Upstream proportional durable test-code review — passed with no findings.
-- Release/tag/publication/provenance/deployment — not performed.
+- `git tag -a v1.0.8 -m "1.0.8"` and `git push origin main --follow-tags` — passed; remote tag resolves to release merge commit `2dd4c2a`.
+- `npm view repository_prisma@1.0.8 version dist.integrity dist.tarball --json` — passed; registry reports version `1.0.8`, integrity `sha512-1ivDY5bVHd0rqgYHORfMl7jDhVxx/0MKZtxO8bM6fJUI1JOFwAs3/C8e520qoYKXNyLDUBOHPqH8wqF8H5ellQ==`, and tarball `https://registry.npmjs.org/repository_prisma/-/repository_prisma-1.0.8.tgz`.
 
 ## Rollback Criteria
 
-Before finalization, discard only the local delivery candidate if execution fails. After an authorized merge/release, rollback follows the repository's normal target-branch and tag/release controls; no rollback action is currently required.
+Rollback criteria: a critical regression in the finalized package or published artifact requires stopping further rollout and following the repository's target-branch/tag controls. No rollback action is currently required.
 
 ## Final Status
 
-`Authorized; repository finalization and documented tag-based release actions in progress.`
+`Finalized and released: main updated, v1.0.8 tag pushed, and npm registry publication verified; cleanup remains to be recorded after execution.`

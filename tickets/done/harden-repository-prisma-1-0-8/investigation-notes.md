@@ -32,7 +32,7 @@ package; it does not publish a release.
 
 - Project Type: `Git`
 - Task Workspace Root: `/Users/normy/autobyteus_org/repository_prisma-1-0-8`
-- Task Artifact Folder: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/in-progress/harden-repository-prisma-1-0-8`
+- Task Artifact Folder: `/Users/normy/autobyteus_org/repository_prisma-1-0-8/tickets/done/harden-repository-prisma-1-0-8`
 - Current Branch: `codex/harden-repository-prisma-1-0-8`
 - Current Worktree / Working Directory: `/Users/normy/autobyteus_org/repository_prisma-1-0-8`
 - Bootstrap Base Branch: `origin/main`
