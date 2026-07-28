@@ -48,18 +48,35 @@ class UserService {
 Best if you prefer explicit scoping and want to avoid experimental decorators.
 
 ```typescript
-import { runInTransaction } from 'repository_prisma';
+import {
+  runInTransaction,
+  type RunInTransactionOptions,
+} from 'repository_prisma';
 
 class UserService {
   async createUserAndPost() {
-    // Explicit wrapper
+    const transactionOptions: RunInTransactionOptions = {
+      maxWait: 2_000,
+      timeout: 10_000,
+    };
+
     await runInTransaction(async () => {
          await this.userRepo.create(...)
          await this.postRepo.create(...)
-    });
+    }, transactionOptions);
   }
 }
 ```
+
+The options are Prisma interactive-transaction settings. When supplied, the exact
+object is passed to Prisma when the outer transaction opens. When omitted,
+`runInTransaction(callback)` retains Prisma's defaults. Prisma owns wait behavior,
+timeouts, isolation enforcement, commit, and rollback; this library does not create
+timers or retries.
+
+Nested `runInTransaction` calls reuse the active AsyncLocalStorage transaction rather
+than opening another physical transaction. Options on a nested call are ignored because
+the outer transaction boundary remains authoritative.
 
 ### Optional: Context-Aware Prisma Client (No Repository)
 
@@ -241,16 +258,16 @@ The test script normalizes relative `file:` URLs to absolute paths for cross-pla
 
 ## Release (Tag-Based)
 
-We use a tag-based release flow. For this already-versioned 1.0.8 release, do not run
-`npm version patch`, because it would advance the package to 1.0.9. Create and push the
+We use a tag-based release flow. For this already-versioned 1.0.9 release, do not run
+`npm version patch`, because it would advance the package to 1.0.10. Create and push the
 explicit release tag instead:
 
 ```bash
-git tag -a v1.0.8 -m "1.0.8"
+git tag -a v1.0.9 -m "1.0.9"
 git push origin main --follow-tags
 ```
 
-If you prefer to tag manually via a Git UI, create the same annotated `v1.0.8` tag and
+If you prefer to tag manually via a Git UI, create the same annotated `v1.0.9` tag and
 push it with the repository's normal tag workflow:
 
 ```bash

@@ -97,6 +97,38 @@ describe.sequential('Implicit Transactions (Integration)', () => {
         expect(user).toBeNull();
     });
 
+    it('should commit multi-repository work with HOF transaction options', async () => {
+        const email = `hof_options_${Date.now()}@example.com`;
+        const title = `HOF Options Post ${Date.now()}`;
+
+        await runInTransaction(async () => {
+             const user = await service.userRepo.create({ data: { email } });
+             await service.postRepo.create({ data: { title, authorId: user.id } });
+        }, { maxWait: 5_000, timeout: 10_000 });
+
+        const user = await rootPrismaClient.user.findUnique({ where: { email } });
+        expect(user).toBeDefined();
+        const posts = await rootPrismaClient.post.findMany({ where: { title } });
+        expect(posts).toHaveLength(1);
+        expect(posts[0].authorId).toBe(user!.id);
+    });
+
+    it('should rollback multi-repository work with HOF transaction options', async () => {
+        const email = `hof_options_fail_${Date.now()}@example.com`;
+        const title = `HOF Options Failure ${Date.now()}`;
+
+        await expect(runInTransaction(async () => {
+             const user = await service.userRepo.create({ data: { email } });
+             await service.postRepo.create({ data: { title, authorId: user.id } });
+             throw new Error("HOF Options Failure");
+        }, { maxWait: 5_000, timeout: 10_000 })).rejects.toThrow("HOF Options Failure");
+
+        const user = await rootPrismaClient.user.findUnique({ where: { email } });
+        const posts = await rootPrismaClient.post.findMany({ where: { title } });
+        expect(user).toBeNull();
+        expect(posts).toHaveLength(0);
+    });
+
     it('should persist single operation WITHOUT transaction decorator (Implicit Atomic)', async () => {
         const email = `atomic_${Date.now()}@example.com`;
         
