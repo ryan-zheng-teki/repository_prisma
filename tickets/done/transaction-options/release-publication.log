@@ -1,0 +1,23 @@
+repository_prisma 1.0.9 release/publication evidence
+date: 2026-07-28
+repository: git@github.com-ryan:ryan-zheng-teki/repository_prisma.git
+finalization target: main
+finalized main commit: 634bb2b19df231957025c786ba5e9da1eabb938f
+ticket branch final commit: daee54a6e17d8c680bef79f2ba2640c0cc32c8f0
+annotated tag: v1.0.9
+tag target: 634bb2b19df231957025c786ba5e9da1eabb938f
+remote main push: pass
+remote tag push: pass
+CI workflow: success
+CI workflow URL: https://github.com/ryan-zheng-teki/repository_prisma/actions/runs/30341915519
+Release workflow: success
+Release workflow URL: https://github.com/ryan-zheng-teki/repository_prisma/actions/runs/30341932789
+npm package: repository_prisma@1.0.9
+npm dist-tag latest: 1.0.9
+npm integrity: sha512-LY1ZkCpUQyj3kSUC7dBYjyBdezvscCOTTMNMNQFsy4g3InKlWii04hHFNMcIriDU4pQVsexx59+rDTPfN+S7YQ==
+npm tarball: https://registry.npmjs.org/repository_prisma/-/repository_prisma-1.0.9.tgz
+npm peer dependency: @prisma/client ^5.22.0
+dedicated ticket worktree cleanup: pass
+local ticket branch cleanup: pass
+remote ticket branch cleanup: pass
+unrelated main-checkout pnpm-lock.yaml: preserved and untouched

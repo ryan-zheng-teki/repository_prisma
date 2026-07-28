@@ -10,13 +10,14 @@ application deployment or persisted-data operation is in scope.
 ## Handoff Summary
 
 - Handoff summary artifact:
-  `/Users/normy/autobyteus_org/autobyteus-worktrees/repository-prisma-transaction-options/tickets/done/transaction-options/handoff-summary.md`
+  `/Users/normy/autobyteus_org/repository_prisma/tickets/done/transaction-options/handoff-summary.md`
 - Handoff summary status: `Updated`
 - Delivery revision record:
-  `/Users/normy/autobyteus_org/autobyteus-worktrees/repository-prisma-transaction-options/tickets/done/transaction-options/delivery-revision-record.md`
-- Current delivery revision ID: `DR-001`
-- Notes: The user verified the integrated candidate and authorized finalization and
-  release in the `repository_prisma` repository.
+  `/Users/normy/autobyteus_org/repository_prisma/tickets/done/transaction-options/delivery-revision-record.md`
+- Current delivery revision ID: `DR-002`
+- Notes: User verification, repository finalization, tag publication, npm registry
+  verification, evidence recording, and cleanup completed in the
+  `repository_prisma` repository.
 
 ## Initial Delivery Integration Refresh
 
@@ -53,7 +54,7 @@ application deployment or persisted-data operation is in scope.
 ## Docs Sync Result
 
 - Docs sync artifact:
-  `/Users/normy/autobyteus_org/autobyteus-worktrees/repository-prisma-transaction-options/tickets/done/transaction-options/docs-sync-report.md`
+  `/Users/normy/autobyteus_org/repository_prisma/tickets/done/transaction-options/docs-sync-report.md`
 - Docs sync result: `Updated`
 - Docs updated: `README.md`, `DESIGN.md`, and `CHANGELOG.md` in the integrated
   candidate; delivery reviewed them against the actual combined state and found no
@@ -67,28 +68,33 @@ application deployment or persisted-data operation is in scope.
 
 ## Version / Tag / Release Commit
 
-Package and lock metadata are already `1.0.9`; the Prisma peer remains `^5.22.0`.
-No additional version bump or release commit is needed before finalization. Local and
-remote `v1.0.9` are absent, and npm returned `E404` for
-`repository_prisma@1.0.9`. No tag has been created.
+Package and lock metadata are `1.0.9`; the published Prisma peer remains `^5.22.0`.
+No additional version bump was needed. Annotated tag `v1.0.9` points to finalized
+main commit `634bb2b19df231957025c786ba5e9da1eabb938f` and was pushed successfully.
 
 ## Repository Finalization
 
 - Bootstrap context source:
   `tickets/done/transaction-options/investigation-notes.md`
 - Ticket branch: `codex/transaction-options`
-- Ticket branch commit result: `Not started — checkpoint only; awaiting user verification`
-- Ticket branch push result: `Not started — awaiting user verification`
+- Ticket branch commit result: `Completed` —
+  `daee54a6e17d8c680bef79f2ba2640c0cc32c8f0`
+- Ticket branch push result: `Completed` — pushed
+  `origin/codex/transaction-options` before merge
 - Finalization target remote: `origin`
 - Finalization target branch: `main`
-- Target advanced after user verification: `N/A — verification not yet received`
-- Delivery-owned edits protected before re-integration: `Not needed yet`
-- Re-integration before final merge result: `Not needed yet`
-- Target branch update result: `Not started`
-- Merge into target result: `Not started`
-- Push target branch result: `Not started`
-- Repository finalization status: `In progress — user authorization received`
-- Blocker (if applicable): None at authorization; final execution evidence pending.
+- Target advanced after user verification: `No` — the final refresh still resolved to
+  `715e4558ddc6ef6907c1f0055d261a8766ff20c6`
+- Delivery-owned edits protected before re-integration: `Completed` — archived in
+  ticket commit `daee54a`
+- Re-integration before final merge result: `Not needed` — target remained unchanged
+- Target branch update result: `Completed` — local `main` was already current with
+  `origin/main`
+- Merge into target result: `Completed` — merge commit
+  `634bb2b19df231957025c786ba5e9da1eabb938f`
+- Push target branch result: `Completed` — `origin/main` advanced to `634bb2b`
+- Repository finalization status: `Completed`
+- Blocker (if applicable): None.
 
 ## Release / Publication / Deployment
 
@@ -97,44 +103,46 @@ remote `v1.0.9` are absent, and npm returned `E404` for
 - Method reference / command: `README.md`, section `Release (Tag-Based)`; finalize
   `main`, then create and push annotated tag `v1.0.9` so
   `.github/workflows/release.yml` publishes with npm trusted publishing.
-- Release/publication/deployment result: `In progress — authorized; execution evidence pending`
-- Release notes handoff result: `Used` — prepared before verification at
+- Release/publication/deployment result: `Completed` — Release workflow
+  `30341932789` succeeded and npm `latest` resolves to
+  `repository_prisma@1.0.9`
+- Release notes handoff result: `Used` — archived before release at
   `tickets/done/transaction-options/release-notes.md`
-- Blocker (if applicable): None at authorization; tag/workflow/npm evidence pending.
+- Blocker (if applicable): None.
 
 ## Post-Finalization Cleanup
 
 - Dedicated ticket worktree path:
   `/Users/normy/autobyteus_org/autobyteus-worktrees/repository-prisma-transaction-options`
-- Worktree cleanup result: `Blocked — finalization has not occurred`
-- Worktree prune result: `Blocked — finalization has not occurred`
-- Local ticket branch cleanup result: `Blocked — finalization has not occurred`
-- Remote branch cleanup result: `Not required` — the ticket branch has not been pushed
-- Blocker (if applicable): Cleanup is intentionally deferred until finalization and
-  publication complete safely.
+- Worktree cleanup result: `Completed` — dedicated ticket worktree removed
+- Worktree prune result: `Completed`
+- Local ticket branch cleanup result: `Completed` —
+  `codex/transaction-options` deleted after merge
+- Remote branch cleanup result: `Completed` —
+  `origin/codex/transaction-options` deleted after merge
+- Blocker (if applicable): None.
 
 ## Escalation / Reroute (Use Only If Final Handoff Cannot Complete)
 
 - Classification: `N/A`
 - Recommended recipient: `N/A`
-- Why final handoff could not complete: `N/A — this is the expected user-verification
-  hold, not a code, design, test, documentation, or deployment-local failure.`
+- Why final handoff could not complete: `N/A — finalization and release completed.`
 
 ## Release Notes Summary
 
 - Release notes artifact created before verification:
-  `/Users/normy/autobyteus_org/autobyteus-worktrees/repository-prisma-transaction-options/tickets/done/transaction-options/release-notes.md`
+  `/Users/normy/autobyteus_org/repository_prisma/tickets/done/transaction-options/release-notes.md`
 - Archived release notes artifact used for release/publication:
   `tickets/done/transaction-options/release-notes.md`
 - Release notes status: `Updated`
 
 ## Deployment Steps
 
-No separate runtime deployment is required. After explicit user authorization:
-refresh `origin/main` again, protect delivery-owned edits, re-integrate and re-verify
-if the target advanced, archive the ticket, commit and push the ticket branch, merge
-and push `main`, create/push annotated `v1.0.9`, monitor the release workflow, verify
-npm metadata, and then perform safe worktree/branch cleanup.
+No separate runtime deployment was required. Delivery refreshed `origin/main`,
+archived and pushed the ticket branch, merged and pushed `main`, created and pushed
+annotated `v1.0.9`, monitored CI and Release workflows to success, verified npm
+metadata and the preserved peer dependency, then removed the dedicated worktree and
+local/remote ticket branches.
 
 ## Environment Or Persisted-Data Transition Notes
 
@@ -152,9 +160,7 @@ npm metadata, and then perform safe worktree/branch cleanup.
   `715e4558ddc6ef6907c1f0055d261a8766ff20c6`.
 - Merge-base/ahead-behind checks — checkpoint is two commits ahead and zero behind
   `origin/main`; the refreshed base remains its merge base.
-- Local and remote `v1.0.9` checks — absent.
-- `npm view repository_prisma@1.0.9 version --json` — expected `E404`; version is not
-  published.
+- Pre-release local/remote `v1.0.9` and npm 1.0.9 checks — absent as expected.
 - `npm run typecheck` at checkpoint `db91c08` — passed.
 - Isolated `npm test` at checkpoint `db91c08` — passed, 8 files / 83 tests; temporary
   SQLite directory removed.
@@ -162,6 +168,22 @@ npm metadata, and then perform safe worktree/branch cleanup.
   98.3% confidence, and proportional durable test-code review — passed.
 - Exact delivery output:
   `tickets/done/transaction-options/delivery-integration-check.log`.
+- Finalized `main` `npm run typecheck` — passed.
+- Finalized `main` isolated `npm test` — passed, 8 files / 83 tests; owned SQLite
+  temporary directory removed.
+- Finalized `main` `npm run test:package` — passed fresh ESM/CJS/declaration
+  build/pack/install/runtime smoke.
+- Finalized-main diff check — passed.
+- Main CI workflow `30341915519` — succeeded at `634bb2b`.
+- Annotated `v1.0.9` push — succeeded and resolves to `634bb2b`.
+- Release workflow `30341932789` — succeeded, including provenance publication.
+- npm registry verification — version/latest `1.0.9`, peer
+  `@prisma/client:^5.22.0`, integrity
+  `sha512-LY1ZkCpUQyj3kSUC7dBYjyBdezvscCOTTMNMNQFsy4g3InKlWii04hHFNMcIriDU4pQVsexx59+rDTPfN+S7YQ==`.
+- Finalized-main output:
+  `tickets/done/transaction-options/finalization-check.log`.
+- Publication and cleanup evidence:
+  `tickets/done/transaction-options/release-publication.log`.
 
 ## Rollback Criteria
 
@@ -173,5 +195,6 @@ finalized change, and publish a new corrective patch rather than moving the immu
 
 ## Final Status
 
-`User verification and release authorization received. Repository finalization,
-tagging, npm publication, evidence recording, and cleanup are in progress.`
+`Completed — repository_prisma main finalized, v1.0.9 published and verified as npm
+latest, CI and Release succeeded, delivery evidence recorded, and ticket
+worktree/branches cleaned up.`

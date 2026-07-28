@@ -27,19 +27,20 @@
 - Proportional durable test-code review: `Pass`; no unresolved findings.
 - Delivery integrated-state verification: `npm run typecheck` passed and isolated
   `npm test` passed with 8 files / 83 tests.
-- Upstream build and installed-package smoke passed for TypeScript declarations,
-  CommonJS, and ESM consumers.
+- Finalized-main verification repeated typecheck and the isolated 83-test suite, then
+  passed fresh build/pack/install smoke for TypeScript declarations, CommonJS, and
+  ESM consumers.
 
 ## Release Method And Current State
 
-Package and lock metadata are already `1.0.9`. After explicit user verification and
-repository finalization, create annotated tag `v1.0.9` on the finalized `main` commit
-and push it through the README's tag-based flow. The tag triggers GitHub Actions to
-build and publish with npm trusted publishing.
+Package and lock metadata are `1.0.9`. The user explicitly verified the ticket and
+authorized finalization and release. Finalized `main` commit `634bb2b` carries
+annotated tag `v1.0.9`; the tag-triggered GitHub Actions workflow published through
+npm trusted publishing.
 
-The user explicitly verified the ticket and authorized finalization and release.
-Repository finalization, the annotated tag, workflow, and registry evidence are
-recorded in the archived delivery report as each step completes.
+Registry verification confirms `repository_prisma@1.0.9` is available as npm
+`latest`, retains peer dependency `@prisma/client:^5.22.0`, and has integrity
+`sha512-LY1ZkCpUQyj3kSUC7dBYjyBdezvscCOTTMNMNQFsy4g3InKlWii04hHFNMcIriDU4pQVsexx59+rDTPfN+S7YQ==`.
 
 ## Rollback
 

@@ -2,14 +2,17 @@
 
 ## Status
 
-`Explicitly user-verified and authorized for repository finalization and release.`
+`Finalized and released as repository_prisma 1.0.9.`
 
 ## Candidate
 
-- Authoritative worktree:
+- Repository:
+  `/Users/normy/autobyteus_org/repository_prisma`
+- Former authoritative ticket worktree:
   `/Users/normy/autobyteus_org/autobyteus-worktrees/repository-prisma-transaction-options`
-- Ticket branch: `codex/transaction-options`
-- Finalization target recorded at bootstrap: `origin/main` / local `main`
+  (removed after successful finalization and publication)
+- Former ticket branch: `codex/transaction-options` (local and remote refs removed)
+- Finalization target: `origin/main` / local `main`
 - Bootstrap base:
   `origin/main@715e4558ddc6ef6907c1f0055d261a8766ff20c6`
 - Reviewed implementation commit:
@@ -17,8 +20,9 @@
 - Delivery-safety checkpoint containing the reviewed implementation, accepted
   API/E2E-owned durable test edits, and cumulative review evidence:
   `db91c0800d11cbd8e5e3b11cc024e313091e79b7`
-- Delivery-owned Markdown records and the integration-check log are intentionally
-  uncommitted until user verification and finalization.
+- Archived delivery commit: `daee54a6e17d8c680bef79f2ba2640c0cc32c8f0`
+- Finalized main/tag target:
+  `634bb2b19df231957025c786ba5e9da1eabb938f`
 
 ## Delivery-Stage Integration
 
@@ -59,32 +63,37 @@
   datasource, logging-policy, lifecycle, decorator, or BaseRepository behavior is
   changed.
 
-## Documentation And Release Readiness
+## Documentation And Release Result
 
 - Docs sync: `Pass`; `README.md`, `DESIGN.md`, and `CHANGELOG.md` are aligned with the
   integrated candidate.
 - Package and lock metadata are consistently `1.0.9`.
-- Local tag `v1.0.9`: absent.
-- Remote tag `v1.0.9`: absent.
-- npm `repository_prisma@1.0.9`: absent (`E404`), as expected before release.
-- Release notes are prepared at
+- Annotated tag `v1.0.9` points to finalized main commit `634bb2b`.
+- CI run `30341915519`: `success`.
+- Release run `30341932789`: `success`.
+- npm `repository_prisma@1.0.9`: published and current `latest`.
+- Published peer contract: `@prisma/client:^5.22.0`.
+- Release notes:
   `tickets/done/transaction-options/release-notes.md`.
-- Release method after authorization: finalize to `main`, create annotated
-  `v1.0.9`, push the tag, and verify the tag-triggered npm publication.
+- Exact finalized-main checks:
+  `tickets/done/transaction-options/finalization-check.log`.
+- Exact release/publication/cleanup evidence:
+  `tickets/done/transaction-options/release-publication.log`.
 
 ## Residual Risk
 
 - No unresolved code, review, test, documentation, integration, migration, tag-name,
   or registry-version conflict is known.
-- Publication itself is not yet evidenced because the mandatory user-verification
-  gate deliberately precedes repository finalization and release.
 - Provider-specific meanings and supported isolation values remain Prisma-owned;
   this release does not broaden the package's Prisma peer contract.
+- GitHub emitted a non-blocking annotation that `actions/checkout@v4` and
+  `actions/setup-node@v4` target deprecated Node.js 20 action runtimes; GitHub forced
+  Node.js 24 and both CI and Release runs succeeded.
 
 ## Authorization And Next Action
 
 The user explicitly confirmed, “the task is done. finalize and release that ticket,”
 and clarified that the ticket belongs to the `repository_prisma` repository itself.
-Delivery will finalize this dedicated repository worktree to the recorded
-`repository_prisma` `main` target, publish `v1.0.9`, verify registry availability,
-and then hand the completed package back to `solution_designer` as requested.
+Finalization, publication, registry verification, and cleanup are complete. The
+cumulative package is ready to return to `solution_designer` so the dependent
+repository-adoption work can resume.
