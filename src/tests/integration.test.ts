@@ -129,6 +129,25 @@ describe.sequential('Implicit Transactions (Integration)', () => {
         expect(posts).toHaveLength(0);
     });
 
+    it('should rollback nested HOF work at the outer optioned boundary', async () => {
+        const email = `hof_nested_options_fail_${Date.now()}@example.com`;
+        const title = `HOF Nested Options Failure ${Date.now()}`;
+        const failure = new Error("Nested HOF Options Failure");
+
+        await expect(runInTransaction(async () => {
+             const user = await service.userRepo.create({ data: { email } });
+             await runInTransaction(async () => {
+                 await service.postRepo.create({ data: { title, authorId: user.id } });
+                 throw failure;
+             }, { maxWait: 1, timeout: 1 });
+        }, { maxWait: 5_000, timeout: 10_000 })).rejects.toBe(failure);
+
+        const user = await rootPrismaClient.user.findUnique({ where: { email } });
+        const posts = await rootPrismaClient.post.findMany({ where: { title } });
+        expect(user).toBeNull();
+        expect(posts).toHaveLength(0);
+    });
+
     it('should persist single operation WITHOUT transaction decorator (Implicit Atomic)', async () => {
         const email = `atomic_${Date.now()}@example.com`;
         
