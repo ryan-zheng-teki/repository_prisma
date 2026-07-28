@@ -10,6 +10,8 @@
 - Use **Decorators** (`@Transactional`) to manage transaction barriers and lifecycle.
 - Use a **Base Repository** or **Dynamic Getter** pattern to ensure all database queries automatically hook into the active ALS context.
   - The HOF `runInTransaction` reuses the existing ALS client if one is already active to avoid accidental nested transactions.
+  - The HOF accepts optional Prisma interactive-transaction settings only at the outer
+    transaction boundary. Prisma remains responsible for enforcing them.
   - The exported `prisma` proxy always routes to the correct client (transaction or root), so ad‑hoc queries stay safe.
 
 ## 2. File Responsibilities & Architecture
@@ -24,9 +26,19 @@ internals.
 **Responsibility**: Managing the lifecycle of the `AsyncLocalStorage`.
 
 - **Key Components**:
-  - `storage`: An instance of `AsyncLocalStorage<Prisma.TransactionClient>`.
-  - `runInTransaction(txClient, callback)`: A helper to run a function within the scope of a specific transaction client.
+  - `prismaContext`: An instance of `AsyncLocalStorage<Prisma.TransactionClient>`.
+  - `runInTransactionContext(txClient, callback)`: An internal helper to run a
+    function within the scope of a specific transaction client.
+  - `runInTransaction(callback, options?)`: The public HOF. It passes an explicitly
+    supplied `RunInTransactionOptions` object unchanged to Prisma when opening the
+    outer interactive transaction. Omitting options preserves Prisma's one-argument
+    call and defaults.
   - `getTransactionClient()`: Returns the current transaction client from store, or `undefined` if none exists.
+
+`RunInTransactionOptions` contains only `maxWait`, `timeout`, and
+`isolationLevel`. Prisma owns wait behavior, timers, isolation enforcement, commit,
+and rollback. When a transaction is already active, nested HOF calls reuse its ALS
+client and ignore inner options; the outer boundary owns configuration and atomicity.
 
 ### B. `src/lib/prisma-manager.ts` (The Client Provider)
 

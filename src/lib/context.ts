@@ -17,17 +17,28 @@ export const runInTransactionContext = <T>(
   return prismaContext.run(tx, callback);
 };
 
+export type RunInTransactionOptions = {
+  maxWait?: number;
+  timeout?: number;
+  isolationLevel?: Prisma.TransactionIsolationLevel;
+};
+
 // Public HOF that STARTS a transaction and puts it in ALS
-export const runInTransaction = <T>(callback: () => Promise<T>): Promise<T> => {
+export const runInTransaction = <T>(
+  callback: () => Promise<T>,
+  options?: RunInTransactionOptions
+): Promise<T> => {
   const existing = getTransactionClient();
 
   if (existing) {
     return runInTransactionContext(existing, callback);
   }
 
-  // Use the standard client to start a tx
-  return rootPrismaClient.$transaction((tx: Prisma.TransactionClient) => {
-    // Inside the tx callback, we set the ALS context
-    return runInTransactionContext(tx, callback);
-  });
+  const execute = (tx: Prisma.TransactionClient) =>
+    runInTransactionContext(tx, callback);
+
+  // Preserve Prisma's one-argument call and defaults when options are omitted.
+  return options === undefined
+    ? rootPrismaClient.$transaction(execute)
+    : rootPrismaClient.$transaction(execute, options);
 };

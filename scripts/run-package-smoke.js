@@ -98,6 +98,22 @@ try {
       true,
       `${declarationPath} must expose the conflict code`
     );
+    assert.equal(
+      declarationSource.includes('type RunInTransactionOptions'),
+      true,
+      `${declarationPath} must expose RunInTransactionOptions`
+    );
+    for (const field of [
+      'maxWait?: number',
+      'timeout?: number',
+      'isolationLevel?: Prisma.TransactionIsolationLevel',
+    ]) {
+      assert.equal(
+        declarationSource.includes(field),
+        true,
+        `${declarationPath} must expose ${field}`
+      );
+    }
   }
 
   const tarballPath = path.join(packDirectory, packRecord.filename);
@@ -445,8 +461,14 @@ const repo = require('repository_prisma');
   assert.equal(typeof repo.initializePrisma, 'function');
   assert.equal(typeof repo.shutdownPrisma, 'function');
   assert.equal(typeof repo.PrismaInitializationError, 'function');
+  assert.equal(typeof repo.runInTransaction, 'function');
   assert.equal(repo.rootPrismaClient.then, undefined);
   await repo.initializePrisma({ datasourceUrl: ${JSON.stringify(`file:${cjsDatabase}`)}, enableWAL: true });
+  const transactionProbe = await repo.runInTransaction(
+    () => repo.prisma.$queryRawUnsafe('SELECT 1 AS transaction_option_probe;'),
+    { maxWait: 5_000, timeout: 10_000 }
+  );
+  assert.equal(Number(Object.values(transactionProbe[0])[0]), 1);
   const identity = await repo.rootPrismaClient.$queryRawUnsafe('PRAGMA database_list;');
   const main = identity.find((row) => String(row.name).toLowerCase() === 'main');
   assert.equal(fs.realpathSync(main.file), fs.realpathSync(${JSON.stringify(cjsDatabase)}));
@@ -525,13 +547,21 @@ import path from 'node:path';
 import {
   initializePrisma,
   PrismaInitializationError,
+  prisma,
   rootPrismaClient,
+  runInTransaction,
   shutdownPrisma,
 } from 'repository_prisma';
 assert.equal(typeof initializePrisma, 'function');
 assert.equal(typeof PrismaInitializationError, 'function');
+assert.equal(typeof runInTransaction, 'function');
 assert.equal(rootPrismaClient.then, undefined);
 await initializePrisma({ datasourceUrl: ${JSON.stringify(`file:${esmDatabase}`)}, enableWAL: true });
+const transactionProbe = await runInTransaction(
+  () => prisma.$queryRawUnsafe('SELECT 1 AS transaction_option_probe;'),
+  { maxWait: 5_000, timeout: 10_000 }
+);
+assert.equal(Number(Object.values(transactionProbe[0])[0]), 1);
 const identity = await rootPrismaClient.$queryRawUnsafe('PRAGMA database_list;');
 const main = identity.find((row) => String(row.name).toLowerCase() === 'main');
 assert.equal(fs.realpathSync(main.file), fs.realpathSync(${JSON.stringify(esmDatabase)}));
@@ -556,6 +586,8 @@ process.stdout.write('esm-package-smoke-ok\\n');
   type InitializePrismaOptions,
   type PrismaInitializationDiagnostic,
   type PrismaInitializationErrorCode,
+  runInTransaction,
+  type RunInTransactionOptions,
 } from 'repository_prisma';
 
 const code: PrismaInitializationErrorCode = 'WAL_VERIFICATION_FAILED';
@@ -568,8 +600,23 @@ const options: InitializePrismaOptions = {
 };
 const queryOptions: InitializePrismaOptions = { logQueries: true };
 const conflictCode: PrismaInitializationErrorCode = 'LOGGING_POLICY_CONFLICT';
+const transactionOptions: RunInTransactionOptions = {
+  maxWait: 2_000,
+  timeout: 10_000,
+  isolationLevel: 'Serializable',
+};
+const defaultTransaction = runInTransaction(async () => 'default');
+const optionedTransaction = runInTransaction(async () => 'optioned', transactionOptions);
+// @ts-expect-error unrelated transaction options are rejected
+const invalidTransactionOptions: RunInTransactionOptions = { retry: 1 };
+// @ts-expect-error maxWait must be numeric
+const invalidWait: RunInTransactionOptions = { maxWait: '2000' };
 void initializePrisma(options);
 void initializePrisma(queryOptions);
+void defaultTransaction;
+void optionedTransaction;
+void invalidTransactionOptions;
+void invalidWait;
 void conflictCode;
 void diagnostic;
 void PrismaInitializationError;

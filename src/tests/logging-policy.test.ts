@@ -24,6 +24,7 @@ const fakeClient = (): FakeClient => ({
 
 const originalQueryFlag = process.env.PRISMA_LOG_QUERIES;
 const originalDatabaseUrl = process.env.DATABASE_URL;
+const originalTestDatabaseUrl = process.env.DATABASE_URL_TEST;
 
 afterEach(() => {
   if (originalQueryFlag === undefined) {
@@ -35,6 +36,11 @@ afterEach(() => {
     delete process.env.DATABASE_URL;
   } else {
     process.env.DATABASE_URL = originalDatabaseUrl;
+  }
+  if (originalTestDatabaseUrl === undefined) {
+    delete process.env.DATABASE_URL_TEST;
+  } else {
+    process.env.DATABASE_URL_TEST = originalTestDatabaseUrl;
   }
   vi.restoreAllMocks();
 });
@@ -78,6 +84,7 @@ describe('query logging policy', () => {
     };
     const lifecycle = new PrismaClientLifecycle(factory);
     const target = 'postgresql://user:password@localhost:5432/logging';
+    delete process.env.DATABASE_URL_TEST;
     process.env.DATABASE_URL = target;
 
     expect(lifecycle.getClientForOperation()).toBe(firstClient);
