@@ -1,0 +1,84 @@
+Delivery integration verification
+timestamp: 2026-07-28T08:11:30Z
+HEAD: db91c0800d11cbd8e5e3b11cc024e313091e79b7
+origin/main: 715e4558ddc6ef6907c1f0055d261a8766ff20c6
++ npm run typecheck
+
+> repository_prisma@1.0.9 typecheck
+> tsc -p tsconfig.json
+
++ DATABASE_URL_TEST=file:/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-delivery-XXXXXX.22PsvEaAVy/test.db npm test
+
+> repository_prisma@1.0.9 test
+> node scripts/run-tests.js
+
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "test.db" at "file:///var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-delivery-XXXXXX.22PsvEaAVy/test.db"
+
+SQLite database test.db created at file:///var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-delivery-XXXXXX.22PsvEaAVy/test.db
+
+🚀  Your database is now in sync with your Prisma schema. Done in 14ms
+
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 36ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Want to react to database changes in your app as they happen? Discover how with Pulse: https://pris.ly/tip-1-pulse
+
+
+ RUN  v4.0.18 /Users/normy/autobyteus_org/autobyteus-worktrees/repository-prisma-transaction-options
+
+ ✓ src/tests/forwarding-proxy.test.ts (3 tests) 4ms
+ ✓ src/tests/database-filter.test.ts (11 tests) 4ms
+ ✓ src/tests/transaction-context.test.ts (4 tests) 5ms
+ ✓ src/tests/logging-policy.test.ts (14 tests) 6ms
+ ✓ src/tests/datasource-readiness.test.ts (18 tests) 21ms
+ ✓ src/tests/client-lifecycle.test.ts (14 tests) 179ms
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > opens DATABASE_URL_TEST under test and leaves DATABASE_URL untouched
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration)
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > lets a non-empty explicit datasource win and treats whitespace as omitted
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > lets a non-empty explicit datasource win and treats whitespace as omitted
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > normalizes cwd-relative paths with spaces, literal percent spelling, and query parameters
+prisma:info Starting a sqlite pool with 1 connections.
+
+ ✓ src/tests/integration.test.ts (10 tests) 418ms
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > accepts a symlink spelling when canonical physical identity is the same
+prisma:info Starting a sqlite pool with 1 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > preserves delete mode without WAL, then upgrades and independently verifies WAL
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > blocks access after a safe missing-target failure and permits corrected explicit retry
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > rejects a lazy-bound target switch without opening the second file, then rebinds captured methods after shutdown
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > rejects a lazy-bound target switch without opening the second file, then rebinds captured methods after shutdown
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > reads representative existing data directly without schema migration
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > context-aware public forwarding with the current Prisma schema > uses a captured context method inside ALS and the root owner after ALS exits
+prisma:info Starting a sqlite pool with 21 connections.
+
+ ✓ src/tests/public-initialization.test.ts (9 tests) 526ms
+     ✓ opens DATABASE_URL_TEST under test and leaves DATABASE_URL untouched  408ms
+
+ Test Files  8 passed (8)
+      Tests  83 passed (83)
+   Start at  10:11:33
+   Duration  819ms (transform 1.00s, setup 0ms, import 1.23s, tests 1.16s, environment 1ms)
+
+cleanup: removed /var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-delivery-XXXXXX.22PsvEaAVy
