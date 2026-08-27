@@ -2,17 +2,17 @@
 
 ## Status
 
-`Ready for explicit user verification; repository finalization, release, publication, deployment, and cleanup held.`
+`Repository finalized on the authorized ticket branch; release tag/publication pending completion of the documented workflow.`
 
 ## Candidate
 
 - Repository: `/Users/normy/autobyteus_org/repository_prisma`
-- Authoritative ticket worktree: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop`
+- Former authoritative ticket worktree: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop`
 - Ticket branch: `codex/repository-prisma-esm-cjs-interop`
 - Finalization target from bootstrap context: this ticket branch, followed by the repository's normal tag-based `repository_prisma` release flow; no direct finalization onto `main` from this worktree.
 - Bootstrap base: `origin/main@8ab582f75e5456856cb0954eaba1ad4882250577`
 - Reviewed implementation commit: `a469dbacf09da878310fdedd72b3a7f6fba7ef32`
-- Current delivery state: `HEAD` is already based on the refreshed `origin/main`; no base commits were integrated. Delivery-preparation commits: `93ea302f56a7bf7e2c2d3f17028aae6f7c996a85` (evidence checkpoint) and `87e86a93cad818da538b1d26e44b5232c57da80e` (delivery-record update); both are local only, not pushed or finalized.
+- Delivery-preparation commits: `93ea302f56a7bf7e2c2d3f17028aae6f7c996a85`, `87e86a93cad818da538b1d26e44b5232c57da80e`, and `0e4cef979ad3375e197b425fb0c6406d932442d5`; archive/finalization commit: `ef59778efca8ef122235a8c6aa2971a926a4299d`; finalization metadata commit is pending.
 
 ## Cumulative Artifact Package
 
@@ -44,16 +44,16 @@
 - Release notes: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/release-notes.md`
 - Release/deployment report: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/release-deployment-report.md`
 - Release preflight: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/release-preflight.log`
+- Finalization checks: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/finalization-check.log`
 
 ## Delivery-Stage Integration
 
-- `git fetch origin --prune`: passed on 2026-08-27.
-- Refreshed tracked base: `origin/main@8ab582f75e5456856cb0954eaba1ad4882250577`.
-- Base advanced beyond bootstrap: `No`.
-- Integration method: `Already current`; no merge or rebase performed.
-- Delivery-preparation commits: `93ea302f56a7bf7e2c2d3f17028aae6f7c996a85` protects the evidence package and `87e86a93cad818da538b1d26e44b5232c57da80e` records the final delivery hold; both are explicitly not finalization commits.
-- Post-integration check: no new base commits were integrated, so no additional base-triggered executable rerun was required. `git diff --check origin/main...HEAD` passed. Upstream API/E2E evidence at this same candidate reports typecheck, build, focused interop, full 83-test suite, packed package smoke, and audits passing.
-- Exact integration record: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/delivery-integration-check.log`.
+- `git fetch origin --prune`: passed on 2026-08-27 before and after user authorization.
+- Refreshed tracked base: `origin/main@8ab582f75e5456856cb0954eaba1ad4882250577`; it did not advance beyond bootstrap.
+- Initial integration method: `Already current`; no merge or rebase performed.
+- Post-verification finalization-target refresh: remote `codex/repository-prisma-esm-cjs-interop` was absent before push; `origin/main` remained unchanged and was an ancestor of the candidate, so no re-integration was required.
+- Delivery-preparation checkpoint and archive commit were created locally; the archived ticket was committed as `ef59778efca8ef122235a8c6aa2971a926a4299d` and pushed to `origin/codex/repository-prisma-esm-cjs-interop`.
+- Post-integration and finalization checks: `npm run typecheck`, `npm test` (8 files / 83 tests), `npm run test:package` (packed CJS/ESM/declarations and dynamic-peer probe), and `git diff --check` passed. Exact output is in `finalization-check.log`.
 
 ## Reviewed Result
 
@@ -71,17 +71,21 @@
 
 ## Documentation And Release Preparation
 
-- `README.md`, `DESIGN.md`, and `CHANGELOG.md` were reviewed against the integrated candidate; the implementation commit already contains the required durable package-loading guidance and `1.0.10` release metadata, so no additional long-lived-doc edit was necessary at delivery.
+- `README.md`, `DESIGN.md`, and `CHANGELOG.md` were verified against the integrated candidate and remain the long-lived docs authority.
+- The cumulative ticket package, including release notes, is archived under `tickets/done/repository-prisma-esm-cjs-interop/`.
 - Package and lock metadata are consistently `1.0.10`.
-- Read-only release preflight found no local or remote `v1.0.10` tag; `npm view repository_prisma@1.0.10 version --json` returned registry `E404`. This confirms only that the version was not available at preflight time; no publication was attempted or claimed.
-- Tag creation, branch push/merge, npm publication, deployment, and worktree/branch cleanup are held until explicit user verification and authorization.
+- Read-only release preflight found no local or remote `v1.0.10` tag and npm returned `E404` before release. No publication was claimed before authorization.
+
+## User Verification And Repository Finalization
+
+- User authorization: explicit message on 2026-08-27 — `the task is done. finalize and release`.
+- Ticket state transition: completed; ticket folder moved to `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/` before the archive/finalization commit.
+- Finalization target: recorded ticket branch `codex/repository-prisma-esm-cjs-interop`, remote `origin`.
+- Finalization commit: `ef59778efca8ef122235a8c6aa2971a926a4299d`; branch push succeeded.
+- Release action remaining: create and push annotated `v1.0.10`, monitor CI/release workflow, verify npm registry publication, then record final release/cleanup evidence.
 
 ## Environment / Persisted Data
 
 - Validation host: macOS ARM64; Node `v22.23.1`; Prisma/Vitest package versions as recorded in the upstream execution report.
 - Approved persisted-data decision: `Not Affected`.
 - No schema, migration, datasource, or stored-data transition was run or required.
-
-## User Verification Gate
-
-The candidate is ready for explicit user verification. Per delivery policy, do not archive the ticket, push the ticket branch, merge to `main`, create/push `v1.0.10`, publish to npm, deploy, or clean up the dedicated worktree/branches until the user explicitly verifies/accepts the candidate and authorizes the finalization/release flow.

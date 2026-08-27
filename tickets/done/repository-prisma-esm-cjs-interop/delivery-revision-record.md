@@ -5,6 +5,7 @@
 | Revision ID | Entry Point / Trigger | Prior Result | Current Result | Affected Canonical Artifacts |
 | --- | --- | --- | --- | --- |
 | `DR-001` | API/E2E `Pass` at 96% confidence and proportional test-code review `CRR-002` `Not Applicable`; initial delivery integration/docs/handoff round | `N/A` | `Ready for explicit user verification; finalization/release held` | `docs-sync-report.md`, `handoff-summary.md`, `release-notes.md`, `release-deployment-report.md`, `delivery-integration-check.log`, `release-preflight.log` |
+| `DR-002` | Explicit user authorization; post-verification refresh, ticket archival, finalization checks, and ticket-branch push | `DR-001 — ready for explicit user verification` | `Repository finalized and pushed; release tag/publication pending` | `docs-sync-report.md`, `handoff-summary.md`, `release-notes.md`, `release-deployment-report.md`, `delivery-revision-record.md`, `finalization-check.log` |
 
 ## Revision Entries
 
@@ -25,3 +26,16 @@
 - Remaining risks or untested scope: Exact Linux ARM64/Vitest consumer remains explicitly `Not Tested`; package publication and final target/CI evidence remain pending the user gate. No code, requirement, design, docs, or test-review finding is open.
 - Why this baseline is recorded: Establishes the first authoritative delivery-stage result, preserves the integrated candidate and cumulative handoff package, and makes the user-verification hold explicit without inferring prior delivery success from missing records.
 - Next action: User explicitly verifies/accepts the candidate and authorizes finalization/release; delivery then refreshes the finalization target again before archival, commit/push/merge, tag/publication, and cleanup.
+
+## DR-002 — Authorized repository finalization baseline
+
+- Delivery round and trigger: Round 2, entered after the explicit user message on 2026-08-27: `the task is done. finalize and release`.
+- Triggering upstream report, verification, or evidence: DR-001 package, post-verification `git fetch origin --prune`, finalization check log, and the recorded bootstrap context in `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/investigation-notes.md`.
+- Prior authoritative result: `DR-001 — ready for explicit user verification; finalization/release held`.
+- Current authoritative result: The ticket folder was moved to `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/` before final commit; the refreshed base remained unchanged and contained; `npm run typecheck`, `npm test` (8 files / 83 tests), `npm run test:package`, and `git diff --check` passed; archive/finalization commit `ef59778efca8ef122235a8c6aa2971a926a4299d` was pushed to `origin/codex/repository-prisma-esm-cjs-interop`.
+- User verification/finalization state: Explicitly authorized. Repository finalization is complete on the recorded ticket branch. The annotated `v1.0.10` tag, tag-triggered publication, registry verification, and cleanup remain the active next delivery steps.
+- Docs sync and handoff artifacts: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/docs-sync-report.md`, `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/handoff-summary.md`, and `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/release-deployment-report.md`.
+- Release preparation: Package/lock metadata are `1.0.10`; archived release notes are `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/release-notes.md`. No tag or npm publication has been attempted in this intermediate record.
+- Persisted-data and rollout posture: `Not Affected`; no schema, migration, datasource, or stored-data transition is required. No separate runtime deployment is in scope.
+- Remaining risks or untested scope: Exact Linux ARM64/Vitest consumer remains explicitly `Not Tested`; release workflow/registry evidence and safe cleanup are pending.
+- Next action: Create and push the documented annotated `v1.0.10` tag, monitor CI/release workflows, verify npm `1.0.10` and peer metadata, then update this record to the final release result and clean up safely.

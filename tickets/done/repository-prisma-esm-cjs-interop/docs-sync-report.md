@@ -53,8 +53,8 @@
 ## Delivery Continuation
 
 - Result: `Pass`
-- Next delivery action: Present the current integrated, documented candidate for explicit user verification. Hold archival, branch push/merge, tag creation, npm publication, deployment, and cleanup until that signal is received.
-- Notes: Documentation is truthful for the candidate at `a469dba`; the exact Linux ARM64/Vitest consumer remains explicitly `Not Tested`, and no publication claim is made.
+- Next delivery action: Archive and finalize the verified candidate, then execute the documented tag-based release and registry verification. Cleanup follows only after release evidence is complete.
+- Notes: Documentation remains truthful for the finalized candidate; the exact Linux ARM64/Vitest consumer remains explicitly `Not Tested` until independently executed, and release publication is separately evidenced.
 
 ## Blocked Or Escalated Follow-Up (Use Only If Docs Sync Cannot Complete)
 
