@@ -1,4 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import PrismaClientPackage from '@prisma/client';
+import type { PrismaClient as PrismaClientType } from '@prisma/client';
 import type { ResolvedDatasourceTarget } from './datasource-target';
 import { resolveDatasourceTarget } from './datasource-target';
 import {
@@ -16,17 +17,19 @@ import {
 } from './sqlite-readiness';
 import { queryLogLevels, resolveQueryLoggingPolicy } from './logging-policy';
 
+const { PrismaClient: PrismaClientRuntime } = PrismaClientPackage;
+
 type IdleState = { kind: 'idle' };
 type LazyBoundState = {
   kind: 'lazy-bound';
   target: ResolvedDatasourceTarget;
-  client: PrismaClient;
+  client: PrismaClientType;
   logQueries: boolean;
 };
 type InitializingState = {
   kind: 'initializing';
   target: ResolvedDatasourceTarget;
-  client: PrismaClient;
+  client: PrismaClientType;
   logQueries: boolean;
   enableWAL: boolean;
   diagnosticListeners: Set<PrismaInitializationDiagnosticListener>;
@@ -37,14 +40,14 @@ type InitializingState = {
 type ReadyState = {
   kind: 'ready';
   target: ResolvedDatasourceTarget;
-  client: PrismaClient;
+  client: PrismaClientType;
   logQueries: boolean;
   walReady: boolean;
 };
 type FailedState = { kind: 'failed' };
 type ShuttingDownState = {
   kind: 'shutting-down';
-  client: PrismaClient;
+  client: PrismaClientType;
   task: Promise<void>;
 };
 
@@ -59,10 +62,10 @@ type LifecycleState =
 export type PrismaClientFactory = (
   target: ResolvedDatasourceTarget,
   logQueries: boolean
-) => PrismaClient;
+) => PrismaClientType;
 
 const defaultClientFactory: PrismaClientFactory = (target, logQueries) =>
-  new PrismaClient({
+  new PrismaClientRuntime({
     datasourceUrl: target.clientUrl,
     log: queryLogLevels(logQueries),
   });
@@ -82,7 +85,7 @@ export class PrismaClientLifecycle {
 
   constructor(private readonly clientFactory: PrismaClientFactory = defaultClientFactory) {}
 
-  getClientForOperation(): PrismaClient {
+  getClientForOperation(): PrismaClientType {
     switch (this.state.kind) {
       case 'lazy-bound':
       case 'ready':
@@ -204,7 +207,7 @@ export class PrismaClientLifecycle {
     }
   }
 
-  private bindLazyClient(): PrismaClient {
+  private bindLazyClient(): PrismaClientType {
     let target: ResolvedDatasourceTarget;
     try {
       target = resolveDatasourceTarget();
@@ -231,7 +234,7 @@ export class PrismaClientLifecycle {
     logQueries: boolean,
     listener?: PrismaInitializationDiagnosticListener
   ): Promise<void> {
-    let client: PrismaClient;
+    let client: PrismaClientType;
     try {
       client = this.clientFactory(target, logQueries);
     } catch (cause) {
@@ -243,7 +246,7 @@ export class PrismaClientLifecycle {
 
   private startInitialization(
     target: ResolvedDatasourceTarget,
-    client: PrismaClient,
+    client: PrismaClientType,
     logQueries: boolean,
     enableWAL: boolean,
     previousWalReady: boolean,
@@ -365,7 +368,7 @@ export class PrismaClientLifecycle {
     return task;
   }
 
-  private shutdownBoundClient(client: PrismaClient): Promise<void> {
+  private shutdownBoundClient(client: PrismaClientType): Promise<void> {
     let shuttingDownState!: ShuttingDownState;
     const task = Promise.resolve().then(async () => {
       try {
@@ -381,7 +384,7 @@ export class PrismaClientLifecycle {
     return task;
   }
 
-  private async disconnectWithoutReplacingFailure(client: PrismaClient): Promise<void> {
+  private async disconnectWithoutReplacingFailure(client: PrismaClientType): Promise<void> {
     try {
       await client.$disconnect();
     } catch {

@@ -1,5 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { Prisma } from '@prisma/client';
+import PrismaClientPackage from '@prisma/client';
+import type { Prisma as PrismaTypes } from '@prisma/client';
+
+const { Prisma: PrismaRuntime } = PrismaClientPackage;
 
 const mocks = vi.hoisted(() => ({
   transaction: vi.fn(),
@@ -26,7 +29,7 @@ const checkOptionTypes = () => {
   const valid: RunInTransactionOptions = {
     maxWait: 2_000,
     timeout: 10_000,
-    isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+    isolationLevel: PrismaRuntime.TransactionIsolationLevel.Serializable,
   };
 
   // @ts-expect-error unrelated transaction settings are not accepted
@@ -49,14 +52,14 @@ describe('runInTransaction control flow', () => {
   const transactionClient = {
     user: { create: userCreate },
     post: { create: postCreate },
-  } as unknown as Prisma.TransactionClient;
+  } as unknown as PrismaTypes.TransactionClient;
 
   beforeEach(() => {
     vi.clearAllMocks();
     userCreate.mockResolvedValue({ id: 1, email: 'outer@example.com' });
     postCreate.mockResolvedValue({ id: 1, title: 'Post', authorId: 1 });
     mocks.transaction.mockImplementation(
-      async (callback: (tx: Prisma.TransactionClient) => Promise<unknown>) =>
+      async (callback: (tx: PrismaTypes.TransactionClient) => Promise<unknown>) =>
         callback(transactionClient)
     );
   });
@@ -76,7 +79,7 @@ describe('runInTransaction control flow', () => {
     const options: RunInTransactionOptions = {
       maxWait: 2_000,
       timeout: 10_000,
-      isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+      isolationLevel: PrismaRuntime.TransactionIsolationLevel.Serializable,
     };
     const userRepository = new UserRepository();
     const postRepository = new PostRepository();
@@ -120,7 +123,7 @@ describe('runInTransaction control flow', () => {
       maxWait: 1,
       timeout: 1,
     };
-    const observedClients: Prisma.TransactionClient[] = [];
+    const observedClients: PrismaTypes.TransactionClient[] = [];
 
     const result = await runInTransaction(async () => {
       observedClients.push(getTransactionClient()!);

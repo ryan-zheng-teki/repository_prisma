@@ -3,7 +3,6 @@ import { BaseRepository } from '../lib/base-repository';
 import { Models } from '../lib/models';
 import { Transactional } from '../lib/decorators';
 import { runInTransaction } from '../lib/context';
-import { Prisma } from '@prisma/client';
 import { rootPrismaClient } from '../lib/prisma-manager';
 import { initializePrisma, shutdownPrisma } from '../lib/client';
 

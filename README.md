@@ -197,6 +197,18 @@ rejects with `DATASOURCE_CONFLICT`; call and await `shutdownPrisma()` before reb
 This behavior-only release does not change the Prisma schema, migrations, or persisted
 data, so no data migration is required.
 
+## ESM and CommonJS Package Loading
+
+The package preserves both published entrypoints: ESM consumers resolve `exports.import`,
+and CommonJS consumers resolve `exports.require`. The external `@prisma/client` peer remains
+external and is supplied by the consuming application. At runtime, the package reads its
+CommonJS-generated Prisma peer through the default namespace and then selects the required
+`PrismaClient` or `Prisma` value. This avoids depending on Node's heuristic CommonJS named-export
+detection while preserving the existing public exports and Prisma behavior.
+
+Type-only Prisma references are kept compile-time-only with explicit `import type` declarations;
+no peer version, schema, migration, or database change is required for this package-loading fix.
+
 ## Advanced: Root Client Access (Use Carefully)
 
 The exported `rootPrismaClient` is intended for app-level tasks (migrations, health checks, cleanup scripts).
@@ -258,16 +270,16 @@ The test script normalizes relative `file:` URLs to absolute paths for cross-pla
 
 ## Release (Tag-Based)
 
-We use a tag-based release flow. For this already-versioned 1.0.9 release, do not run
-`npm version patch`, because it would advance the package to 1.0.10. Create and push the
+We use a tag-based release flow. For this already-versioned 1.0.10 release, do not run
+`npm version patch`, because it would advance the package to 1.0.11. Create and push the
 explicit release tag instead:
 
 ```bash
-git tag -a v1.0.9 -m "1.0.9"
+git tag -a v1.0.10 -m "1.0.10"
 git push origin main --follow-tags
 ```
 
-If you prefer to tag manually via a Git UI, create the same annotated `v1.0.9` tag and
+If you prefer to tag manually via a Git UI, create the same annotated `v1.0.10` tag and
 push it with the repository's normal tag workflow:
 
 ```bash

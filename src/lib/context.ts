@@ -1,5 +1,5 @@
 import { AsyncLocalStorage } from 'async_hooks';
-import { Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import { rootPrismaClient } from './client';
 
 // The storage holds the Transaction Client

@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma } from '@prisma/client';
+import type { PrismaClient, Prisma } from '@prisma/client';
 import { getTransactionClient } from './context';
 import { rootPrismaClient } from './client';
 

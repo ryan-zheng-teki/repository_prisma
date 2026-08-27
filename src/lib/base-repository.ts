@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import type { Prisma, PrismaClient } from '@prisma/client';
 import { getPrismaClient } from './prisma-manager';
 
 // Type helper: Extracts the Delegate type from the Model Name

@@ -266,7 +266,7 @@ process.on('exit', () => fs.writeFileSync(process.env.POLICY_OPTIONS_FILE, JSON.
   const policyPeerStub = `
 import fs from 'node:fs';
 const logLevels = [];
-export class PrismaClient {
+class PrismaClient {
   constructor(options) {
     logLevels.push(Array.isArray(options?.log) ? [...options.log] : []);
   }
@@ -274,7 +274,8 @@ export class PrismaClient {
   async $disconnect() {}
   async $queryRawUnsafe() { return []; }
 }
-export const Prisma = { ModelName: {} };
+const Prisma = { ModelName: {} };
+export default { PrismaClient, Prisma };
 process.on('exit', () => fs.writeFileSync(process.env.POLICY_OPTIONS_FILE, JSON.stringify(logLevels)));
 `;
   fs.writeFileSync(path.join(consumerDirectory, 'policy-peer-stub.mjs'), policyPeerStub);

@@ -1,0 +1,150 @@
+Implementation validation log
+worktree: /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop
+node: v22.23.1
+npm: 10.9.8
+timestamp: 2026-08-27T05:54:42Z
+
+=== npm run typecheck ===
+
+> repository_prisma@1.0.10 typecheck
+> tsc -p tsconfig.json
+
+=== npm run build ===
+
+> repository_prisma@1.0.10 build
+> tsup
+
+CLI Building entry: src/index.ts
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.1
+CLI Using tsup config: /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tsup.config.ts
+CLI Target: es2018
+CLI Cleaning output folder
+CJS Build start
+ESM Build start
+CJS You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+ESM You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+ESM dist/index.mjs     26.77 KB
+ESM dist/index.mjs.map 55.74 KB
+ESM ⚡️ Build success in 47ms
+CJS dist/index.js     29.27 KB
+CJS dist/index.js.map 56.97 KB
+CJS ⚡️ Build success in 48ms
+DTS Build start
+DTS ⚡️ Build success in 1053ms
+DTS dist/index.d.ts  8.96 KB
+DTS dist/index.d.mts 8.96 KB
+=== emitted ESM/CJS import audit ===
+109:import PrismaClientPackage from "@prisma/client";
+809:import PrismaClientPackage2 from "@prisma/client";
+162:var import_client = __toESM(require("@prisma/client"));
+862:var import_client5 = __toESM(require("@prisma/client"));
+PASS: emitted artifacts use no unsafe ESM named Prisma peer imports
+=== node scripts/run-esm-cjs-interop.js ===
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-esm-cjs-interop-DFQlqa"}
+=== npm test ===
+
+> repository_prisma@1.0.10 test
+> node scripts/run-tests.js
+
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "test.db" at "file:///Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/test.db"
+
+The database is already in sync with the Prisma schema.
+
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 44ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Help us improve the Prisma ORM for everyone. Share your feedback in a short 2-min survey: https://pris.ly/orm/survey/release-5-22
+
+
+ RUN  v4.0.18 /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop
+
+ ✓ src/tests/forwarding-proxy.test.ts (3 tests) 6ms
+ ✓ src/tests/database-filter.test.ts (11 tests) 5ms
+ ✓ src/tests/logging-policy.test.ts (14 tests) 8ms
+ ✓ src/tests/transaction-context.test.ts (4 tests) 8ms
+ ✓ src/tests/datasource-readiness.test.ts (18 tests) 35ms
+ ✓ src/tests/client-lifecycle.test.ts (14 tests) 204ms
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > opens DATABASE_URL_TEST under test and leaves DATABASE_URL untouched
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration)
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > lets a non-empty explicit datasource win and treats whitespace as omitted
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > lets a non-empty explicit datasource win and treats whitespace as omitted
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > normalizes cwd-relative paths with spaces, literal percent spelling, and query parameters
+prisma:info Starting a sqlite pool with 1 connections.
+
+ ✓ src/tests/integration.test.ts (10 tests) 594ms
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > accepts a symlink spelling when canonical physical identity is the same
+prisma:info Starting a sqlite pool with 1 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > preserves delete mode without WAL, then upgrades and independently verifies WAL
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > blocks access after a safe missing-target failure and permits corrected explicit retry
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > rejects a lazy-bound target switch without opening the second file, then rebinds captured methods after shutdown
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > rejects a lazy-bound target switch without opening the second file, then rebinds captured methods after shutdown
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > reads representative existing data directly without schema migration
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > context-aware public forwarding with the current Prisma schema > uses a captured context method inside ALS and the root owner after ALS exits
+prisma:info Starting a sqlite pool with 21 connections.
+
+ ✓ src/tests/public-initialization.test.ts (9 tests) 705ms
+     ✓ opens DATABASE_URL_TEST under test and leaves DATABASE_URL untouched  580ms
+
+ Test Files  8 passed (8)
+      Tests  83 passed (83)
+   Start at  07:54:49
+   Duration  1.08s (transform 1.03s, setup 0ms, import 1.35s, tests 1.57s, environment 1ms)
+
+=== npm run test:package ===
+
+> repository_prisma@1.0.10 test:package
+> npm run build && node scripts/run-package-smoke.js && node scripts/run-esm-cjs-interop.js
+
+
+> repository_prisma@1.0.10 build
+> tsup
+
+CLI Building entry: src/index.ts
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.1
+CLI Using tsup config: /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tsup.config.ts
+CLI Target: es2018
+CLI Cleaning output folder
+CJS Build start
+ESM Build start
+CJS You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+ESM You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+ESM dist/index.mjs     26.77 KB
+ESM dist/index.mjs.map 55.74 KB
+ESM ⚡️ Build success in 34ms
+CJS dist/index.js     29.27 KB
+CJS dist/index.js.map 56.97 KB
+CJS ⚡️ Build success in 35ms
+DTS Build start
+DTS ⚡️ Build success in 1160ms
+DTS dist/index.d.ts  8.96 KB
+DTS dist/index.d.mts 8.96 KB
+
+added 2 packages in 284ms
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-package-smoke-Y9nSFM"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-esm-cjs-interop-N0LXKf"}
+validation exit status: 0

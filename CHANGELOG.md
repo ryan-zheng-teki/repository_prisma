@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.10
+
+- Fix ESM package loading with CommonJS-generated `@prisma/client` peers by consuming runtime
+  values through the peer's default namespace instead of heuristic named exports.
+- Mark package-source Prisma type references as explicit `import type` dependencies and add a
+  synthetic CommonJS-peer ESM regression probe.
+- Preserve the CommonJS entrypoint, public exports, peer range, Prisma schema, migrations, and
+  persisted data.
+
 ## 1.0.9
 
 - Add exported `RunInTransactionOptions` support for Prisma interactive-transaction

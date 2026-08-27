@@ -114,6 +114,20 @@ reads already-present values only when resolving a datasource or constructing a 
 This behavior-only hardening changes no schema, migration, or persisted-data
 representation, so existing consumer databases are directly usable without migration.
 
+### Package ESM/CommonJS Boundary
+
+The package exports separate ESM and CommonJS artifacts through the existing `exports.import`
+and `exports.require` conditions. Because `@prisma/client` is a CommonJS-generated external peer,
+ESM source must consume it through the default CommonJS namespace rather than named runtime
+imports, which rely on Node's heuristic named-export detection. The lifecycle owner destructures
+`PrismaClient` for raw client construction, and the model-value owner destructures `Prisma` for
+`Models`; each keeps a separate aliased `import type` binding for TypeScript-only references.
+
+All other Prisma references in package source use explicit `import type`, so declarations retain
+the existing contracts without adding runtime peer edges. The package does not add a fallback,
+`createRequire` path, compatibility adapter, or peer-range change. Package validation includes a
+synthetic dynamic CommonJS-peer ESM probe in addition to the installed generated-peer smoke.
+
 ### F. `src/lib/forwarding-proxy.ts` and `src/lib/prisma-proxy.ts` (Access Routing)
 
 **Responsibility**: Preserve Prisma-shaped public access without leaking a retained raw root or ALS

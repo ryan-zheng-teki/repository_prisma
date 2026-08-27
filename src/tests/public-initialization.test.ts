@@ -10,7 +10,7 @@ import {
 import os from 'node:os';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { PrismaClient } from '@prisma/client';
+import PrismaClientPackage from '@prisma/client';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
   initializePrisma,
@@ -21,6 +21,8 @@ import {
 import { runInTransaction } from '../lib/context';
 import { getPrismaClient } from '../lib/prisma-manager';
 import { prisma } from '../lib/prisma-proxy';
+
+const { PrismaClient: PrismaClientRuntime } = PrismaClientPackage;
 
 type DatabaseListRow = { name: string; file: string };
 type JournalModeRow = Record<string, string>;
@@ -208,7 +210,7 @@ describe.sequential('public initialization and real SQLite identity', () => {
     const directory = await temporaryDirectory();
     const databasePath = path.join(directory, 'existing.db');
     const datasourceUrl = `file:${databasePath}`;
-    const seedClient = new PrismaClient({ datasourceUrl });
+    const seedClient = new PrismaClientRuntime({ datasourceUrl });
     await seedClient.$executeRawUnsafe(
       'CREATE TABLE existing_probe (id INTEGER PRIMARY KEY, value TEXT NOT NULL);'
     );
@@ -244,7 +246,7 @@ describe.sequential('context-aware public forwarding with the current Prisma sch
     temporaryDirectories.push(directory);
     const databasePath = path.join(directory, 'als.db');
     const schemaDatabaseUrl = `file:${databasePath}`;
-    const schemaClient = new PrismaClient({ datasourceUrl: schemaDatabaseUrl });
+    const schemaClient = new PrismaClientRuntime({ datasourceUrl: schemaDatabaseUrl });
     await schemaClient.$executeRawUnsafe(
       'CREATE TABLE "User" ("id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "email" TEXT NOT NULL);'
     );
