@@ -18,7 +18,7 @@ Delivery of the reviewed `repository-prisma-esm-cjs-interop` candidate, includin
 - Latest tracked remote base reference checked: `origin/main@8ab582f75e5456856cb0954eaba1ad4882250577` after `git fetch origin --prune`
 - Base advanced since bootstrap or previous refresh: `No`
 - New base commits integrated into the ticket branch: `No`
-- Local checkpoint commit result: `Completed` — delivery-safety checkpoint `93ea302f56a7bf7e2c2d3f17028aae6f7c996a85`; no base integration risk existed, and the checkpoint protects the cumulative evidence and handoff artifacts without finalizing the repository.
+- Local checkpoint commit result: `Completed` — delivery-safety/evidence checkpoint `93ea302f56a7bf7e2c2d3f17028aae6f7c996a85` followed by delivery-record update `87e86a93cad818da538b1d26e44b5232c57da80e`; both protect the cumulative evidence and handoff artifacts without finalizing the repository.
 - Integration method: `Already current`
 - Integration result: `Completed`
 - Post-integration executable checks rerun: `No`
@@ -56,7 +56,7 @@ Package and lock metadata are consistently `1.0.10`; no version bump or release 
 
 - Bootstrap context source: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/investigation-notes.md`
 - Ticket branch: `codex/repository-prisma-esm-cjs-interop`
-- Ticket branch commit result: `Held — only the delivery-safety checkpoint `93ea302f56a7bf7e2c2d3f17028aae6f7c996a85` exists; the archival/finalization commit is not created`
+- Ticket branch commit result: `Held — local delivery-preparation commits `93ea302f56a7bf7e2c2d3f17028aae6f7c996a85` and `87e86a93cad818da538b1d26e44b5232c57da80e` exist; the archival/finalization commit is not created`
 - Ticket branch push result: `Held — explicit user verification required`
 - Finalization target remote: `origin`
 - Finalization target branch: `codex/repository-prisma-esm-cjs-interop` per bootstrap context; no direct `main` finalization from this worktree

@@ -12,7 +12,7 @@
 - Finalization target from bootstrap context: this ticket branch, followed by the repository's normal tag-based `repository_prisma` release flow; no direct finalization onto `main` from this worktree.
 - Bootstrap base: `origin/main@8ab582f75e5456856cb0954eaba1ad4882250577`
 - Reviewed implementation commit: `a469dbacf09da878310fdedd72b3a7f6fba7ef32`
-- Current delivery state: `HEAD` is already based on the refreshed `origin/main`; no base commits were integrated. Delivery-safety checkpoint: `93ea302f56a7bf7e2c2d3f17028aae6f7c996a85` (local only, not pushed or finalized).
+- Current delivery state: `HEAD` is already based on the refreshed `origin/main`; no base commits were integrated. Delivery-preparation commits: `93ea302f56a7bf7e2c2d3f17028aae6f7c996a85` (evidence checkpoint) and `87e86a93cad818da538b1d26e44b5232c57da80e` (delivery-record update); both are local only, not pushed or finalized.
 
 ## Cumulative Artifact Package
 
@@ -51,7 +51,7 @@
 - Refreshed tracked base: `origin/main@8ab582f75e5456856cb0954eaba1ad4882250577`.
 - Base advanced beyond bootstrap: `No`.
 - Integration method: `Already current`; no merge or rebase performed.
-- Delivery-safety checkpoint: `93ea302f56a7bf7e2c2d3f17028aae6f7c996a85`, created after docs/evidence preparation and explicitly not a finalization commit.
+- Delivery-preparation commits: `93ea302f56a7bf7e2c2d3f17028aae6f7c996a85` protects the evidence package and `87e86a93cad818da538b1d26e44b5232c57da80e` records the final delivery hold; both are explicitly not finalization commits.
 - Post-integration check: no new base commits were integrated, so no additional base-triggered executable rerun was required. `git diff --check origin/main...HEAD` passed. Upstream API/E2E evidence at this same candidate reports typecheck, build, focused interop, full 83-test suite, packed package smoke, and audits passing.
 - Exact integration record: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/in-progress/repository-prisma-esm-cjs-interop/delivery-integration-check.log`.
 
