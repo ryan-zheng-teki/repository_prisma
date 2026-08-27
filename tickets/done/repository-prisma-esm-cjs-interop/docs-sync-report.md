@@ -6,7 +6,7 @@
 - Trigger: API/E2E `Pass` at `96%` final confidence (`API-REV-001`) followed by proportional test-code review `CRR-002`, `Not Applicable`, with no findings.
 - Bootstrap base reference: `origin/main@8ab582f75e5456856cb0954eaba1ad4882250577` (`docs: record repository_prisma 1.0.9 release`)
 - Integrated base reference used for docs sync: `origin/main@8ab582f75e5456856cb0954eaba1ad4882250577` after `git fetch origin --prune`; already current and unchanged from bootstrap.
-- Post-integration verification reference: delivery-safety checkpoint `93ea302f56a7bf7e2c2d3f17028aae6f7c996a85` containing the reviewed candidate, upstream evidence, and delivery artifacts; `tickets/in-progress/repository-prisma-esm-cjs-interop/delivery-integration-check.log` records the refreshed-base relation and diff check. No base commits were integrated, so no additional base-triggered executable rerun was required; upstream API/E2E execution logs remain authoritative.
+- Post-integration verification reference: delivery-safety checkpoint `93ea302f56a7bf7e2c2d3f17028aae6f7c996a85` containing the reviewed candidate, upstream evidence, and delivery artifacts; `tickets/done/repository-prisma-esm-cjs-interop/delivery-integration-check.log` records the refreshed-base relation and diff check. No base commits were integrated, so no additional base-triggered executable rerun was required; upstream API/E2E execution logs remain authoritative.
 
 ## Why Docs Were Updated
 
