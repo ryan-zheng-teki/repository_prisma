@@ -83,7 +83,7 @@
 - Ticket state transition: completed; ticket folder moved to `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/` before the archive/finalization commit.
 - Finalization target: recorded ticket branch `codex/repository-prisma-esm-cjs-interop`, remote `origin`.
 - Finalization commit: `ef59778efca8ef122235a8c6aa2971a926a4299d`; branch push succeeded.
-- Release action remaining: create and push annotated `v1.0.10`, monitor CI/release workflow, verify npm registry publication, then record final release/cleanup evidence.
+- Release completion: annotated `v1.0.10` tag push, Release workflow `33045422351`, npm publication, and registry verification completed. The exact Linux ARM64/Vitest consumer remains explicitly `Not Tested`.
 
 ## Environment / Persisted Data
 
