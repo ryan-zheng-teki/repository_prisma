@@ -20,7 +20,7 @@ $ git diff --check origin/main...HEAD
 PASS: reviewed candidate diff has no whitespace errors.
 
 Integration method: Already current; no merge or rebase performed.
-Checkpoint: Not needed for base refresh; reviewed implementation is committed at HEAD.
+Checkpoint: Completed after delivery artifact preparation at 93ea302f56a7bf7e2c2d3f17028aae6f7c996a85; this is delivery-safety only, not repository finalization.
 Post-integration rerun: Not required because refreshed origin/main is unchanged from bootstrap and no new base commits were integrated.
 Upstream executable evidence remains authoritative at HEAD: api-e2e-typecheck.log, api-e2e-build.log, api-e2e-interop.log, api-e2e-npm-test.log, api-e2e-package.log, api-e2e-audits.log.
 
