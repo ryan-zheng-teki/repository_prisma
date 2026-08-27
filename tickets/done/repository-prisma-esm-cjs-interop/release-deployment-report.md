@@ -6,9 +6,9 @@ Delivery of the reviewed `repository-prisma-esm-cjs-interop` candidate, includin
 
 ## Handoff Summary
 
-- Handoff summary artifact: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/in-progress/repository-prisma-esm-cjs-interop/handoff-summary.md`
+- Handoff summary artifact: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/handoff-summary.md`
 - Handoff summary status: `Updated`
-- Delivery revision record: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/in-progress/repository-prisma-esm-cjs-interop/delivery-revision-record.md`
+- Delivery revision record: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/delivery-revision-record.md`
 - Current delivery revision ID: `DR-001`
 - Notes: The integrated, documented candidate is ready for user verification. No finalization, publication, deployment, or cleanup action has been attempted.
 
@@ -38,7 +38,7 @@ Delivery of the reviewed `repository-prisma-esm-cjs-interop` candidate, includin
 
 ## Docs Sync Result
 
-- Docs sync artifact: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/in-progress/repository-prisma-esm-cjs-interop/docs-sync-report.md`
+- Docs sync artifact: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/docs-sync-report.md`
 - Docs sync result: `Updated`
 - Docs updated: `README.md`, `DESIGN.md`, and `CHANGELOG.md` in the reviewed implementation candidate; delivery verified them against the integrated state and found no further edit necessary.
 - No-impact rationale (if applicable): `N/A — docs impact was addressed in the candidate.`
@@ -54,7 +54,7 @@ Package and lock metadata are consistently `1.0.10`; no version bump or release 
 
 ## Repository Finalization
 
-- Bootstrap context source: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/investigation-notes.md`
+- Bootstrap context source: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/investigation-notes.md`
 - Ticket branch: `codex/repository-prisma-esm-cjs-interop`
 - Ticket branch commit result: `Held — local delivery-preparation commits `93ea302f56a7bf7e2c2d3f17028aae6f7c996a85` and `87e86a93cad818da538b1d26e44b5232c57da80e` exist; the archival/finalization commit is not created`
 - Ticket branch push result: `Held — explicit user verification required`
@@ -95,7 +95,7 @@ Package and lock metadata are consistently `1.0.10`; no version bump or release 
 
 ## Release Notes Summary
 
-- Release notes artifact created before verification / acceptance: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/in-progress/repository-prisma-esm-cjs-interop/release-notes.md`
+- Release notes artifact created before verification / acceptance: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/release-notes.md`
 - Archived release notes artifact used for release/publication: `N/A — not archived or used before verification`
 - Release notes status: `Updated`
 

@@ -1,0 +1,122 @@
+Finalization checks — 2026-08-27
+
+$ npm run typecheck
+
+> repository_prisma@1.0.10 typecheck
+> tsc -p tsconfig.json
+
+exit=0
+
+$ npm test
+
+> repository_prisma@1.0.10 test
+> node scripts/run-tests.js
+
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "test.db" at "file:///Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/test.db"
+
+The database is already in sync with the Prisma schema.
+
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 34ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Curious about the SQL queries Prisma ORM generates? Optimize helps you enhance your visibility: https://pris.ly/tip-2-optimize
+
+
+ RUN  v4.0.18 /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop
+
+ ✓ src/tests/forwarding-proxy.test.ts (3 tests) 3ms
+ ✓ src/tests/database-filter.test.ts (11 tests) 4ms
+ ✓ src/tests/transaction-context.test.ts (4 tests) 5ms
+ ✓ src/tests/logging-policy.test.ts (14 tests) 6ms
+ ✓ src/tests/datasource-readiness.test.ts (18 tests) 21ms
+ ✓ src/tests/client-lifecycle.test.ts (14 tests) 180ms
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration)
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > opens DATABASE_URL_TEST under test and leaves DATABASE_URL untouched
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > lets a non-empty explicit datasource win and treats whitespace as omitted
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > lets a non-empty explicit datasource win and treats whitespace as omitted
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > normalizes cwd-relative paths with spaces, literal percent spelling, and query parameters
+prisma:info Starting a sqlite pool with 1 connections.
+
+ ✓ src/tests/integration.test.ts (10 tests) 564ms
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > accepts a symlink spelling when canonical physical identity is the same
+prisma:info Starting a sqlite pool with 1 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > preserves delete mode without WAL, then upgrades and independently verifies WAL
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > blocks access after a safe missing-target failure and permits corrected explicit retry
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > rejects a lazy-bound target switch without opening the second file, then rebinds captured methods after shutdown
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > rejects a lazy-bound target switch without opening the second file, then rebinds captured methods after shutdown
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > reads representative existing data directly without schema migration
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > context-aware public forwarding with the current Prisma schema > uses a captured context method inside ALS and the root owner after ALS exits
+prisma:info Starting a sqlite pool with 21 connections.
+
+ ✓ src/tests/public-initialization.test.ts (9 tests) 680ms
+     ✓ opens DATABASE_URL_TEST under test and leaves DATABASE_URL untouched  546ms
+
+ Test Files  8 passed (8)
+      Tests  83 passed (83)
+   Start at  08:15:12
+   Duration  989ms (transform 886ms, setup 0ms, import 1.16s, tests 1.46s, environment 1ms)
+
+exit=0
+
+$ npm run test:package
+
+> repository_prisma@1.0.10 test:package
+> npm run build && node scripts/run-package-smoke.js && node scripts/run-esm-cjs-interop.js
+
+
+> repository_prisma@1.0.10 build
+> tsup
+
+CLI Building entry: src/index.ts
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.1
+CLI Using tsup config: /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tsup.config.ts
+CLI Target: es2018
+CLI Cleaning output folder
+CJS Build start
+ESM Build start
+CJS You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+ESM You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+ESM dist/index.mjs     26.77 KB
+ESM dist/index.mjs.map 55.74 KB
+ESM ⚡️ Build success in 22ms
+CJS dist/index.js     29.27 KB
+CJS dist/index.js.map 56.97 KB
+CJS ⚡️ Build success in 24ms
+DTS Build start
+DTS ⚡️ Build success in 979ms
+DTS dist/index.d.ts  8.96 KB
+DTS dist/index.d.mts 8.96 KB
+
+added 2 packages in 234ms
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-package-smoke-ScqNGG"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-esm-cjs-interop-y9FH6Q"}
+exit=0
+
+$ git diff --check
+exit=0
+
+All finalization checks passed.
