@@ -1,0 +1,23 @@
+Release preflight (read-only) — 2026-08-27
+$ git tag -l v1.0.10
+(absent)
+$ git ls-remote --tags origin refs/tags/v1.0.10 refs/tags/v1.0.10^{}
+(absent)
+$ npm view repository_prisma@1.0.10 version --json
+npm error code E404
+npm error 404 No match found for version 1.0.10
+npm error 404
+npm error 404  'repository_prisma@1.0.10' is not in this registry.
+npm error 404
+npm error 404 Note that you can also install from a
+npm error 404 tarball, folder, http url, or git url.
+{
+  "error": {
+    "code": "E404",
+    "summary": "No match found for version 1.0.10",
+    "detail": "'repository_prisma@1.0.10' is not in this registry.\n\nNote that you can also install from a\ntarball, folder, http url, or git url."
+  }
+}
+npm error A complete log of this run can be found in: /Users/normy/.npm/_logs/2026-08-27T06_12_07_330Z-debug-0.log
+npm view exit status: 1 (404/not published is expected before the authorized release flow)
+No tag creation, push, npm publish, or deployment was attempted.

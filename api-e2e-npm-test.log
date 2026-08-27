@@ -1,0 +1,70 @@
+
+> repository_prisma@1.0.10 test
+> node scripts/run-tests.js
+
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": SQLite database "test.db" at "file:///Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/test.db"
+
+The database is already in sync with the Prisma schema.
+
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 53ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Help us improve the Prisma ORM for everyone. Share your feedback in a short 2-min survey: https://pris.ly/orm/survey/release-5-22
+
+
+ RUN  v4.0.18 /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop
+
+ ✓ src/tests/forwarding-proxy.test.ts (3 tests) 6ms
+ ✓ src/tests/database-filter.test.ts (11 tests) 5ms
+ ✓ src/tests/transaction-context.test.ts (4 tests) 6ms
+ ✓ src/tests/logging-policy.test.ts (14 tests) 8ms
+ ✓ src/tests/datasource-readiness.test.ts (18 tests) 33ms
+ ✓ src/tests/client-lifecycle.test.ts (14 tests) 198ms
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > opens DATABASE_URL_TEST under test and leaves DATABASE_URL untouched
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/integration.test.ts > Implicit Transactions (Integration)
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > lets a non-empty explicit datasource win and treats whitespace as omitted
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > lets a non-empty explicit datasource win and treats whitespace as omitted
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > normalizes cwd-relative paths with spaces, literal percent spelling, and query parameters
+prisma:info Starting a sqlite pool with 1 connections.
+
+ ✓ src/tests/integration.test.ts (10 tests) 616ms
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > accepts a symlink spelling when canonical physical identity is the same
+prisma:info Starting a sqlite pool with 1 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > preserves delete mode without WAL, then upgrades and independently verifies WAL
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > blocks access after a safe missing-target failure and permits corrected explicit retry
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > rejects a lazy-bound target switch without opening the second file, then rebinds captured methods after shutdown
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > rejects a lazy-bound target switch without opening the second file, then rebinds captured methods after shutdown
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > public initialization and real SQLite identity > reads representative existing data directly without schema migration
+prisma:info Starting a sqlite pool with 21 connections.
+
+stdout | src/tests/public-initialization.test.ts > context-aware public forwarding with the current Prisma schema > uses a captured context method inside ALS and the root owner after ALS exits
+prisma:info Starting a sqlite pool with 21 connections.
+
+ ✓ src/tests/public-initialization.test.ts (9 tests) 735ms
+     ✓ opens DATABASE_URL_TEST under test and leaves DATABASE_URL untouched  606ms
+
+ Test Files  8 passed (8)
+      Tests  83 passed (83)
+   Start at  08:04:00
+   Duration  1.13s (transform 1.25s, setup 0ms, import 1.58s, tests 1.61s, environment 1ms)

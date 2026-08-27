@@ -1,0 +1,41 @@
+Delivery integration refresh — 2026-08-27
+$ git fetch origin --prune
+
+$ git rev-parse origin/main
+8ab582f75e5456856cb0954eaba1ad4882250577
+$ git show -s --format=%H\\n%s origin/main
+8ab582f75e5456856cb0954eaba1ad4882250577
+docs: record repository_prisma 1.0.9 release
+
+$ git rev-parse HEAD
+a469dbacf09da878310fdedd72b3a7f6fba7ef32
+$ git show -s --format=%H\\n%s HEAD
+a469dbacf09da878310fdedd72b3a7f6fba7ef32
+fix: make Prisma ESM peer imports CJS-safe
+
+$ git merge-base --is-ancestor origin/main HEAD
+PASS: origin/main is already an ancestor of the ticket branch; no base commits require integration.
+
+$ git diff --check origin/main...HEAD
+PASS: reviewed candidate diff has no whitespace errors.
+
+Integration method: Already current; no merge or rebase performed.
+Checkpoint: Not needed for base refresh; reviewed implementation is committed at HEAD.
+Post-integration rerun: Not required because refreshed origin/main is unchanged from bootstrap and no new base commits were integrated.
+Upstream executable evidence remains authoritative at HEAD: api-e2e-typecheck.log, api-e2e-build.log, api-e2e-interop.log, api-e2e-npm-test.log, api-e2e-package.log, api-e2e-audits.log.
+
+$ git status --short --branch
+## codex/repository-prisma-esm-cjs-interop...origin/main [ahead 1]
+?? api-e2e-audits.log
+?? api-e2e-build.log
+?? api-e2e-coverage-investigation.md
+?? api-e2e-execution-coverage-report.md
+?? api-e2e-interop.log
+?? api-e2e-npm-test.log
+?? api-e2e-package.log
+?? api-e2e-revision-record.md
+?? api-e2e-test-review-report.md
+?? api-e2e-typecheck.log
+?? code-review-report.md
+?? code-review-revision-record.md
+?? tickets/in-progress/

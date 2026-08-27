@@ -1,0 +1,45 @@
+=== runtime ===
+v22.23.1
+10.9.8
+Darwin 25.5.0 arm64
+=== emitted ESM unsafe named imports ===
+absent
+=== package metadata ===
+{
+  "version": "1.0.10",
+  "peer": {
+    "@prisma/client": "^5.22.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  }
+}
+=== source peer import inventory ===
+src/lib/base-repository.ts:1:import type { Prisma, PrismaClient } from '@prisma/client';
+src/lib/client.ts:1:import type { PrismaClient } from '@prisma/client';
+src/lib/client/lifecycle.ts:1:import PrismaClientPackage from '@prisma/client';
+src/lib/client/lifecycle.ts:2:import type { PrismaClient as PrismaClientType } from '@prisma/client';
+src/lib/client/logging-policy.ts:1:import type { Prisma } from '@prisma/client';
+src/lib/client/sqlite-readiness.ts:3:import type { PrismaClient } from '@prisma/client';
+src/lib/context.ts:2:import type { Prisma } from '@prisma/client';
+src/lib/decorators.ts:3:import type { Prisma } from '@prisma/client';
+src/lib/filters.ts:1:import type { Prisma } from '@prisma/client';
+src/lib/models.ts:1:import PrismaClientPackage from '@prisma/client';
+src/lib/models.ts:2:import type { Prisma as PrismaTypes } from '@prisma/client';
+src/lib/prisma-manager.ts:1:import type { PrismaClient, Prisma } from '@prisma/client';
+src/lib/prisma-proxy.ts:1:import type { PrismaClient } from '@prisma/client';
+src/lib/repository-factory.ts:1:import type { Prisma } from '@prisma/client';
+src/lib/types-experiment.ts:1:import type { PrismaClient, Prisma } from '@prisma/client';
+src/tests/client-lifecycle.test.ts:4:import type { PrismaClient } from '@prisma/client';
+src/tests/datasource-readiness.test.ts:4:import type { PrismaClient } from '@prisma/client';
+src/tests/logging-policy.test.ts:1:import type { PrismaClient } from '@prisma/client';
+src/tests/public-initialization.test.ts:13:import PrismaClientPackage from '@prisma/client';
+src/tests/transaction-context.test.ts:2:import PrismaClientPackage from '@prisma/client';
+src/tests/transaction-context.test.ts:3:import type { Prisma as PrismaTypes } from '@prisma/client';
+=== schema/migration diff vs origin/main ===
+=== diff check ===

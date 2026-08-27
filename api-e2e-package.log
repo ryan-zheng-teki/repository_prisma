@@ -1,0 +1,32 @@
+
+> repository_prisma@1.0.10 test:package
+> npm run build && node scripts/run-package-smoke.js && node scripts/run-esm-cjs-interop.js
+
+
+> repository_prisma@1.0.10 build
+> tsup
+
+CLI Building entry: src/index.ts
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.1
+CLI Using tsup config: /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tsup.config.ts
+CLI Target: es2018
+CLI Cleaning output folder
+CJS Build start
+ESM Build start
+CJS You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+ESM You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+CJS dist/index.js     29.27 KB
+CJS dist/index.js.map 56.97 KB
+CJS ⚡️ Build success in 26ms
+ESM dist/index.mjs     26.77 KB
+ESM dist/index.mjs.map 55.74 KB
+ESM ⚡️ Build success in 27ms
+DTS Build start
+DTS ⚡️ Build success in 1286ms
+DTS dist/index.d.ts  8.96 KB
+DTS dist/index.d.mts 8.96 KB
+
+added 2 packages in 361ms
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-package-smoke-Q4q3yt"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-esm-cjs-interop-vXiyvs"}
