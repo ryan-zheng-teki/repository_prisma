@@ -53,8 +53,8 @@
 ## Delivery Continuation
 
 - Result: `Pass`
-- Next delivery action: Archive and finalize the verified candidate, then execute the documented tag-based release and registry verification. Cleanup follows only after release evidence is complete.
-- Notes: Documentation remains truthful for the finalized candidate; the exact Linux ARM64/Vitest consumer remains explicitly `Not Tested` until independently executed, and release publication is separately evidenced.
+- Next delivery action: Finalization, tag-based release, registry verification, and evidence recording are complete. The authoritative ticket branch/worktree is retained because the bootstrap finalization target is the ticket branch.
+- Notes: Documentation remains truthful for the finalized and released candidate; the exact Linux ARM64/Vitest consumer remains explicitly `Not Tested`, and release publication is evidenced separately.
 
 ## Blocked Or Escalated Follow-Up (Use Only If Docs Sync Cannot Complete)
 

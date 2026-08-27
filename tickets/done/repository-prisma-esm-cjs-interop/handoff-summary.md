@@ -2,7 +2,7 @@
 
 ## Status
 
-`Repository finalized on the authorized ticket branch; release tag/publication pending completion of the documented workflow.`
+`Finalized and released as repository_prisma 1.0.10; registry verified.`
 
 ## Candidate
 
@@ -12,7 +12,7 @@
 - Finalization target from bootstrap context: this ticket branch, followed by the repository's normal tag-based `repository_prisma` release flow; no direct finalization onto `main` from this worktree.
 - Bootstrap base: `origin/main@8ab582f75e5456856cb0954eaba1ad4882250577`
 - Reviewed implementation commit: `a469dbacf09da878310fdedd72b3a7f6fba7ef32`
-- Delivery-preparation commits: `93ea302f56a7bf7e2c2d3f17028aae6f7c996a85`, `87e86a93cad818da538b1d26e44b5232c57da80e`, and `0e4cef979ad3375e197b425fb0c6406d932442d5`; archive/finalization commit: `ef59778efca8ef122235a8c6aa2971a926a4299d`; finalization metadata commit is pending.
+- Delivery-preparation commits: `93ea302f56a7bf7e2c2d3f17028aae6f7c996a85`, `87e86a93cad818da538b1d26e44b5232c57da80e`, and `0e4cef979ad3375e197b425fb0c6406d932442d5`; archive/finalization commit: `ef59778efca8ef122235a8c6aa2971a926a4299d`; finalization metadata commit: `5c57ebdb34ebbc6e80bf762d3c89e8e36386889e`; annotated tag `v1.0.10` points to this commit.
 
 ## Cumulative Artifact Package
 
@@ -45,6 +45,7 @@
 - Release/deployment report: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/release-deployment-report.md`
 - Release preflight: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/release-preflight.log`
 - Finalization checks: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/finalization-check.log`
+- Release/publication evidence: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-esm-cjs-interop/tickets/done/repository-prisma-esm-cjs-interop/release-publication.log`
 
 ## Delivery-Stage Integration
 
@@ -72,7 +73,7 @@
 ## Documentation And Release Preparation
 
 - `README.md`, `DESIGN.md`, and `CHANGELOG.md` were verified against the integrated candidate and remain the long-lived docs authority.
-- The cumulative ticket package, including release notes, is archived under `tickets/done/repository-prisma-esm-cjs-interop/`.
+- The cumulative ticket package, including release notes and release evidence, is archived under `tickets/done/repository-prisma-esm-cjs-interop/`.
 - Package and lock metadata are consistently `1.0.10`.
 - Read-only release preflight found no local or remote `v1.0.10` tag and npm returned `E404` before release. No publication was claimed before authorization.
 

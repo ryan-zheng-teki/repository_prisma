@@ -21,8 +21,8 @@
 
 ## Release Method And Current State
 
-Package and lock metadata are prepared at `1.0.10`. The repository documents the annotated tag flow: after explicit user verification and repository finalization, create and push `v1.0.10` so the tag-triggered GitHub Actions release workflow can publish through npm trusted publishing. No tag creation, npm publication, or deployment has been attempted or claimed in this delivery round.
+Package and lock metadata are `1.0.10`. After user authorization and ticket-branch finalization, annotated tag `v1.0.10` was pushed. GitHub Release workflow `33045422351` succeeded through npm trusted publishing. Registry verification confirms `repository_prisma@1.0.10` is npm `latest`, retains peer `@prisma/client:^5.22.0`, and has integrity `sha512-pU9uNyvq4Y0N8VmYOBgG6TXNxxV6WeFTuHd6kMI0Flr8frc51rzKCNVeZMFv04dNfwXOJ7n23x4Msv7gt1Z8Nw==`.
 
 ## Rollback
 
-Before publication, withhold finalization and release if user verification or the required final-target refresh/check exposes a regression or materially changed state. After publication, stop adoption of `1.0.10`, direct consumers to `1.0.9`, revert the finalized change on `main`, and publish a new corrective patch rather than moving or reusing the immutable `v1.0.10` tag. No data-migration rollback is required.
+After publication, stop adoption of `1.0.10`, direct consumers to `1.0.9`, revert the finalized change on the recorded ticket branch, and publish a new corrective patch rather than moving or reusing the immutable `v1.0.10` tag. No data-migration rollback is required.
