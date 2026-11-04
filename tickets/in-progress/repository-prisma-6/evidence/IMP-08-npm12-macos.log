@@ -1,0 +1,53 @@
+# Check: IMP-08 (AC-003: npm 12.2.1 on macOS arm64)
+# Command: git archive b87252c into /tmp/rp6-npm12; PATH has npm 12.2.1 first (the smoke's own npm pack/install use it too); env -u DATABASE_URL -u DATABASE_URL_TEST npm ci; count install-script warnings; npm run typecheck; npm test; npm run build; npm run test:package
+# Commit: b87252c
+# Environment: macOS 26.5.2 arm64, Node v22.23.1, npm 12.2.1, uid 501
+# Date: 2026-11-04T17:13Z
+
+$ npm ci
+npm-ci exit=0
+npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
+npm notice run repository_prisma@2.0.0 prepare
+npm notice run prisma generate
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+
+✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 41ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+
+
+added 274 packages, and audited 275 packages in 4s
+
+found 0 vulnerabilities
+install-script warning lines (grep -ciE 'install-scripts|not approved|allow-scripts|allowScripts'): 0
+$ ls node_modules/better-sqlite3/build/Release/*.node
+node_modules/better-sqlite3/build/Release/better_sqlite3.node
+
+$ npm run typecheck
+typecheck exit=0
+$ npm test
+ Test Files  11 passed (11)
+      Tests  113 passed (113)
+npm-test exit=0
+$ npm run build
+build exit=0
+$ npm run test:package
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","externalDriverAdapter":"pass","noNativeAddonOnImport":"pass","noQueryStringFiles":"pass","readonlyWal":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-package-smoke-pfKfAA"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-esm-cjs-interop-brtG1e"}
+test-package exit=0
+
+## control: the same copy with allowScripts removed (node -e delete pkg.allowScripts), npm ci
+npm-ci exit=0
+npm warn install-scripts 5 packages had install scripts blocked because they are not covered by allowScripts:
+npm warn install-scripts   @prisma/engines@7.10.1 (postinstall: node scripts/postinstall.js)
+npm warn install-scripts   better-sqlite3@12.11.1 (install: prebuild-install || node-gyp rebuild --release)
+npm warn install-scripts   esbuild@0.27.2 (postinstall: node install.js)
+npm warn install-scripts   fsevents@2.3.3 (install: (install scripts present))
+npm warn install-scripts   prisma@7.10.1 (preinstall: node scripts/preinstall-entry.js)
+npm warn install-scripts
+npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+install-script warning lines: 8
+better-sqlite3 native module present: 0

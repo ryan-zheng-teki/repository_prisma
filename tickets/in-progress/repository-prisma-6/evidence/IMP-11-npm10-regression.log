@@ -1,0 +1,19 @@
+# Check: IMP-11 (REQ-002: npm 10 unaffected; final regression on the branch head)
+# Command: env -u DATABASE_URL -u DATABASE_URL_TEST sh -c "rm -rf node_modules && npm ci"; npm run typecheck; npm test; npm run test:package; git diff --check 5528fc4..HEAD
+# Commit: 7047cdf
+# Environment: macOS 26.5.2 arm64, Node v22.23.1, npm 10.9.8, uid 501
+# Date: 2026-11-04T17:18Z
+
+npm-ci exit=0
+added 274 packages, and audited 275 packages in 4s
+
+found 0 vulnerabilities
+native module: node_modules/better-sqlite3/build/Release/better_sqlite3.node
+typecheck exit=0
+ Test Files  11 passed (11)
+      Tests  113 passed (113)
+npm-test exit=0
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","externalDriverAdapter":"pass","noNativeAddonOnImport":"pass","noQueryStringFiles":"pass","readonlyWal":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-package-smoke-4Uu1fB"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-esm-cjs-interop-kVg6Ut"}
+test-package exit=0
+diff-check exit=0

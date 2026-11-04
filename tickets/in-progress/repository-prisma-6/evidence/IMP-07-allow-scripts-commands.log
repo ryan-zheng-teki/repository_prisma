@@ -1,0 +1,48 @@
+# Check: IMP-07 (record the approvals with npm commands)
+# Command: npx npm@12.2.1 install-scripts approve better-sqlite3 ; npx npm@12.2.1 install-scripts deny esbuild prisma @prisma/engines fsevents ; then diff package.json and package-lock.json
+# Commit: 8ef7b77 (worktree, before committing the change)
+# Environment: macOS 26.5.2, Node v22.23.1, npm 12.2.1 via npx
+# Date: 2026-11-04T17:11Z
+
+$ npm install-scripts approve better-sqlite3
+Approved better-sqlite3:
+  added better-sqlite3@12.11.1
+exit=0
+$ npm install-scripts deny esbuild prisma @prisma/engines fsevents
+Denied esbuild:
+  added esbuild
+Denied prisma:
+  added prisma
+Denied @prisma/engines:
+  added @prisma/engines
+Denied fsevents:
+  added fsevents
+exit=0
+
+$ git diff package.json
+diff --git a/package.json b/package.json
+index 272341d..5fd15b2 100644
+--- a/package.json
++++ b/package.json
+@@ -54,5 +54,12 @@
+   },
+   "engines": {
+     "node": "^20.19 || ^22.12 || >=24"
++  },
++  "allowScripts": {
++    "better-sqlite3@12.11.1": true,
++    "esbuild": false,
++    "prisma": false,
++    "@prisma/engines": false,
++    "fsevents": false
+   }
+ }
+$ cmp package-lock.json (unchanged?)
+package-lock.json unchanged
+$ npm ls better-sqlite3
+repository_prisma@2.0.0 /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-6
++-- @prisma/adapter-better-sqlite3@7.10.1
+| `-- better-sqlite3@12.11.1
+`-- prisma@7.10.1
+  `-- better-sqlite3@12.11.1 deduped
+

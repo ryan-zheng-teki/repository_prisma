@@ -1,0 +1,70 @@
+# Check: IMP-09 (AC-003 Linux x64 npm 12.2.1; AC-004 npm 11.19.1 strict and stale pin)
+# Command: git archive b87252c > src.tar; docker run --rm --platform linux/amd64 -v /tmp/rp6-tools:/in:ro node:24-bookworm bash /in/linux-npm-checks.sh
+# Commit: b87252c
+# Environment: Docker 29.0.1, linux/amd64 (emulated on macOS arm64), image node:24-bookworm, as root
+# Date: 2026-11-04T17:13Z
+
+--- linux-npm-checks.sh
+# Runs inside node:24-bookworm (linux/amd64) as root; expects /in/src.tar
+set -u
+warn_re='install-scripts|not approved|allow-scripts|allowScripts'
+fresh() { rm -rf /work && mkdir -p /work && cd /work && tar -xf /in/src.tar; }
+echo "## container: $(uname -sm), node $(node -v), bundled npm $(npm -v), uid $(id -u)"
+
+echo; echo "## A. npm 11.19.1 (bundled, as in CI): npm ci --strict-allow-scripts"
+fresh; npm ci --strict-allow-scripts --no-fund > /tmp/a.log 2>&1; echo "npm-ci-strict exit=$?"
+echo "install-script warning lines: $(grep -ciE "$warn_re" /tmp/a.log)"
+echo "better-sqlite3 native module present: $(ls node_modules/better-sqlite3/build/Release/*.node 2>/dev/null | wc -l)"
+NO_COLOR=1 npm test 2>&1 | grep -E "Tests "; echo "npm-test exit=${PIPESTATUS[0]}"
+
+echo; echo "## B. npm 11.19.1 strict with a stale pin (better-sqlite3@12.10.0 instead of 12.11.1)"
+fresh; sed -i 's/"better-sqlite3@12.11.1": true/"better-sqlite3@12.10.0": true/' package.json; grep -n 'better-sqlite3@' package.json
+npm ci --strict-allow-scripts --no-fund > /tmp/b.log 2>&1; echo "npm-ci-strict exit=$?"
+grep -E "ESTRICTALLOWSCRIPTS|npm error" /tmp/b.log | head -8
+echo "node_modules present after the failure: $(test -d node_modules/better-sqlite3 && echo yes || echo no)"
+
+echo; echo "## C. npm 12.2.1: npm ci, typecheck, test, build, test:package"
+npm i -g npm@12.2.1 --no-fund --no-audit > /tmp/npm12.log 2>&1; echo "npm $(npm -v)"
+fresh; npm ci --no-fund > /tmp/c.log 2>&1; echo "npm-ci exit=$?"
+echo "install-script warning lines: $(grep -ciE "$warn_re" /tmp/c.log)"
+echo "better-sqlite3 native module present: $(ls node_modules/better-sqlite3/build/Release/*.node 2>/dev/null | wc -l)"
+echo "@prisma/engines schema engine present (no postinstall): $(ls node_modules/@prisma/engines/schema-engine-* 2>/dev/null | xargs -n1 basename | tr '\n' ' ')"
+npm run typecheck > /dev/null 2>&1; echo "typecheck exit=$?"
+NO_COLOR=1 npm test 2>&1 | grep -E "Test Files|Tests "; echo "npm-test exit=${PIPESTATUS[0]}"
+npm run build > /dev/null 2>&1; echo "build exit=$?"
+NO_COLOR=1 npm run test:package 2>&1 | grep -E '^skip:|"result"|Error'; echo "test-package exit=${PIPESTATUS[0]}"
+--- output
+## container: Linux x86_64, node v24.22.2, bundled npm 11.19.1, uid 0
+
+## A. npm 11.19.1 (bundled, as in CI): npm ci --strict-allow-scripts
+npm-ci-strict exit=0
+install-script warning lines: 0
+better-sqlite3 native module present: 1
+      Tests  113 passed (113)
+npm-test exit=0
+
+## B. npm 11.19.1 strict with a stale pin (better-sqlite3@12.10.0 instead of 12.11.1)
+59:    "better-sqlite3@12.10.0": true,
+npm-ci-strict exit=1
+npm error code ESTRICTALLOWSCRIPTS
+npm error --strict-allow-scripts: 1 package(s) have install scripts not covered by allowScripts:
+npm error   better-sqlite3@12.11.1 (install: (install scripts present))
+npm error Approve them with `npm install-scripts approve`, deny them with `npm install-scripts deny`, or bypass this check with `--dangerously-allow-all-scripts`.
+npm error A complete log of this run can be found in: /root/.npm/_logs/2026-11-04T17_14_29_264Z-debug-0.log
+node_modules present after the failure: no
+
+## C. npm 12.2.1: npm ci, typecheck, test, build, test:package
+npm 12.2.1
+npm-ci exit=0
+install-script warning lines: 0
+better-sqlite3 native module present: 1
+@prisma/engines schema engine present (no postinstall): schema-engine-debian-openssl-3.0.x 
+typecheck exit=0
+ Test Files  11 passed (11)
+      Tests  113 passed (113)
+npm-test exit=0
+build exit=0
+skip: read-only WAL case (running as root; root ignores file permissions)
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","externalDriverAdapter":"pass","noNativeAddonOnImport":"pass","noQueryStringFiles":"pass","readonlyWal":"skipped-root","cleanup":"/tmp/repository-prisma-package-smoke-TrJccZ"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"/tmp/repository-prisma-esm-cjs-interop-qevGOP"}
+test-package exit=0

@@ -1,0 +1,153 @@
+# Check: IMP-10 (AC-006: fresh consumers following only the README setup section, installing the published repository_prisma 2.0.0)
+# Commands: per section below. Schema/config/app are the ticket probes (consumer-schema.prisma = README schema snippet + a User model; consumer-prisma.config.ts = README config snippet; consumer-app.mjs = initializePrisma(file:./app.db) + query).
+# Environment: macOS 26.5.2 arm64, Node v22.23.1; npm 12.2.1 and pnpm 12.16.1 from temporary prefixes; pnpm 10.28.2 local
+# Date: 2026-11-04T17:18Z
+
+==== A. npm 12.2.1 (README steps: install, install -D prisma@7, install-scripts approve, rebuild, generate, run)
+## npm 12.2.1, node v22.23.1, Darwin arm64
+$ npm install repository_prisma
+npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
+
+added 45 packages in 4s
+npm warn install-scripts 1 package had install scripts blocked because they are not covered by allowScripts:
+npm warn install-scripts   better-sqlite3@12.11.1 (install: prebuild-install || node-gyp rebuild --release)
+npm warn install-scripts
+npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+exit=0
+$ npm install -D prisma@7
+npm warn install-scripts   prisma@7.10.1 (preinstall: node scripts/preinstall-entry.js)
+npm warn install-scripts   @prisma/engines@7.10.1 (postinstall: node scripts/postinstall.js)
+npm warn install-scripts
+npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+exit=0
+$ npm install-scripts approve better-sqlite3
+Approved better-sqlite3:
+  added better-sqlite3@12.11.1
+exit=0
+$ npm rebuild better-sqlite3
+npm warn rebuild 2 packages had install scripts blocked because they are not covered by allowScripts. Run `npm install-scripts ls` to review.
+rebuilt dependencies successfully
+exit=0
+native module: node_modules/better-sqlite3/build/Release/better_sqlite3.node
+$ npx prisma generate
+✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 34ms
+exit=0
+$ node app.mjs
+count 0
+RESULT ok
+versions: @prisma/client@7.10.1 prisma@7.10.1 repository_prisma@2.0.0 
+
+==== B. npm 12.2.1 symptom check (same steps without the approval step)
+## symptom check: npm 12.2.1, the README steps without the approval step
+generate exit=0
+$ node app.mjs
+diagnostic CONNECTION_FAILED Could not locate the bindings file. Tried:
+RESULT failed CONNECTION_FAILED The Prisma client could not connect to its datasource.
+
+==== C. pnpm 12.16.1, first attempt WITHOUT the release-age exclusion: pnpm resolved repository_prisma 1.0.10, because 2.0.0 is newer than pnpm 12's default minimum release age. Not a README step; consumers stop seeing this once 2.0.0 is old enough.
+## pnpm 12.16.1, node v22.23.1, Darwin arm64
+$ pnpm add repository_prisma @prisma/client@7
+Progress: resolved 0, reused 1, downloaded 0, added 0
+Packages are cloned from the content-addressable store to the virtual store.
+  Content-addressable store is at: /Users/normy/Library/pnpm/store/v11
+  Virtual store is at:             node_modules/.pnpm
+Packages: +4
+++++
+Progress: resolved 4, reused 3, downloaded 1, added 4, done
+[WARN] Issues with peer dependencies found. Run "pnpm peers check" to list them.
+
+dependencies:
++ @prisma/client 7.10.1
++ repository_prisma 1.0.10
+
+Done in 171ms using pnpm v12.16.1
+exit=0
+
+==== D. pnpm 12.16.1 (README pnpm steps: pnpm add repository_prisma @prisma/client@7, pnpm add -D prisma@7, pnpm approve-builds better-sqlite3, generate, run), with the test-only release-age exclusion
+## pnpm 12.16.1, node v22.23.1, Darwin arm64
+## test-environment-only setup (not a README step): 2.0.0 is newer than pnpm's default minimum release age
+minimumReleaseAgeExclude:
+  - repository_prisma@2.0.0
+$ pnpm add repository_prisma @prisma/client@7
++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 45, reused 45, downloaded 0, added 45, done
+
+dependencies:
++ @prisma/client 7.10.1
++ repository_prisma 2.0.0
+
+Error: ERR_PNPM_IGNORED_BUILDS
+
+  × adding a new package
+  ╰─▶ Ignored build scripts: better-sqlite3@12.11.1
+  help: Run "pnpm approve-builds" to pick which dependencies should be allowed
+        to run scripts.
+
+exit=1
+$ pnpm add -D prisma@7
+  × adding a new package
+  ╰─▶ Ignored build scripts: @prisma/engines@7.10.1, better-sqlite3@12.11.1,
+      prisma@7.10.1
+  help: Run "pnpm approve-builds" to pick which dependencies should be allowed
+        to run scripts.
+
+exit=1
+native module before approval: 0
+$ pnpm approve-builds better-sqlite3
+✓ Lockfile passes supply-chain policies (verified 84ms ago)
+Already up to date
+.../node_modules/better-sqlite3 install$ prebuild-install || node-gyp rebuild --release
+.../node_modules/better-sqlite3 install: Done
+exit=0
+--- pnpm-workspace.yaml
+allowBuilds:
+  better-sqlite3: true
+minimumReleaseAgeExclude:
+  - repository_prisma@2.0.0
+native module after approval: node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node
+$ npx prisma generate
+✔ Generated Prisma Client (v7.10.1) to ./node_modules/.pnpm/@prisma+client@7.10.1_prisma@7.10.1_@types+node@26.6.6_@types+react@19.3.0_better-sqlit_8d30ceece285447d65420ece44415af0/node_modules/@prisma/client in 36ms
+exit=0
+$ node app.mjs
+count 0
+RESULT ok
+versions: ├── @prisma/client@7.10.1;├── repository_prisma@2.0.0;
+
+==== E. pnpm 10.28.2 (README pnpm 10 steps: pnpm add ..., pnpm add -D prisma@7, pnpm-workspace.yaml onlyBuiltDependencies, pnpm install, generate, run)
+## pnpm 10.28.2, node v22.23.1, Darwin arm64
+$ pnpm add repository_prisma @prisma/client@7
+╭ Warning ─────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│   Ignored build scripts: better-sqlite3@12.11.1.                             │
+│   Run "pnpm approve-builds" to pick which dependencies should be allowed     │
+│   to run scripts.                                                            │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+Done in 2.3s using pnpm v10.28.2
+exit=0
+$ pnpm add -D prisma@7
+│   to run scripts.                                                            │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+Done in 9.1s using pnpm v10.28.2
+exit=0
+native module before: 0
+--- pnpm-workspace.yaml (README snippet)
+onlyBuiltDependencies:
+  - better-sqlite3
+$ pnpm install
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+.../node_modules/better-sqlite3 install$ prebuild-install || node-gyp rebuild --release
+.../node_modules/better-sqlite3 install: Done
+Done in 928ms using pnpm v10.28.2
+exit=0
+native module after: node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node
+$ npx prisma generate
+✔ Generated Prisma Client (v7.10.1) to ./node_modules/.pnpm/@prisma+client@7.10.1_prisma@7.10.1_@types+node@26.6.6_@ty
+exit=0
+$ node app.mjs
+count 0
+RESULT ok
+versions: @prisma/client 7.10.1;repository_prisma 2.0.0;prisma 7.10.1;

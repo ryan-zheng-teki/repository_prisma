@@ -1,0 +1,35 @@
+# Check: IMP-06 (AC-002 mutation checks on the split smoke)
+# Command: (a) sed: drop '@prisma/adapter-better-sqlite3' from tsup.config.ts external; npm run test:package; git checkout -- tsup.config.ts
+#          (b) sed: in scripts/package-smoke/cjs-runtime.js make the generated cjs-smoke.cjs print the invalid datasource path (contains the secret); npm run test:package; git checkout -- that file
+#          (c) node: drop "DESIGN.md" from package.json files; npm run test:package; git checkout -- package.json
+# Commit: 8ef7b77 (mutations in the working tree only, then restored)
+# Environment: macOS 26.5.2, Node v22.23.1, npm 10.9.8
+# Date: 2026-11-04T17:10Z
+
+## (a) adapter bundled into dist
+11:  external: ['@prisma/client'],
+exit=0
+
+## (b) generated CJS smoke leaks the secret datasource path
+103:  console.log(invalid);
+exit=1
+32:  throw new AssertionError(obj);
+35:AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+39:    at checkCjsRuntime (/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-6/scripts/package-smoke/cjs-runtime.js:114:10)
+50:  actual: true,
+51:  expected: false,
+
+## restored
+working tree restored: unchanged from 8ef7b77
+
+Note on (a): not an effective break. tsup externalizes package.json peerDependencies by default, and @prisma/adapter-better-sqlite3 is a peer, so dist still imports it as external and the smoke passes (exit=0). The original script behaves the same; the external list entry is redundant. (c) replaces it for the packed-artifact step.
+
+## (c) packed artifact misses DESIGN.md (package.json "files" without "DESIGN.md")
+["dist","README.md","CHANGELOG.md"]
+exit=1
+30:  throw new AssertionError(obj);
+33:AssertionError [ERR_ASSERTION]: missing DESIGN.md
+37:    at checkPackedArtifact (/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-6/scripts/package-smoke/packed-artifact.js:28:12)
+
+## restored (c)
+working tree restored: package.json unchanged from 8ef7b77

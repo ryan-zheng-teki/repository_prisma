@@ -1,0 +1,44 @@
+# Check: IMP-05 (AC-001: before/after output comparison)
+# Command: for each pair, take the run output (after the header / after "--- output"), normalize it with the script below, then diff
+# Commits: before 5528fc4, after 8ef7b77
+# Date: 2026-11-04T17:10Z
+
+--- normalize.sh
+# Normalizes volatile parts of test:package output: temp directories, durations and the evidence header.
+sed -E -e '/^# /d' -e '/^exit=/d' \
+  -e 's#[^ "]*/repository-prisma-(package-smoke|esm-cjs-interop)-[A-Za-z0-9]+#<TMP-\1>#g' \
+  -e 's/ in [0-9.]+m?s/ in <T>/g' "$1"
+
+## diff IMP-01-baseline-test-package-macos.log IMP-03-split-test-package-macos.log (      32 vs       32 normalized lines)
+identical
+## final JSON lines after the split:
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","externalDriverAdapter":"pass","noNativeAddonOnImport":"pass","noQueryStringFiles":"pass","readonlyWal":"pass","cleanup":"<TMP-package-smoke>"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"<TMP-esm-cjs-interop>"}
+
+## diff IMP-02-baseline-test-package-linux-root.log IMP-04-split-test-package-linux-root.log (      36 vs       36 normalized lines)
+22,24d21
+< CJS dist/index.js     31.85 KB
+< CJS dist/index.js.map 64.01 KB
+< CJS ⚡️ Build success in <T>
+27a25,27
+> CJS dist/index.js     31.85 KB
+> CJS dist/index.js.map 64.01 KB
+> CJS ⚡️ Build success in <T>
+## final JSON lines after the split:
+skip: read-only WAL case (running as root; root ignores file permissions)
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","externalDriverAdapter":"pass","noNativeAddonOnImport":"pass","noQueryStringFiles":"pass","readonlyWal":"skipped-root","cleanup":"<TMP-package-smoke>"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"<TMP-esm-cjs-interop>"}
+
+## wc -l of the split files
+      43 scripts/run-package-smoke.js
+     121 scripts/package-smoke/cjs-runtime.js
+      33 scripts/package-smoke/consumer-install.js
+      78 scripts/package-smoke/consumer-types.js
+      53 scripts/package-smoke/esm-runtime.js
+      67 scripts/package-smoke/harness.js
+     118 scripts/package-smoke/import-safety.js
+     222 scripts/package-smoke/logging-policy.js
+     106 scripts/package-smoke/packed-artifact.js
+     841 total
+
+Note: the only Linux difference is the order in which tsup prints its parallel CJS and ESM build lines (from `npm run build`, before the smoke starts). The smoke output itself is identical.

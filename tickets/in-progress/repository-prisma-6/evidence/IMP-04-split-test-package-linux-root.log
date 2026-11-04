@@ -1,0 +1,44 @@
+# Check: IMP-04 (after the split; Linux x64 as root)
+# Command: git archive 8ef7b77 > src.tar; docker run --rm --platform linux/amd64 -v /tmp/rp6-tools:/in:ro node:24-bookworm bash /in/root-test-package.sh (script reproduced in IMP-02)
+# Commit: 8ef7b77
+# Environment: Docker 29.0.1, linux/amd64 (emulated on macOS arm64), image node:24-bookworm
+# Date: 2026-11-04T17:09Z
+
+--- output
+## container: Linux x86_64, node v24.22.2, npm 11.19.1, uid 0
+npm-ci exit=0
+## npm run test:package
+
+> repository_prisma@2.0.0 test:package
+> npm run build && node scripts/run-package-smoke.js && node scripts/run-esm-cjs-interop.js
+
+
+> repository_prisma@2.0.0 build
+> tsup
+
+CLI Building entry: src/index.ts
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.1
+CLI Using tsup config: /work/tsup.config.ts
+CLI Target: es2018
+CLI Cleaning output folder
+CJS Build start
+ESM Build start
+CJS You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+ESM You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+ESM dist/index.mjs     29.31 KB
+ESM dist/index.mjs.map 62.79 KB
+ESM ⚡️ Build success in 132ms
+CJS dist/index.js     31.85 KB
+CJS dist/index.js.map 64.01 KB
+CJS ⚡️ Build success in 133ms
+DTS Build start
+DTS ⚡️ Build success in 3039ms
+DTS dist/index.d.ts  9.01 KB
+DTS dist/index.d.mts 9.01 KB
+
+added 1 package in 516ms
+skip: read-only WAL case (running as root; root ignores file permissions)
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","externalDriverAdapter":"pass","noNativeAddonOnImport":"pass","noQueryStringFiles":"pass","readonlyWal":"skipped-root","cleanup":"/tmp/repository-prisma-package-smoke-HGcjuB"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"/tmp/repository-prisma-esm-cjs-interop-RqOpuB"}
+exit=0
