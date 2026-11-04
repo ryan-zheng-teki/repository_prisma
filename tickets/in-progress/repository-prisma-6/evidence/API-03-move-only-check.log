@@ -1,0 +1,107 @@
+# Case API-03
+# Code commit 7047cdf (HEAD 72ef918 differs only in tickets/). Scripts: evidence/API-scripts/. Recorded by api_e2e_engineer, 2026-11-04.
+# Independent move-only check (evidence/API-scripts/move-check.py), macOS.
+
+# API-03 independent move-only check; 2026-11-04T17:23:39Z
+$ python3 move-check.py 5a73159 8ef7b77
+# 5a73159:scripts/run-package-smoke.js (739 lines) vs 8ef7b77 runner + 8 modules: ['scripts/package-smoke/cjs-runtime.js', 'scripts/package-smoke/consumer-install.js', 'scripts/package-smoke/consumer-types.js', 'scripts/package-smoke/esm-runtime.js', 'scripts/package-smoke/harness.js', 'scripts/package-smoke/import-safety.js', 'scripts/package-smoke/logging-policy.js', 'scripts/package-smoke/packed-artifact.js']
+old non-blank lines: 719; new: 809
+old-only lines (in the monolith, not in the split): 1
+  -1x const repoRoot = path.resolve(__dirname, '..');
+new-only lines (glue added by the split): 91
+  +1x /** Checks that importing the CJS and ESM entries loads no `.env`, builds no client and loads no native addon. */
+  +1x /** Checks the query-logging policy matrix (environment flag, typed option, lazy conflict) in CJS and ESM. */
+  +1x /** Creates the smoke's temporary root with its `pack` and `consumer` directories. */
+  +1x /** Installs the packed tarball into the consumer and links the Prisma peers from the repository. */
+  +1x /** Packs the package and checks the packed file list, the built `dist` text and the declarations. */
+  +1x /** Runs the CJS runtime smoke: WAL, transactions, identity, read-only WAL (skipped as root or on Windows), safe failures. */
+  +1x /** Runs the ESM runtime smoke and checks that no file is named after a URL query string. */
+  +1x /** Type-checks a consumer TypeScript file against the installed declarations. */
+  +1x // Each step lives in scripts/package-smoke/; this runner owns their order and the result.
+  +1x // Package smoke: packs the package, installs it into a temporary consumer and checks it.
+  +1x checkConsumerTypes(context);
+  +1x checkEsmRuntime(context);
+  +1x checkImportSafety(context);
+  +1x checkLoggingPolicy(context);
+  +4x const assert = require('node:assert/strict');
+  +1x const checkCjsRuntime = (context) => {
+  +1x const checkConsumerTypes = (context) => {
+  +1x const checkEsmRuntime = (context) => {
+  +1x const checkImportSafety = (context) => {
+  +1x const checkLoggingPolicy = (context) => {
+  +1x const checkPackedArtifact = (context) => {
+  +1x const context = createSmokeContext();
+  +1x const createSmokeContext = () => {
+  +8x const fs = require('node:fs');
+  +1x const installConsumer = (context, { tarballPath }) => {
+  +7x const path = require('node:path');
+  +1x const repoRoot = path.resolve(__dirname, '..', '..');
+  +1x const { checkCjsRuntime } = require('./package-smoke/cjs-runtime');
+  +1x const { checkConsumerTypes } = require('./package-smoke/consumer-types');
+  +1x const { checkEsmRuntime } = require('./package-smoke/esm-runtime');
+  +1x const { checkImportSafety } = require('./package-smoke/import-safety');
+  +1x const { checkLoggingPolicy } = require('./package-smoke/logging-policy');
+  +1x const { checkPackedArtifact } = require('./package-smoke/packed-artifact');
+  +1x const { createSmokeContext } = require('./package-smoke/harness');
+  +1x const { includedPaths, tarballPath } = checkPackedArtifact(context);
+  +1x const { installConsumer } = require('./package-smoke/consumer-install');
+  +3x const { nodeCommand, temporaryRoot, consumerDirectory, run } = context;
+  +1x const { nodeCommand, temporaryRoot, consumerDirectory, run, filesWithQueryInName } = context;
+  +1x const { readonlyWal } = checkCjsRuntime(context);
+  +1x const { repoRoot, nodeCommand, consumerDirectory, run } = context;
+  +1x const { repoRoot, npmCommand, consumerDirectory, run, symlinkDirectory } = context;
+  +1x const { repoRoot, npmCommand, packDirectory, run } = context;
+  +1x const { temporaryRoot } = context;
+  +1x consumerDirectory,
+  +1x filesWithQueryInName,
+  +1x installConsumer(context, { tarballPath });
+  +1x module.exports = { checkCjsRuntime };
+  +1x module.exports = { checkConsumerTypes };
+  +1x module.exports = { checkEsmRuntime };
+  +1x module.exports = { checkImportSafety };
+  +1x module.exports = { checkLoggingPolicy };
+  +1x module.exports = { checkPackedArtifact };
+  +1x module.exports = { createSmokeContext };
+  +1x module.exports = { installConsumer };
+  +1x nodeCommand,
+  +1x npmCommand,
+  +1x packDirectory,
+  +1x repoRoot,
+  +1x return {
+  +1x return { includedPaths, tarballPath };
+  +1x return { readonlyWal };
+  +1x run,
+  +1x symlinkDirectory,
+  +1x temporaryRoot,
+  +9x };
+template-literal lines (exact, with indentation): old 303, missing in split 0
+
+$ git diff 8ef7b77 b87252c -- scripts/ (the only later smoke change)
+diff --git a/scripts/package-smoke/packed-artifact.js b/scripts/package-smoke/packed-artifact.js
+index 24696ca..8afb619 100644
+--- a/scripts/package-smoke/packed-artifact.js
++++ b/scripts/package-smoke/packed-artifact.js
+@@ -11,7 +11,9 @@ const checkPackedArtifact = (context) => {
+     { capture: true }
+   );
+   // `npm pack` runs the `prepare` script (prisma generate), whose output precedes the JSON.
+-  const packRecords = JSON.parse(packResult.stdout.slice(packResult.stdout.search(/^\[/m)));
++  // npm 10 and 11 print an array of records; npm 12 prints an object keyed by package name.
++  const packJson = JSON.parse(packResult.stdout.slice(packResult.stdout.search(/^[[{]/m)));
++  const packRecords = Array.isArray(packJson) ? packJson : Object.values(packJson);
+   assert.equal(packRecords.length, 1);
+   const packRecord = packRecords[0];
+   const includedPaths = new Set(packRecord.files.map((file) => file.path));
+$ git diff b87252c HEAD -- scripts/ | wc -l
+       0
+$ wc -l (HEAD)
+      43 scripts/run-package-smoke.js
+     121 scripts/package-smoke/cjs-runtime.js
+      33 scripts/package-smoke/consumer-install.js
+      78 scripts/package-smoke/consumer-types.js
+      53 scripts/package-smoke/esm-runtime.js
+      67 scripts/package-smoke/harness.js
+     118 scripts/package-smoke/import-safety.js
+     222 scripts/package-smoke/logging-policy.js
+     108 scripts/package-smoke/packed-artifact.js
+     843 total

@@ -1,0 +1,53 @@
+# Code commit 7047cdf (HEAD 72ef918 differs only in tickets/); base 5a73159. Recorded by api_e2e_engineer, 2026-11-04.
+# API-02 output equivalence, original smoke (base 5a73159) vs split smoke (HEAD 72ef918 = code 7047cdf), macOS 26.5.2 arm64, Node v22.23.1, non-root uid 501; 2026-11-04T17:24:58Z
+# Commands: npm run test:package in /tmp/rp6-e2e/base (git archive 5a73159 + npm ci) and in the worktree; npm 10.9.8, then npm 12.2.1 first on PATH. Normalizer and comparer: evidence/API-scripts/normalize.sh, compare.sh (build section compared as a sorted set because tsup builds CJS/ESM in parallel).
+
+== npm 10.9.8: base vs HEAD
+build section (sorted) diff:
+  identical
+smoke section (exact) diff:
+  identical (5 lines)
+
+== npm 12.2.1 HEAD vs npm 10.9.8 HEAD (npm 12 prints its script banners as 'npm notice run ...')
+build section (sorted) diff:
+1,8d0
+< 
+< 
+< 
+< 
+< > npm run build && node scripts/run-package-smoke.js && node scripts/run-esm-cjs-interop.js
+< > repository_prisma@2.0.0 build
+< > repository_prisma@2.0.0 test:package
+< > tsup
+28a21,24
+> npm notice run npm run build && node scripts/run-package-smoke.js && node scripts/run-esm-cjs-interop.js
+> npm notice run repository_prisma@2.0.0 build
+> npm notice run repository_prisma@2.0.0 test:package
+> npm notice run tsup
+smoke section (exact) diff:
+  identical (5 lines)
+
+== npm 10 base, normalized smoke section:
+
+added <N> packages in <T>
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","externalDriverAdapter":"pass","noNativeAddonOnImport":"pass","noQueryStringFiles":"pass","readonlyWal":"pass","cleanup":"<TMP>/repository-prisma-package-smoke-XXXX"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"<TMP>/repository-prisma-esm-cjs-interop-XXXX"}
+exit=0
+== npm 10 HEAD, normalized smoke section:
+
+added <N> packages in <T>
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","externalDriverAdapter":"pass","noNativeAddonOnImport":"pass","noQueryStringFiles":"pass","readonlyWal":"pass","cleanup":"<TMP>/repository-prisma-package-smoke-XXXX"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"<TMP>/repository-prisma-esm-cjs-interop-XXXX"}
+exit=0
+== npm 12 HEAD, normalized smoke section:
+
+added <N> packages in <T>
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","externalDriverAdapter":"pass","noNativeAddonOnImport":"pass","noQueryStringFiles":"pass","readonlyWal":"pass","cleanup":"<TMP>/repository-prisma-package-smoke-XXXX"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"<TMP>/repository-prisma-esm-cjs-interop-XXXX"}
+exit=0
+
+== base 5a73159 on npm 12.2.1 (reproduces the recorded deviation):
+2:npm notice run npm run build && node scripts/run-package-smoke.js && node scripts/run-esm-cjs-interop.js
+28:SyntaxError: Unexpected end of JSON input
+30:    at Object.<anonymous> (/private/tmp/rp6-e2e/base/scripts/run-package-smoke.js:60:28)
+40:exit=1

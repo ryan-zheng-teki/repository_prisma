@@ -1,0 +1,26 @@
+# Case API-05
+# Code commit 7047cdf (HEAD 72ef918 differs only in tickets/). Scripts: evidence/API-scripts/. Recorded by api_e2e_engineer, 2026-11-04.
+# GitHub runner toolchain from the latest main CI run (read only).
+
+# API-05 GitHub runner toolchain and pre-change install warnings (latest main CI run 41872190680 on 5a73159); 2026-11-04T17:21:59Z
+$ gh run view 41872190680 --log | grep -E "Environment details|node: v|npm: |Found in cache|node-version|install-scripts|Run npm ci"
+Run actions/setup-node@v5	2026-11-04T16:54:28.3019497Z   node-version: 24
+Run actions/setup-node@v5	2026-11-04T16:54:28.4004348Z Found in cache @ /opt/hostedtoolcache/node/24.22.2/x64
+Run actions/setup-node@v5	2026-11-04T16:54:28.4014794Z ##[group]Environment details
+Run actions/setup-node@v5	2026-11-04T16:54:31.3902353Z node: v24.22.2
+Run actions/setup-node@v5	2026-11-04T16:54:31.3902783Z npm: 11.19.1
+Run npm ci	﻿2026-11-04T16:54:34.2284077Z ##[group]Run npm ci
+Run npm ci	2026-11-04T16:54:34.2284331Z npm ci
+Run npm ci	2026-11-04T16:54:34.2378532Z shell: /usr/bin/bash -e {0}
+Run npm ci	2026-11-04T16:54:34.2378755Z ##[endgroup]
+Run npm ci	2026-11-04T16:54:36.7316624Z npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
+Run npm ci	2026-11-04T16:54:38.3163314Z 
+Run npm ci	2026-11-04T16:54:38.3164354Z > repository_prisma@2.0.0 prepare
+Run npm ci	2026-11-04T16:54:38.3164617Z > prisma generate
+Run npm ci	2026-11-04T16:54:38.3164712Z 
+Run npm ci	2026-11-04T16:54:38.8756972Z Loaded Prisma config from prisma.config.ts.
+Run npm ci	2026-11-04T16:54:38.8757365Z 
+Run npm ci	2026-11-04T16:54:38.9611550Z Prisma schema loaded from prisma/schema.prisma.
+Run npm ci	2026-11-04T16:54:39.0433697Z 
+Run npm ci	2026-11-04T16:54:39.0434926Z ✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 51ms
+Run npm ci	2026-11-04T16:54:39.0435259Z 

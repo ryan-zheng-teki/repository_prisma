@@ -1,0 +1,59 @@
+# Code commit 7047cdf (HEAD 72ef918 differs only in tickets/); base 5a73159. Recorded by api_e2e_engineer, 2026-11-04.
+# API-04 mutations in the 4 steps the IR did not mutate (AC-002). Product-level breaks in dist (from npm run build at HEAD), then node scripts/run-package-smoke.js; dist restored by npm run build after each. macOS, Node v22.23.1, npm 10.9.8, uid 501; 2026-11-04T17:25:18Z
+# Mutation script: evidence/API-scripts/mutate.py
+
+########## M1
+applied M1
+3:/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-6/scripts/package-smoke/harness.js:23
+4:    throw new Error(
+7:Error: Command failed (/Users/normy/.hermes/node/bin/node --require ./constructor-spy.cjs cjs-import-safety.cjs):
+8:node:assert:150
+9:  throw new AssertionError(obj);
+12:AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+13:+ actual - expected
+29:  actual: 'repository-prisma-import-canary',
+30:  expected: undefined,
+37:    at run (/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-6/scripts/package-smoke/harness.js:23:11)
+38:    at checkImportSafety (/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-6/scripts/package-smoke/import-safety.js:70:27)
+M1 smoke-exit=1
+
+########## M2
+applied M2
+3:node:assert:150
+4:  throw new AssertionError(obj);
+7:AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+8:+ actual - expected
+19:    at runPolicyProbe (/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-6/scripts/package-smoke/logging-policy.js:176:12)
+20:    at checkLoggingPolicy (/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-6/scripts/package-smoke/logging-policy.js:180:7)
+31:  actual: [ [ 'info', 'warn', 'error', 'query' ] ],
+32:  expected: [ [ 'info', 'warn', 'error' ] ],
+M2 smoke-exit=1
+
+########## M3
+applied M3
+3:/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-6/scripts/package-smoke/harness.js:23
+4:    throw new Error(
+7:Error: Command failed (/Users/normy/.hermes/node/bin/node esm-smoke.mjs):
+9:  return new PrismaInitializationError(code);
+12:PrismaInitializationError: SQLite WAL mode could not be verified.
+13:    at initializationError (file:///private/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-package-smoke-vHpoVv/consumer/node_modules/repository_prisma/dist/index.mjs:223:10)
+21:    at run (/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-6/scripts/package-smoke/harness.js:23:11)
+22:    at checkEsmRuntime (/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-6/scripts/package-smoke/esm-runtime.js:40:21)
+M3 smoke-exit=1
+
+########## M4
+applied M4
+3:type-smoke.ts(15,3): error TS2322: Type 'true' is not assignable to type 'false'.
+4:/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-6/scripts/package-smoke/harness.js:23
+5:    throw new Error(
+8:Error: Command failed (/Users/normy/.hermes/node/bin/node /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-6/node_modules/typescript/bin/tsc --project tsconfig.json):
+10:    at run (/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-6/scripts/package-smoke/harness.js:23:11)
+11:    at checkConsumerTypes (/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-6/scripts/package-smoke/consumer-types.js:67:3)
+M4 smoke-exit=1
+
+########## restore + control
+build exit=0
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","externalDriverAdapter":"pass","noNativeAddonOnImport":"pass","noQueryStringFiles":"pass","readonlyWal":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-package-smoke-61r2B6"}
+control smoke-exit=0
+?? tickets/in-progress/repository-prisma-6/api-e2e-coverage-investigation.md
+?? tickets/in-progress/repository-prisma-6/api-e2e-test-progress.md

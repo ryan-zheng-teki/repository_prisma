@@ -1,0 +1,161 @@
+# Case API-11
+# Code commit 7047cdf (HEAD 72ef918 differs only in tickets/). Scripts: evidence/API-scripts/. Recorded by api_e2e_engineer, 2026-11-04.
+# release.yml steps (after checkout/setup-node) with the new allowScripts: docker --platform linux/amd64 node:24-bookworm as root (global npm). Container-only version bump; nothing published.
+
+# node=v24.22.2 npm=11.19.1 arch=x86_64 user=root date=2026-11-04T17:28:25Z
+
+$ npm --version
+11.19.1
+exit=0 (npm --version)
+
+$ npm i -g npm@^11.5.1
+
+changed 21 packages in 7s
+
+15 packages are looking for funding
+  run `npm fund` for details
+exit=0 (npm i -g npm@^11.5.1)
+
+$ npm --version
+11.21.1
+exit=0 (npm --version)
+
+$ npm ci
+npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
+
+> repository_prisma@2.0.0 prepare
+> prisma generate
+
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+
+✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 102ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+
+
+added 273 packages, and audited 274 packages in 16s
+
+47 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+exit=0 (npm ci)
+install-script warning lines: 0
+native module: node_modules/better-sqlite3/build/Release/better_sqlite3.node
+
+$ npm run build
+
+> repository_prisma@2.0.0 build
+> tsup
+
+CLI Building entry: src/index.ts
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.1
+CLI Using tsup config: /root/work/tsup.config.ts
+CLI Target: es2018
+CLI Cleaning output folder
+CJS Build start
+ESM Build start
+CJS You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+ESM You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+ESM dist/index.mjs     29.31 KB
+ESM dist/index.mjs.map 62.79 KB
+ESM ⚡️ Build success in 143ms
+CJS dist/index.js     31.85 KB
+CJS dist/index.js.map 64.01 KB
+CJS ⚡️ Build success in 145ms
+DTS Build start
+DTS ⚡️ Build success in 3179ms
+DTS dist/index.d.ts  9.01 KB
+DTS dist/index.d.mts 9.01 KB
+exit=0 (npm run build)
+
+$ npm version 2.0.1-e2e.0 --no-git-tag-version
+v2.0.1-e2e.0
+exit=0 (npm version 2.0.1-e2e.0 --no-git-tag-version)
+
+$ npm publish --dry-run --access public --tag e2e
+
+> repository_prisma@2.0.1-e2e.0 prepublishOnly
+> npm run build
+
+
+> repository_prisma@2.0.1-e2e.0 build
+> tsup
+
+CLI Building entry: src/index.ts
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.1
+CLI Using tsup config: /root/work/tsup.config.ts
+CLI Target: es2018
+CLI Cleaning output folder
+CJS Build start
+ESM Build start
+CJS You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+ESM You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+CJS dist/index.js     31.85 KB
+CJS dist/index.js.map 64.01 KB
+CJS ⚡️ Build success in 142ms
+ESM dist/index.mjs     29.31 KB
+ESM dist/index.mjs.map 62.79 KB
+ESM ⚡️ Build success in 142ms
+DTS Build start
+DTS ⚡️ Build success in 3093ms
+DTS dist/index.d.ts  9.01 KB
+DTS dist/index.d.mts 9.01 KB
+
+> repository_prisma@2.0.1-e2e.0 prepare
+> prisma generate
+
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+┌─────────────────────────────────────────────────────────┐
+│  Update available 7.10.1 -> 8.0.0-rc.30                 │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+
+✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 123ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+
+npm notice
+npm notice package: repository_prisma@2.0.1-e2e.0
+npm notice Tarball Contents
+npm notice 4.8kB CHANGELOG.md
+npm notice 19.7kB DESIGN.md
+npm notice 18.5kB README.md
+npm notice 9.2kB dist/index.d.mts
+npm notice 9.2kB dist/index.d.ts
+npm notice 32.6kB dist/index.js
+npm notice 65.5kB dist/index.js.map
+npm notice 30.0kB dist/index.mjs
+npm notice 64.3kB dist/index.mjs.map
+npm notice 1.7kB package.json
+npm notice Tarball Details
+npm notice name: repository_prisma
+npm notice version: 2.0.1-e2e.0
+npm notice filename: repository_prisma-2.0.1-e2e.0.tgz
+npm notice package size: 60.6 kB
+npm notice unpacked size: 255.6 kB
+npm notice shasum: 7c03ffa29efdd6722c23f632a8d0fbb50fee4a86
+npm notice integrity: sha512-+zOlxrxBeCncA[...]YK5bwIcn60Mig==
+npm notice total files: 10
+npm notice
+npm warn publish This command requires you to be logged in to https://registry.npmjs.org/ (dry-run)
+npm notice Publishing to https://registry.npmjs.org/ with tag e2e and public access (dry-run)
++ repository_prisma@2.0.1-e2e.0
+exit=0 (npm publish --dry-run --access public --tag e2e)
+packed allowScripts: {"better-sqlite3@12.11.1":true,"esbuild":false,"prisma":false,"@prisma/engines":false,"fsevents":false}
+
+ALL-STEPS-FAILED=0
