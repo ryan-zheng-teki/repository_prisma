@@ -1,0 +1,20 @@
+# Delivery rerun on 157f5ee — 2026-11-04T17:32:32Z; user normy uid 501; node v22.23.1 Darwin arm64
+$ npx -y npm@11.19.1 ci --strict-allow-scripts
+exit=0 (npm@11.19.1 ci --strict-allow-scripts)
+47 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+install-script warning lines: 0
+node_modules/better-sqlite3/build/Release/better_sqlite3.node
+exit=0 (typecheck)
+ Test Files  11 passed (11)
+      Tests  113 passed (113)
+exit=0 (npm test)
+exit=0 (build)
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","externalDriverAdapter":"pass","noNativeAddonOnImport":"pass","noQueryStringFiles":"pass","readonlyWal":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-package-smoke-AkFqX8"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-esm-cjs-interop-rTwaGK"}
+exit=0 (test:package, npm 10.9.8)
+     222 scripts/package-smoke/logging-policy.js
+     843 total
+diff-check ok
