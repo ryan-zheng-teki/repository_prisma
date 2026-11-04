@@ -4,7 +4,7 @@
 
 | Revision ID | Entry Point / Trigger | Prior Result | Current Result | Affected Canonical Artifacts |
 | --- | --- | --- | --- | --- |
-| DR-001 | Code reviewer handoff after CRR-003 Pass (API-REV-001 Pass, 95%) | N/A | Verified; finalized into `main`; no release | `docs-sync-report.md`, `handoff-summary.md`, `release-deployment-report.md`, `evidence/DE-01-delivery-integrated-rerun.log` |
+| DR-001 | Code reviewer handoff after CRR-003 Pass (API-REV-001 Pass, 95%) | N/A | Verified; finalized into `main`; no release | `docs-sync-report.md`, `handoff-summary.md`, `release-deployment-report.md`, `evidence/DE-01-delivery-integrated-rerun.log`, `evidence/DE-02-ci-main-342c701.log` |
 
 ## Revision Entries
 
@@ -18,9 +18,9 @@
 - Handoff summary: `handoff-summary.md`
 - Release/publication/deployment report: `release-deployment-report.md`
 - Integration and post-integration verification: `Already current` (base `f2ffd5c` and `origin/main@8ab582f` not advanced); DE-01 rerun on `53a633b` passed
-- Verification (evidence judgement or user check) and finalization state: evidence `Sufficient`, no user check needed. The finalization state is in the release report's Finalization Record.
-- Terminal return to the Solution Designer: see the release report's Finalization Record
-- Terminal return message/reference: see the release report
+- Verification (evidence judgement or user check) and finalization state: evidence `Sufficient`, no user check needed. Archive commit `342c701` pushed to `origin/codex/prisma-7-upgrade`. `main` fast-forwarded `8ab582f..342c701` and pushed; CI run `41837785124` on `main` passed (hosted ubuntu x64, Node 20, 113/113). Worktree removed, local branch deleted. The finalization metadata commit is on `main`.
+- Terminal return to the Solution Designer: `Sent` (after the metadata commit was pushed)
+- Terminal return message/reference: `Delivery Completed`, 2026-11-04, to the address from `get_handoff_rules`
 - Why this baseline or delivery revision was recorded: first completed delivery round
 - Next recipient/action: Solution Designer (terminal `Delivery Completed`)
 - Remaining blockers, rollback concerns, or untested scope: Windows untested (API-12); Linux x64 only emulated; documented gate throughput cost; Node 20 EBADENGINE warning (FU-003); FU-001..FU-005

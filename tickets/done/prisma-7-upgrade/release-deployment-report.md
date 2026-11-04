@@ -87,29 +87,33 @@ None. `package.json` `version` stays `1.0.10`; no tag; no release commit (REQ-01
 
 - Bootstrap context source: `handoff.md` § Workspace (finalization target `origin/main`, DEC-008)
 - Ticket branch: `codex/prisma-7-upgrade`
-- Ticket branch commit result: see Finalization Record below
-- Ticket branch push result: see Finalization Record below
+- Ticket branch commit result: `Completed`: `342c701` (archive + delivery documents, on top of `53a633b`)
+- Ticket branch push result: `Completed`: new remote branch `origin/codex/prisma-7-upgrade` = `342c701`
 - Finalization target remote: `origin` (`git@github.com-ryan:ryan-zheng-teki/repository_prisma.git`)
 - Finalization target branch: `main`
-- Target advanced after verification / acceptance: see Finalization Record below
+- Target advanced after verification / acceptance: `No` (re-fetched before merge: `origin/main` = `8ab582f`, an ancestor; `origin/codex/repository-prisma-esm-cjs-interop` = `f2ffd5c`)
 - Delivery-owned edits protected before re-integration: `Not needed`
-- Re-integration before final merge result: see Finalization Record below
-- Target branch update result: see Finalization Record below
-- Merge into target result: see Finalization Record below
-- Push target branch result: see Finalization Record below
-- Repository finalization status: see Finalization Record below
-- Blocker (if applicable): see Finalization Record below
+- Re-integration before final merge result: `Not needed`
+- Target branch update result: `Completed`: `git fetch origin`; local `main` = `origin/main` = `8ab582f`
+- Merge into target result: `Completed`: `git merge --ff-only codex/prisma-7-upgrade` in the shared checkout; `main` `8ab582f..342c701` (fast-forward over the released 1.0.10 commits and this ticket, DEC-008)
+- Push target branch result: `Completed`: `8ab582f..342c701  main -> main`
+- Repository finalization status: `Completed`
+- Blocker (if applicable): None
 
 ### Finalization Record
 
-(Filled in after the finalization steps; see the metadata commit.)
+- 2026-11-04 13:23Z: archive commit `342c701` on `codex/prisma-7-upgrade`; pushed to `origin/codex/prisma-7-upgrade`.
+- `main` fast-forwarded `8ab582f..342c701` and pushed.
+- CI on `main@342c701` (`ci.yml`, push trigger): run `41837785124`, conclusion `success`, https://github.com/ryan-zheng-teki/repository_prisma/actions/runs/41837785124. Hosted runner `ubuntu-26.04` (x64), Node `v20.20.2`. `npm ci` generated Prisma Client v7.10.1 (with the known `EBADENGINE` warning, FU-003); typecheck, `npm test` (`Test Files 11 passed (11)`, `Tests 113 passed (113)`) and build all passed. Log: `evidence/DE-02-ci-main-342c701.log`. This adds the real x64 Linux hosted-runner evidence that API/E2E could only emulate (ENV-2x). CI does not run `test:package`; that ran in DE-01 and API-04.
+- Cleanup: `git worktree remove /Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade` (clean worktree, HEAD `342c701` = remote branch); `git worktree prune`; `git branch -d codex/prisma-7-upgrade` (merged).
+- This metadata (finalization record and DE-02 log) is committed directly on `main` in the shared checkout, as was done for 1.0.10 (`5c57ebd`), and pushed. Only the ticket folder is staged; the user's untracked `pnpm-lock.yaml` and `.claude/` stay untouched (DEC-007b).
 
 ## Release / Publication / Deployment
 
 - Applicable: `No`
 - Method: N/A
 - Method reference / command: N/A (README § Release (Tag-Based) when a major release is decided)
-- Pipelines triggered and their results: None. The `main` push triggers only `ci.yml`, if configured for pushes; no tag is pushed, so `release.yml` does not run.
+- Pipelines triggered and their results: the `main` push triggered only `ci.yml`, which passed (run `41837785124`). No tag was pushed, so `release.yml` did not run.
 - Published artifacts checked against what the release should produce: N/A
 - Release/publication/deployment result: `Not required`
 - Release notes handoff result: `Not required`
@@ -118,11 +122,11 @@ None. `package.json` `version` stays `1.0.10`; no tag; no release commit (REQ-01
 ## Post-Finalization Cleanup
 
 - Dedicated ticket worktree path: `/Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade`
-- Worktree cleanup result: see Finalization Record
-- Worktree prune result: see Finalization Record
-- Local ticket branch cleanup result: see Finalization Record
+- Worktree cleanup result: `Completed`
+- Worktree prune result: `Completed`
+- Local ticket branch cleanup result: `Completed` (`codex/prisma-7-upgrade` deleted; was `342c701`)
 - Remote branch cleanup result: `Not required`. `origin/codex/prisma-7-upgrade` is kept as the reviewable ticket branch, as for earlier tickets (e.g. `origin/codex/repository-prisma-esm-cjs-interop`).
-- Blocker (if applicable): see Finalization Record
+- Blocker (if applicable): None
 
 ## Escalation / Reroute (Use Only If Final Handoff Cannot Complete)
 
@@ -148,6 +152,7 @@ None (library; no deployment).
 ## Verification Checks
 
 - DE-01 (delivery, `53a633b`): `npm ls`, `npm run typecheck`, `npm test`, `npm run build`, `npm run test:package`, all pass
+- DE-02 (hosted CI, `main@342c701`): `npm ci`, typecheck, `npm test` 113/113, build, all pass
 - `git diff --check f2ffd5c..53a633b`: clean for source/docs. Trailing whitespace appears only inside the archived patch `probes/feasibility-patch.diff`, which is ticket evidence and kept verbatim.
 - Filename portability check: no Windows-invalid characters, reserved names, trailing dot/space, case collisions or overlong paths
 
@@ -160,10 +165,10 @@ None (library; no deployment).
 ## Final Status
 
 - Verification complete (from the evidence, or the user's check where needed): `Yes`
-- Repository finalization complete: see Finalization Record
+- Repository finalization complete: `Yes`
 - Applicable release/deployment/rollout complete or not required: `Yes` (not required)
-- Applicable safe cleanup complete or not required: see Finalization Record
-- Unresolved blocker: see Finalization Record
-- Successful terminal package eligible for return: see Finalization Record
-- Terminal package sent to the Solution Designer: see Finalization Record
-- Terminal message/reference: see Finalization Record
+- Applicable safe cleanup complete or not required: `Yes`
+- Unresolved blocker: `None`
+- Successful terminal package eligible for return: `Yes`
+- Terminal package sent to the Solution Designer: `Yes`, sent right after this metadata commit was pushed
+- Terminal message/reference: `Delivery Completed` message to the Solution Designer address returned by `get_handoff_rules`, 2026-11-04

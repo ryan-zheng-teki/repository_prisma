@@ -2,7 +2,7 @@
 
 ## Status
 
-`Verified from evidence; finalized into main. No release (by the Task's scope).` The repository finalization record is in `release-deployment-report.md`.
+`Verified from evidence; finalized into main (`8ab582f..342c701`, pushed; CI on main passed, run 41837785124). No release (by the Task's scope).` The full finalization record is in `release-deployment-report.md`.
 
 ## Classification And Route
 
@@ -17,7 +17,7 @@
 - Bootstrap base: `origin/codex/repository-prisma-esm-cjs-interop@f2ffd5c` (published 1.0.10)
 - Finalization target: `origin/main` (DEC-008). `main@8ab582f` (1.0.9) is an ancestor, so `main` fast-forwards over the released 1.0.10 commits and this ticket.
 - Reviewed code commit: `e5d2371` (IR-002); API/E2E test and evidence `53a633b`; whole change `f2ffd5c..53a633b`
-- Delivery commits: listed in `release-deployment-report.md` § Repository Finalization
+- Delivery commits: archive `342c701` (ticket branch, pushed; `main` fast-forwarded to it); finalization metadata commit on `main` right after it
 
 ## What Changed (consumer view)
 
@@ -43,7 +43,7 @@ Sufficient. The per-criterion table is in `release-deployment-report.md` § Veri
 ## Residual Risks
 
 - Windows path handling has not been tested on a real host (API-12); only the mocked `win32` unit test covers it.
-- Linux x64 ran only under emulation (ENV-2x). Consumer journeys on Linux ran on arm64.
+- Linux x64: the repository CI commands now also passed on the real hosted runner (ubuntu-26.04 x64, Node 20; DE-02). The consumer journeys on Linux (packed tarball, native addon) ran only on arm64.
 - Throughput cost of the gate is documented. On Linux DELETE mode with 4 busy transaction workers, plain p99 was 406 ms and max 420 ms.
 - Node 20 `npm ci` gives an `EBADENGINE` warning from Prisma's transitive `@prisma/streams-local` (warning only; FU-003).
 - RSK-001: consumer-built clients with the ISO default (FU-001, documented). RSK-002: native addon on consumer platforms (documented).
@@ -66,5 +66,5 @@ Folder: `/Users/normy/autobyteus_org/repository_prisma/tickets/done/prisma-7-upg
 - Code review: `code-review-report.md`, `code-review-revision-record.md`, `api-e2e-test-review-report.md`
 - API/E2E: `api-e2e-coverage-investigation.md`, `api-e2e-execution-coverage-report.md`, `api-e2e-revision-record.md`, `api-e2e-test-progress.md`
 - Delivery: `docs-sync-report.md`, `handoff-summary.md`, `release-deployment-report.md`, `delivery-revision-record.md`
-- Evidence: `evidence/` (IMP-*, API-*, CR-01, DE-01)
+- Evidence: `evidence/` (IMP-*, API-*, CR-01, DE-01, DE-02)
 - Follow-ups: `follow-ups.md`
