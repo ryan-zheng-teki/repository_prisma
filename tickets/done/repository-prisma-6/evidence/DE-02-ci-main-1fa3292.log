@@ -1,0 +1,291 @@
+# CI run 41878633972 on main@1fa3292 (post-merge, AC-005) — fetched 2026-11-04T17:46:38Z
+$ gh api .../actions/runs/41878633972/jobs (job and step conclusions)
+job: completed success
+  Set up job: success
+  Run actions/checkout@v5: success
+  Run actions/setup-node@v5: success
+  Run npm ci --strict-allow-scripts: success
+  Run npm run typecheck: success
+  Run npm test: success
+  Run npm run build: success
+  Post Run actions/setup-node@v5: success
+  Post Run actions/checkout@v5: success
+  Complete job: success
+install-script/allowScripts warning lines in the log: 0
+
+$ gh run view 41878633972 --log  (the log API labelled steps 'UNKNOWN STEP' at fetch time)
+test	UNKNOWN STEP	﻿2026-11-04T17:34:23.7679439Z Current runner version: '2.338.2'
+test	UNKNOWN STEP	2026-11-04T17:34:23.7699830Z ##[group]Runner Image Provisioner
+test	UNKNOWN STEP	2026-11-04T17:34:23.7700649Z Hosted Compute Agent
+test	UNKNOWN STEP	2026-11-04T17:34:23.7701221Z Version: 20261021.618
+test	UNKNOWN STEP	2026-11-04T17:34:23.7701769Z Commit: 21505ad2541d5be6135ed84fc33697146cf75b8e
+test	UNKNOWN STEP	2026-11-04T17:34:23.7702379Z Build Date: 2026-10-21T00:45:21Z
+test	UNKNOWN STEP	2026-11-04T17:34:23.7702983Z Worker ID: {2ace1a1f-7ad0-4577-a8a7-bb36c69b7b7d}
+test	UNKNOWN STEP	2026-11-04T17:34:23.7703527Z Region: westus3
+test	UNKNOWN STEP	2026-11-04T17:34:23.7704364Z Cloud: Azure
+test	UNKNOWN STEP	2026-11-04T17:34:23.7704859Z ##[endgroup]
+test	UNKNOWN STEP	2026-11-04T17:34:23.7706006Z ##[group]Operating System
+test	UNKNOWN STEP	2026-11-04T17:34:23.7706527Z Ubuntu
+test	UNKNOWN STEP	2026-11-04T17:34:23.7706955Z 26.04.1
+test	UNKNOWN STEP	2026-11-04T17:34:23.7707417Z LTS
+test	UNKNOWN STEP	2026-11-04T17:34:23.7707879Z ##[endgroup]
+test	UNKNOWN STEP	2026-11-04T17:34:23.7708322Z ##[group]Runner Image
+test	UNKNOWN STEP	2026-11-04T17:34:23.7708892Z Image: ubuntu-26.04
+test	UNKNOWN STEP	2026-11-04T17:34:23.7709355Z Version: 20261025.179.1
+test	UNKNOWN STEP	2026-11-04T17:34:23.7710661Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261025.179/images/ubuntu/Ubuntu2604-Readme.md
+test	UNKNOWN STEP	2026-11-04T17:34:23.7711924Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261025.179
+test	UNKNOWN STEP	2026-11-04T17:34:23.7712735Z ##[endgroup]
+test	UNKNOWN STEP	2026-11-04T17:34:23.7713670Z ##[group]GITHUB_TOKEN Permissions
+test	UNKNOWN STEP	2026-11-04T17:34:23.7715294Z Contents: read
+test	UNKNOWN STEP	2026-11-04T17:34:23.7715782Z Metadata: read
+test	UNKNOWN STEP	2026-11-04T17:34:23.7716322Z Packages: read
+test	UNKNOWN STEP	2026-11-04T17:34:23.7716783Z ##[endgroup]
+test	UNKNOWN STEP	2026-11-04T17:34:23.7718376Z Secret source: Actions
+test	UNKNOWN STEP	2026-11-04T17:34:23.7719396Z Cache mode: write
+test	UNKNOWN STEP	2026-11-04T17:34:23.7719934Z Prepare workflow directory
+test	UNKNOWN STEP	2026-11-04T17:34:23.7985926Z Prepare all required actions
+test	UNKNOWN STEP	2026-11-04T17:34:23.8040528Z Getting action download info
+test	UNKNOWN STEP	2026-11-04T17:34:24.1038418Z Download action repository 'actions/checkout@v5' (SHA:fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09)
+test	UNKNOWN STEP	2026-11-04T17:34:24.1972112Z Download action repository 'actions/setup-node@v5' (SHA:a0853c24544627f65ddf259abe73b1d18a591444)
+test	UNKNOWN STEP	2026-11-04T17:34:24.4026439Z Complete job name: test
+test	UNKNOWN STEP	2026-11-04T17:34:24.4738083Z ##[group]Run actions/checkout@v5
+test	UNKNOWN STEP	2026-11-04T17:34:24.4738745Z with:
+test	UNKNOWN STEP	2026-11-04T17:34:24.4739156Z   repository: ryan-zheng-teki/repository_prisma
+test	UNKNOWN STEP	2026-11-04T17:34:24.4742434Z   token: ***
+test	UNKNOWN STEP	2026-11-04T17:34:24.4742790Z   ssh-strict: true
+test	UNKNOWN STEP	2026-11-04T17:34:24.4743155Z   ssh-user: git
+test	UNKNOWN STEP	2026-11-04T17:34:24.4743582Z   persist-credentials: true
+test	UNKNOWN STEP	2026-11-04T17:34:24.4743977Z   clean: true
+test	UNKNOWN STEP	2026-11-04T17:34:24.4744342Z   sparse-checkout-cone-mode: true
+test	UNKNOWN STEP	2026-11-04T17:34:24.4744765Z   fetch-depth: 1
+test	UNKNOWN STEP	2026-11-04T17:34:24.4745125Z   fetch-tags: false
+test	UNKNOWN STEP	2026-11-04T17:34:24.4745483Z   show-progress: true
+test	UNKNOWN STEP	2026-11-04T17:34:24.4745843Z   lfs: false
+test	UNKNOWN STEP	2026-11-04T17:34:24.4746181Z   submodules: false
+test	UNKNOWN STEP	2026-11-04T17:34:24.4746543Z   set-safe-directory: true
+test	UNKNOWN STEP	2026-11-04T17:34:24.4746945Z   allow-unsafe-pr-checkout: false
+test	UNKNOWN STEP	2026-11-04T17:34:24.4747524Z ##[endgroup]
+test	UNKNOWN STEP	2026-11-04T17:34:24.7343198Z Syncing repository: ryan-zheng-teki/repository_prisma
+test	UNKNOWN STEP	2026-11-04T17:34:24.7345066Z ##[group]Getting Git version info
+test	UNKNOWN STEP	2026-11-04T17:34:24.7345860Z Working directory is '/home/runner/work/repository_prisma/repository_prisma'
+test	UNKNOWN STEP	2026-11-04T17:34:24.7347000Z [command]/usr/bin/git version
+test	UNKNOWN STEP	2026-11-04T17:34:24.7352648Z git version 2.56.0
+test	UNKNOWN STEP	2026-11-04T17:34:24.7367998Z ##[endgroup]
+test	UNKNOWN STEP	2026-11-04T17:34:24.7379339Z Temporarily overriding HOME='/home/runner/work/_temp/70dd9c40-6c78-4de3-95fb-ddbbd6817a2f' before making global git config changes
+test	UNKNOWN STEP	2026-11-04T17:34:24.7380665Z Adding repository directory to the temporary git global config as a safe directory
+test	UNKNOWN STEP	2026-11-04T17:34:24.7383493Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/repository_prisma/repository_prisma
+test	UNKNOWN STEP	2026-11-04T17:34:24.7462512Z Deleting the contents of '/home/runner/work/repository_prisma/repository_prisma'
+test	UNKNOWN STEP	2026-11-04T17:34:24.7464386Z ##[group]Initializing the repository
+test	UNKNOWN STEP	2026-11-04T17:34:24.7465786Z [command]/usr/bin/git init /home/runner/work/repository_prisma/repository_prisma
+test	UNKNOWN STEP	2026-11-04T17:34:24.7553504Z hint: Using 'master' as the name for the initial branch. This default branch name
+test	UNKNOWN STEP	2026-11-04T17:34:24.7554676Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+test	UNKNOWN STEP	2026-11-04T17:34:24.7555591Z hint: to use in all of your new repositories, which will suppress this warning,
+test	UNKNOWN STEP	2026-11-04T17:34:24.7556197Z hint: call:
+test	UNKNOWN STEP	2026-11-04T17:34:24.7556540Z hint:
+test	UNKNOWN STEP	2026-11-04T17:34:24.7556956Z hint: 	git config --global init.defaultBranch <name>
+test	UNKNOWN STEP	2026-11-04T17:34:24.7557464Z hint:
+test	UNKNOWN STEP	2026-11-04T17:34:24.7558070Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+test	UNKNOWN STEP	2026-11-04T17:34:24.7558816Z hint: 'development'. The just-created branch can be renamed via this command:
+test	UNKNOWN STEP	2026-11-04T17:34:24.7559463Z hint:
+test	UNKNOWN STEP	2026-11-04T17:34:24.7559878Z hint: 	git branch -m <name>
+test	UNKNOWN STEP	2026-11-04T17:34:24.7560279Z hint:
+test	UNKNOWN STEP	2026-11-04T17:34:24.7561154Z hint: Disable this message with "git config set advice.defaultBranchName false"
+test	UNKNOWN STEP	2026-11-04T17:34:24.7583068Z Initialized empty Git repository in /home/runner/work/repository_prisma/repository_prisma/.git/
+test	UNKNOWN STEP	2026-11-04T17:34:24.7592880Z [command]/usr/bin/git remote add origin https://github.com/ryan-zheng-teki/repository_prisma
+test	UNKNOWN STEP	2026-11-04T17:34:24.7685455Z ##[endgroup]
+test	UNKNOWN STEP	2026-11-04T17:34:24.7686102Z ##[group]Disabling automatic garbage collection
+test	UNKNOWN STEP	2026-11-04T17:34:24.7686800Z [command]/usr/bin/git config --local gc.auto 0
+test	UNKNOWN STEP	2026-11-04T17:34:24.7714946Z ##[endgroup]
+test	UNKNOWN STEP	2026-11-04T17:34:24.7715647Z ##[group]Setting up auth
+test	UNKNOWN STEP	2026-11-04T17:34:24.7720768Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+test	UNKNOWN STEP	2026-11-04T17:34:24.7748698Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+test	UNKNOWN STEP	2026-11-04T17:34:24.8176708Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test	UNKNOWN STEP	2026-11-04T17:34:24.8206637Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+test	UNKNOWN STEP	2026-11-04T17:34:24.8443052Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+test	UNKNOWN STEP	2026-11-04T17:34:24.8474756Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+test	UNKNOWN STEP	2026-11-04T17:34:24.8716967Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+test	UNKNOWN STEP	2026-11-04T17:34:24.8751090Z ##[endgroup]
+test	UNKNOWN STEP	2026-11-04T17:34:24.8757598Z ##[group]Fetching the repository
+test	UNKNOWN STEP	2026-11-04T17:34:24.8758844Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +1fa3292375275a7d8edeae84af122f90d6f1d690:refs/remotes/origin/main
+test	UNKNOWN STEP	2026-11-04T17:34:25.5666685Z From https://github.com/ryan-zheng-teki/repository_prisma
+test	UNKNOWN STEP	2026-11-04T17:34:25.5671787Z  * [new ref]         1fa3292375275a7d8edeae84af122f90d6f1d690 -> origin/main
+test	UNKNOWN STEP	2026-11-04T17:34:25.5675150Z ##[endgroup]
+test	UNKNOWN STEP	2026-11-04T17:34:25.5675893Z ##[group]Determining the checkout info
+test	UNKNOWN STEP	2026-11-04T17:34:25.5676669Z ##[endgroup]
+test	UNKNOWN STEP	2026-11-04T17:34:25.5679256Z [command]/usr/bin/git sparse-checkout disable
+test	UNKNOWN STEP	2026-11-04T17:34:25.5726565Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+test	UNKNOWN STEP	2026-11-04T17:34:25.5755068Z ##[group]Checking out the ref
+test	UNKNOWN STEP	2026-11-04T17:34:25.5757830Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+test	UNKNOWN STEP	2026-11-04T17:34:25.5986811Z Switched to a new branch 'main'
+test	UNKNOWN STEP	2026-11-04T17:34:25.5991702Z branch 'main' set up to track 'origin/main'.
+test	UNKNOWN STEP	2026-11-04T17:34:25.5995110Z ##[endgroup]
+test	UNKNOWN STEP	2026-11-04T17:34:25.6034580Z [command]/usr/bin/git log -1 --format=%H
+test	UNKNOWN STEP	2026-11-04T17:34:25.6056824Z 1fa3292375275a7d8edeae84af122f90d6f1d690
+test	UNKNOWN STEP	2026-11-04T17:34:25.6378797Z ##[group]Run actions/setup-node@v5
+test	UNKNOWN STEP	2026-11-04T17:34:25.6379814Z with:
+test	UNKNOWN STEP	2026-11-04T17:34:25.6380667Z   node-version: 24
+test	UNKNOWN STEP	2026-11-04T17:34:25.6381450Z   cache: npm
+test	UNKNOWN STEP	2026-11-04T17:34:25.6382199Z   always-auth: false
+test	UNKNOWN STEP	2026-11-04T17:34:25.6383192Z   check-latest: false
+test	UNKNOWN STEP	2026-11-04T17:34:25.6390902Z   token: ***
+test	UNKNOWN STEP	2026-11-04T17:34:25.6391694Z   package-manager-cache: true
+test	UNKNOWN STEP	2026-11-04T17:34:25.6392586Z ##[endgroup]
+test	UNKNOWN STEP	2026-11-04T17:34:25.7633797Z (node:2165) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+test	UNKNOWN STEP	2026-11-04T17:34:25.7637143Z (Use `node --trace-deprecation ...` to show where the warning was created)
+test	UNKNOWN STEP	2026-11-04T17:34:25.7639682Z Found in cache @ /opt/hostedtoolcache/node/24.22.1/x64
+test	UNKNOWN STEP	2026-11-04T17:34:25.7641594Z ##[group]Environment details
+test	UNKNOWN STEP	2026-11-04T17:34:26.0930884Z node: v24.22.1
+test	UNKNOWN STEP	2026-11-04T17:34:26.0931338Z npm: 11.19.1
+test	UNKNOWN STEP	2026-11-04T17:34:26.0931684Z yarn: 1.22.22
+test	UNKNOWN STEP	2026-11-04T17:34:26.0932460Z ##[endgroup]
+test	UNKNOWN STEP	2026-11-04T17:34:26.1009673Z [command]/opt/hostedtoolcache/node/24.22.1/x64/bin/npm config get cache
+test	UNKNOWN STEP	2026-11-04T17:34:26.1899790Z /home/runner/.npm
+test	UNKNOWN STEP	2026-11-04T17:34:26.4142099Z Cache hit for: node-cache-Linux-x64-npm-0ec990f6a001e08cce687be5d7407e4441a6851063729fd8a8d2b931b73e57b8
+test	UNKNOWN STEP	2026-11-04T17:34:26.4226960Z (node:2165) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+test	UNKNOWN STEP	2026-11-04T17:34:27.6588703Z Received 41943040 of 114270587 (36.7%), 40.0 MBs/sec
+test	UNKNOWN STEP	2026-11-04T17:34:28.1729692Z Received 114270587 of 114270587 (100.0%), 72.0 MBs/sec
+test	UNKNOWN STEP	2026-11-04T17:34:28.1730580Z Cache Size: ~109 MB (114270587 B)
+test	UNKNOWN STEP	2026-11-04T17:34:28.1837074Z [command]/usr/bin/tar -xf /home/runner/work/_temp/492f7d81-01ea-4eba-8bdf-91ec4eb44d20/cache.tzst -P -C /home/runner/work/repository_prisma/repository_prisma --use-compress-program unzstd
+test	UNKNOWN STEP	2026-11-04T17:34:28.3459581Z Cache restored successfully
+test	UNKNOWN STEP	2026-11-04T17:34:28.3510899Z Cache restored from key: node-cache-Linux-x64-npm-0ec990f6a001e08cce687be5d7407e4441a6851063729fd8a8d2b931b73e57b8
+test	UNKNOWN STEP	2026-11-04T17:34:28.3698352Z ##[group]Run npm ci --strict-allow-scripts
+test	UNKNOWN STEP	2026-11-04T17:34:28.3698694Z [36;1mnpm ci --strict-allow-scripts[0m
+test	UNKNOWN STEP	2026-11-04T17:34:28.3736060Z shell: /usr/bin/bash -e {0}
+test	UNKNOWN STEP	2026-11-04T17:34:28.3736310Z ##[endgroup]
+test	UNKNOWN STEP	2026-11-04T17:34:31.0201618Z npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
+test	UNKNOWN STEP	2026-11-04T17:34:32.6202560Z 
+test	UNKNOWN STEP	2026-11-04T17:34:32.6203472Z > repository_prisma@2.0.0 prepare
+test	UNKNOWN STEP	2026-11-04T17:34:32.6204176Z > prisma generate
+test	UNKNOWN STEP	2026-11-04T17:34:32.6204488Z 
+test	UNKNOWN STEP	2026-11-04T17:34:33.3020194Z Loaded Prisma config from prisma.config.ts.
+test	UNKNOWN STEP	2026-11-04T17:34:33.3020902Z 
+test	UNKNOWN STEP	2026-11-04T17:34:33.7480576Z Prisma schema loaded from prisma/schema.prisma.
+test	UNKNOWN STEP	2026-11-04T17:34:33.9141118Z 
+test	UNKNOWN STEP	2026-11-04T17:34:33.9169209Z ✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 113ms
+test	UNKNOWN STEP	2026-11-04T17:34:33.9171196Z 
+test	UNKNOWN STEP	2026-11-04T17:34:33.9171913Z Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+test	UNKNOWN STEP	2026-11-04T17:34:33.9172314Z 
+test	UNKNOWN STEP	2026-11-04T17:34:33.9172357Z 
+test	UNKNOWN STEP	2026-11-04T17:34:34.1125176Z 
+test	UNKNOWN STEP	2026-11-04T17:34:34.1126000Z added 273 packages, and audited 274 packages in 6s
+test	UNKNOWN STEP	2026-11-04T17:34:34.1150864Z 
+test	UNKNOWN STEP	2026-11-04T17:34:34.1151239Z 47 packages are looking for funding
+test	UNKNOWN STEP	2026-11-04T17:34:34.1151656Z   run `npm fund` for details
+test	UNKNOWN STEP	2026-11-04T17:34:34.1151936Z 
+test	UNKNOWN STEP	2026-11-04T17:34:34.1152107Z found 0 vulnerabilities
+test	UNKNOWN STEP	2026-11-04T17:34:34.1580674Z ##[group]Run npm run typecheck
+test	UNKNOWN STEP	2026-11-04T17:34:34.1580958Z [36;1mnpm run typecheck[0m
+test	UNKNOWN STEP	2026-11-04T17:34:34.1612186Z shell: /usr/bin/bash -e {0}
+test	UNKNOWN STEP	2026-11-04T17:34:34.1612405Z ##[endgroup]
+test	UNKNOWN STEP	2026-11-04T17:34:34.2459917Z 
+test	UNKNOWN STEP	2026-11-04T17:34:34.2460725Z > repository_prisma@2.0.0 typecheck
+test	UNKNOWN STEP	2026-11-04T17:34:34.2461071Z > tsc -p tsconfig.json
+test	UNKNOWN STEP	2026-11-04T17:34:34.2461215Z 
+test	UNKNOWN STEP	2026-11-04T17:34:35.7756465Z ##[group]Run npm test
+test	UNKNOWN STEP	2026-11-04T17:34:35.7756701Z [36;1mnpm test[0m
+test	UNKNOWN STEP	2026-11-04T17:34:35.7784059Z shell: /usr/bin/bash -e {0}
+test	UNKNOWN STEP	2026-11-04T17:34:35.7784305Z ##[endgroup]
+test	UNKNOWN STEP	2026-11-04T17:34:35.9271401Z 
+test	UNKNOWN STEP	2026-11-04T17:34:35.9272092Z > repository_prisma@2.0.0 test
+test	UNKNOWN STEP	2026-11-04T17:34:35.9272475Z > node scripts/run-tests.js
+test	UNKNOWN STEP	2026-11-04T17:34:35.9273087Z 
+test	UNKNOWN STEP	2026-11-04T17:34:36.7405621Z Loaded Prisma config from prisma.config.ts.
+test	UNKNOWN STEP	2026-11-04T17:34:36.7405974Z 
+test	UNKNOWN STEP	2026-11-04T17:34:36.8231820Z Prisma schema loaded from prisma/schema.prisma.
+test	UNKNOWN STEP	2026-11-04T17:34:36.8232527Z Datasource "db": SQLite database "test.db" at "file:///home/runner/work/repository_prisma/repository_prisma/test.db"
+test	UNKNOWN STEP	2026-11-04T17:34:36.8464863Z 
+test	UNKNOWN STEP	2026-11-04T17:34:36.8465930Z SQLite database test.db created at file:///home/runner/work/repository_prisma/repository_prisma/test.db
+test	UNKNOWN STEP	2026-11-04T17:34:36.9317257Z 
+test	UNKNOWN STEP	2026-11-04T17:34:36.9318543Z 🚀  Your database is now in sync with your Prisma schema. Done in 86ms
+test	UNKNOWN STEP	2026-11-04T17:34:36.9334197Z 
+test	UNKNOWN STEP	2026-11-04T17:34:36.9341456Z ┌─────────────────────────────────────────────────────────┐
+test	UNKNOWN STEP	2026-11-04T17:34:36.9351189Z │  Update available 7.10.1 -> 8.0.0-rc.30                 │
+test	UNKNOWN STEP	2026-11-04T17:34:36.9351793Z │                                                         │
+test	UNKNOWN STEP	2026-11-04T17:34:36.9352400Z │  This is a major update - please follow the guide at    │
+test	UNKNOWN STEP	2026-11-04T17:34:36.9353083Z │  https://pris.ly/d/major-version-upgrade                │
+test	UNKNOWN STEP	2026-11-04T17:34:36.9353686Z │                                                         │
+test	UNKNOWN STEP	2026-11-04T17:34:36.9354291Z │  Run the following to update                            │
+test	UNKNOWN STEP	2026-11-04T17:34:36.9354665Z │    npm i --save-dev prisma@latest                       │
+test	UNKNOWN STEP	2026-11-04T17:34:36.9355028Z │    npm i @prisma/client@latest                          │
+test	UNKNOWN STEP	2026-11-04T17:34:36.9355407Z └─────────────────────────────────────────────────────────┘
+test	UNKNOWN STEP	2026-11-04T17:34:37.7169469Z Loaded Prisma config from prisma.config.ts.
+test	UNKNOWN STEP	2026-11-04T17:34:37.7169786Z 
+test	UNKNOWN STEP	2026-11-04T17:34:37.7959869Z Prisma schema loaded from prisma/schema.prisma.
+test	UNKNOWN STEP	2026-11-04T17:34:37.8901606Z 
+test	UNKNOWN STEP	2026-11-04T17:34:37.8905290Z ✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 55ms
+test	UNKNOWN STEP	2026-11-04T17:34:37.8905720Z 
+test	UNKNOWN STEP	2026-11-04T17:34:37.8906132Z Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+test	UNKNOWN STEP	2026-11-04T17:34:37.8906608Z 
+test	UNKNOWN STEP	2026-11-04T17:34:37.8906613Z 
+test	UNKNOWN STEP	2026-11-04T17:34:38.3754181Z 
+test	UNKNOWN STEP	2026-11-04T17:34:38.3757516Z [1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/home/runner/work/repository_prisma/repository_prisma[39m
+test	UNKNOWN STEP	2026-11-04T17:34:38.3758255Z 
+test	UNKNOWN STEP	2026-11-04T17:34:38.8502451Z  [32m✓[39m src/tests/client-lifecycle.test.ts [2m([22m[2m19 tests[22m[2m)[22m[32m 194[2mms[22m[39m
+test	UNKNOWN STEP	2026-11-04T17:34:38.8852593Z  [32m✓[39m src/tests/public-initialization.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 229[2mms[22m[39m
+test	UNKNOWN STEP	2026-11-04T17:34:39.0973048Z  [32m✓[39m src/tests/sqlite-connection-gate.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 100[2mms[22m[39m
+test	UNKNOWN STEP	2026-11-04T17:34:39.2002790Z  [32m✓[39m src/tests/integration.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 138[2mms[22m[39m
+test	UNKNOWN STEP	2026-11-04T17:34:39.2715945Z  [32m✓[39m src/tests/datasource-readiness.test.ts [2m([22m[2m22 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+test	UNKNOWN STEP	2026-11-04T17:34:39.3690507Z  [32m✓[39m src/tests/transaction-context.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+test	UNKNOWN STEP	2026-11-04T17:34:39.4260124Z  [32m✓[39m src/tests/logging-policy.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+test	UNKNOWN STEP	2026-11-04T17:34:39.5381425Z  [32m✓[39m src/tests/forwarding-proxy.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+test	UNKNOWN STEP	2026-11-04T17:34:39.6980837Z  [32m✓[39m src/tests/database-filter.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+test	UNKNOWN STEP	2026-11-04T17:34:39.7214495Z  [32m✓[39m src/tests/datetime-continuity.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 210[2mms[22m[39m
+test	UNKNOWN STEP	2026-11-04T17:34:42.7075086Z  [32m✓[39m src/tests/transaction-isolation.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 4046[2mms[22m[39m
+test	UNKNOWN STEP	2026-11-04T17:34:42.7076458Z      [33m[2m✓[22m[39m keeps a request without a transaction out of another request's open transaction [33m 415[2mms[22m[39m
+test	UNKNOWN STEP	2026-11-04T17:34:42.7077817Z      [33m[2m✓[22m[39m runs a nested write concurrently with an interactive transaction [33m 378[2mms[22m[39m
+test	UNKNOWN STEP	2026-11-04T17:34:42.7079413Z      [33m[2m✓[22m[39m keeps concurrent plain requests isolated and loses no writes while transactions commit and roll back [33m 917[2mms[22m[39m
+test	UNKNOWN STEP	2026-11-04T17:34:42.7081048Z      [33m[2m✓[22m[39m fails a transaction that uses rootPrismaClient inside its own callback with Prisma's timeout (SCN-007) [33m 1080[2mms[22m[39m
+test	UNKNOWN STEP	2026-11-04T17:34:42.7082349Z      [33m[2m✓[22m[39m fails a transaction queued past its maxWait and keeps the connection usable [33m 813[2mms[22m[39m
+test	UNKNOWN STEP	2026-11-04T17:34:42.7123866Z 
+test	UNKNOWN STEP	2026-11-04T17:34:42.7127285Z [2m Test Files [22m [1m[32m11 passed[39m[22m[90m (11)[39m
+test	UNKNOWN STEP	2026-11-04T17:34:42.7128192Z [2m      Tests [22m [1m[32m113 passed[39m[22m[90m (113)[39m
+test	UNKNOWN STEP	2026-11-04T17:34:42.7128726Z [2m   Start at [22m 17:34:38
+test	UNKNOWN STEP	2026-11-04T17:34:42.7129557Z [2m   Duration [22m 4.32s[2m (transform 284ms, setup 0ms, import 683ms, tests 4.96s, environment 1ms)[22m
+test	UNKNOWN STEP	2026-11-04T17:34:42.7132563Z 
+test	UNKNOWN STEP	2026-11-04T17:34:42.7532461Z ##[group]Run npm run build
+test	UNKNOWN STEP	2026-11-04T17:34:42.7532713Z [36;1mnpm run build[0m
+test	UNKNOWN STEP	2026-11-04T17:34:42.7559845Z shell: /usr/bin/bash -e {0}
+test	UNKNOWN STEP	2026-11-04T17:34:42.7560080Z ##[endgroup]
+test	UNKNOWN STEP	2026-11-04T17:34:42.8394879Z 
+test	UNKNOWN STEP	2026-11-04T17:34:42.8395517Z > repository_prisma@2.0.0 build
+test	UNKNOWN STEP	2026-11-04T17:34:42.8395827Z > tsup
+test	UNKNOWN STEP	2026-11-04T17:34:42.8395934Z 
+test	UNKNOWN STEP	2026-11-04T17:34:43.0757045Z [34mCLI[39m Building entry: src/index.ts
+test	UNKNOWN STEP	2026-11-04T17:34:43.0758794Z [34mCLI[39m Using tsconfig: tsconfig.json
+test	UNKNOWN STEP	2026-11-04T17:34:43.0759961Z [34mCLI[39m tsup v8.5.1
+test	UNKNOWN STEP	2026-11-04T17:34:43.0761131Z [34mCLI[39m Using tsup config: /home/runner/work/repository_prisma/repository_prisma/tsup.config.ts
+test	UNKNOWN STEP	2026-11-04T17:34:43.0793399Z [34mCLI[39m Target: es2018
+test	UNKNOWN STEP	2026-11-04T17:34:43.0799950Z [34mCLI[39m Cleaning output folder
+test	UNKNOWN STEP	2026-11-04T17:34:43.0809673Z [34mCJS[39m Build start
+test	UNKNOWN STEP	2026-11-04T17:34:43.0810182Z [34mESM[39m Build start
+test	UNKNOWN STEP	2026-11-04T17:34:43.0823291Z [33mCJS[39m [33mYou have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin[39m
+test	UNKNOWN STEP	2026-11-04T17:34:43.0829251Z [33mESM[39m [33mYou have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin[39m
+test	UNKNOWN STEP	2026-11-04T17:34:43.1093754Z [32mCJS[39m [1mdist/index.js     [22m[32m31.85 KB[39m
+test	UNKNOWN STEP	2026-11-04T17:34:43.1094776Z [32mCJS[39m [1mdist/index.js.map [22m[32m64.01 KB[39m
+test	UNKNOWN STEP	2026-11-04T17:34:43.1095725Z [32mCJS[39m ⚡️ Build success in 29ms
+test	UNKNOWN STEP	2026-11-04T17:34:43.1103386Z [32mESM[39m [1mdist/index.mjs     [22m[32m29.31 KB[39m
+test	UNKNOWN STEP	2026-11-04T17:34:43.1104000Z [32mESM[39m [1mdist/index.mjs.map [22m[32m62.79 KB[39m
+test	UNKNOWN STEP	2026-11-04T17:34:43.1104679Z [32mESM[39m ⚡️ Build success in 29ms
+test	UNKNOWN STEP	2026-11-04T17:34:43.3202316Z [34mDTS[39m Build start
+test	UNKNOWN STEP	2026-11-04T17:34:44.8133253Z [32mDTS[39m ⚡️ Build success in 1493ms
+test	UNKNOWN STEP	2026-11-04T17:34:44.8134002Z [32mDTS[39m [1mdist/index.d.ts  [22m[32m9.01 KB[39m
+test	UNKNOWN STEP	2026-11-04T17:34:44.8134637Z [32mDTS[39m [1mdist/index.d.mts [22m[32m9.01 KB[39m
+test	UNKNOWN STEP	2026-11-04T17:34:44.8866556Z Post job cleanup.
+test	UNKNOWN STEP	2026-11-04T17:34:44.9854992Z (node:2565) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+test	UNKNOWN STEP	2026-11-04T17:34:44.9855652Z (Use `node --trace-deprecation ...` to show where the warning was created)
+test	UNKNOWN STEP	2026-11-04T17:34:44.9858318Z Cache hit occurred on the primary key node-cache-Linux-x64-npm-0ec990f6a001e08cce687be5d7407e4441a6851063729fd8a8d2b931b73e57b8, not saving cache.
+test	UNKNOWN STEP	2026-11-04T17:34:45.0014118Z Post job cleanup.
+test	UNKNOWN STEP	2026-11-04T17:34:45.0704641Z [command]/usr/bin/git version
+test	UNKNOWN STEP	2026-11-04T17:34:45.0743920Z git version 2.56.0
+test	UNKNOWN STEP	2026-11-04T17:34:45.0777537Z Temporarily overriding HOME='/home/runner/work/_temp/cb941eb6-ae33-4e33-88a1-d776d14d4d34' before making global git config changes
+test	UNKNOWN STEP	2026-11-04T17:34:45.0778621Z Adding repository directory to the temporary git global config as a safe directory
+test	UNKNOWN STEP	2026-11-04T17:34:45.0782256Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/repository_prisma/repository_prisma
+test	UNKNOWN STEP	2026-11-04T17:34:45.0820537Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+test	UNKNOWN STEP	2026-11-04T17:34:45.0861650Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+test	UNKNOWN STEP	2026-11-04T17:34:45.1141196Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test	UNKNOWN STEP	2026-11-04T17:34:45.1173032Z http.https://github.com/.extraheader
+test	UNKNOWN STEP	2026-11-04T17:34:45.1182462Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+test	UNKNOWN STEP	2026-11-04T17:34:45.1213895Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+test	UNKNOWN STEP	2026-11-04T17:34:45.1465175Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+test	UNKNOWN STEP	2026-11-04T17:34:45.1493922Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+test	UNKNOWN STEP	2026-11-04T17:34:45.1851896Z Cleaning up orphan processes

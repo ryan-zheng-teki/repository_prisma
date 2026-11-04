@@ -2,7 +2,7 @@
 
 ## Status
 
-Verified from evidence and merged into `main`. No release, tag or version bump (version stays `2.0.0`). The post-merge CI result (AC-005) and cleanup are recorded in `release-deployment-report.md` § Finalization Record.
+Verified from evidence and merged into `main` (`5a73159..1fa3292`, pushed). Post-merge CI run `41878633972` passed, with `npm ci --strict-allow-scripts` succeeding (AC-005). Cleanup is done. No release, tag or version bump (version stays `2.0.0`).
 
 ## Classification And Route
 
