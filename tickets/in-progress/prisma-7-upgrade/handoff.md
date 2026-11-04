@@ -1,10 +1,16 @@
-# Handoff: prisma-7-upgrade — Architecture Design Complete
+# Handoff: prisma-7-upgrade — Architecture Design Complete (revised, SR-004)
 
 - Package identifier: `prisma-7-upgrade` (Project Task `repository-prisma-1`, project `project_75b2027e-1264-44a0-99d7-92b5838eae81`)
 - Requested by: `/project_task_manager` (run `project_task_manager_843e78c72f40444ca701a6c2c0dfe98c`) on behalf of the user
 - Classification: `Architecture Design Complete`. `task_size = Medium`, `architectural_risk = High`.
-- Current solution revision: `SR-003` (requirements approved at `SR-002`; design at `SR-003`)
-- Route applied: `/software_engineering_team/architecture_reviewer` (rule: architectural_risk=High). Recorded 2026-11-04.
+- Current solution revision: `SR-004` (requirements Approved at SR-004, design Ready at SR-004). Prior: SR-003, reviewed in ARCH-REV-001 (Fail).
+- Route applied: `/software_engineering_team/architecture_reviewer` (rule: architectural_risk=High). Recorded 2026-11-04 for SR-003, then again for SR-004 (re-review).
+
+## Round 2 Changes (response to ARCH-REV-001)
+
+- ARCH-001 (Requirement Gap): AC-006 is narrowed to SQLite targets. AC-008 now covers every non-SQLite form and lifecycle state: `UNSUPPORTED_DATASOURCE_PROVIDER`; a bound client is untouched; `shutting-down` keeps `CLIENT_NOT_READY`. This stays within the approved DEC-001, so no renewed user approval is needed. Design BEH-004/BEH-007 rows and the DS-001 narrative state the precedence with line citations (`lifecycle.ts:103-109`, `:111-121`, `:133-135`, `:147-149`, `:283-288`). The Guidance has a 5-case AC-008 test plan, including the replaced `client-lifecycle.test.ts:162-178` row and the former `DATASOURCE_CONFLICT` case.
+- ARCH-002: `logging-policy.test.ts:81-104` is added to the Removal plan, rewritten on a `file::memory:` target.
+- Residual points decided: both peers are also listed in `devDependencies`; the AC-005 fixture table is created by raw SQL; the five README sentences that become false are listed for rewrite.
 
 ## Original Request And Goals
 

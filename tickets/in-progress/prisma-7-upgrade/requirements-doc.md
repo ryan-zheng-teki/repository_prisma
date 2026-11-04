@@ -3,14 +3,14 @@
 ## Document Status
 
 - Status: `Approved`
-- Current solution revision ID: `SR-002`
+- Current solution revision ID: `SR-004`
 - Package identifier: `prisma-7-upgrade`
 - Request / ticket: Project Task `repository-prisma-1`: upgrade Prisma (client and CLI) from 5.22.0 to the latest stable 7.x (7.10.1)
 - Requested by: `/project_task_manager` (run `project_task_manager_843e78c72f40444ca701a6c2c0dfe98c`), on behalf of the user
 - Requirements owner: Solution Designer
 - Date: 2026-11-04
 - Approved by and reference: `Solution Designer within the direction (user informed)`. Reference: the user's messages on 2026-11-04, "why wait here?", "regarding these technical things, i trust you have good architecture technical understanding for this project" and "at the same time, since its a library, how user use it will still be intuitive and simple" (the last adds REQ-015/AC-012). The user was informed in the conversation of each decision taken (DEC-001, DEC-002, DEC-007b, DEC-008).
-- Exact approved requirements baseline / solution revision: `SR-002` (this document as committed with SR-002)
+- Exact approved requirements baseline / solution revision: `SR-004`. SR-002 was approved within the direction. SR-004 corrects AC-006/AC-008 to be consistent with the already decided DEC-001 (architecture review ARCH-REV-001, finding ARCH-001); intended behavior is unchanged from DEC-001, so no renewed user approval is needed.
 - Behavior-defining supplements and their approved versions: none. `probes/` is evidence only.
 
 ## Problem And Desired Outcome
@@ -116,9 +116,9 @@ None. The released-but-unmerged 1.0.10 line is handled by the base choice DEC-00
 | AC-003 | REQ-003 | SCN-002 | No explicit init; `DATABASE_URL` set; first repository call | Lazily bound and works | Missing URL -> `DATABASE_URL_MISSING` | Existing tests |
 | AC-004 | REQ-004 | BEH-005 | URL `file:<path>?connection_limit=1` (relative, spaces, `%20`, symlink) | Opens `<path>`; no file containing `?` is created | — | Extended public-initialization test (asserts no `?` file) |
 | AC-005 | REQ-005 | BEH-006 | DB with a DateTime row written as INTEGER ms (Prisma-5 format); a new row is written through the library's client | New row stored as INTEGER; a `gt`/`lt` filter returns both old and new rows as expected | — | New test with a DateTime fixture (test schema may gain a DateTime model, or a raw-SQL fixture) |
-| AC-006 | REQ-006 | BEH-004 | `enableWAL: true` on file/memory/non-SQLite; identity mismatch; connection failure | Same codes and outcomes as today; messages contain no URL/path | — | Existing tests on 7 |
+| AC-006 | REQ-006 | BEH-004 | SQLite targets only: `enableWAL: true` on file/memory targets; identity mismatch; connection failure | Same codes and outcomes as today (memory + WAL -> `WAL_UNSUPPORTED_PROVIDER`); messages contain no URL/path | Non-SQLite inputs are not covered here; they follow AC-008 | Existing tests on 7 |
 | AC-007 | REQ-007 | BEH-009 | Transactions with options and nesting | Same as today | — | Existing tests on 7 |
-| AC-008 | REQ-008 | SCN-005 | `initializePrisma({ datasourceUrl: 'postgresql://...' })` and lazy binding to a non-SQLite URL | Outcome per DEC-001 (recommended: rejects with a new stable code, no URL in the message) | — | New tests |
+| AC-008 | REQ-008 | SCN-005 | A non-SQLite URL in any form: `initializePrisma({ datasourceUrl: 'postgresql://...' })` with or without `enableWAL`; the same while a SQLite client is lazily bound, initializing or ready; lazy binding with a non-SQLite `DATABASE_URL` | Rejects with `UNSUPPORTED_DATASOURCE_PROVIDER` (DEC-001), and the message contains no URL or credentials. A SQLite client that is already bound stays bound and usable. From `idle`/`failed`, the lifecycle is `failed`, as for any resolution failure today. | While shutdown is in progress, `CLIENT_NOT_READY` keeps precedence (unchanged ordering) | New tests; the former `WAL_UNSUPPORTED_PROVIDER` (non-SQLite) and `DATASOURCE_CONFLICT` (bound SQLite then non-SQLite) expectations are replaced |
 | AC-009 | REQ-009 | SCN-003 | Packed tarball installed in an ESM and a CJS consumer with Prisma 7 peers | Both import; `dist` contains no bundled adapter or better-sqlite3 code; no `.env` loaded; no native addon loaded on import | — | `npm run test:package` incl. interop probe |
 | AC-010 | REQ-010, REQ-011 | SCN-004 | Clean checkout | All commands in REQ-010 pass; CI workflow commands match | — | Logged evidence |
 | AC-012 | REQ-015 | SCN-001, SCN-003 | A fresh consumer project follows only the README setup section | `npm install repository_prisma` (plus `prisma` as a dev dependency) installs `@prisma/client` and the adapter; the existing `initializePrisma({ datasourceUrl })` + repository code runs unchanged; no adapter import in consumer code | A non-SQLite URL gets an error whose message states that only SQLite is supported | Package smoke installs without `--legacy-peer-deps`; README review |

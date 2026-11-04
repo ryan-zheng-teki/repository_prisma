@@ -7,6 +7,7 @@
 | SR-001 | Requirements | Initial coherent baseline (Task `repository-prisma-1`) | N/A | N/A | Ready for Approval | BEH-001..013, REQ-001..014 | Awaiting user decisions DEC-001, DEC-002, DEC-007b, DEC-008 |
 | SR-002 | Requirements | User messages 2026-11-04 delegating technical decisions and asking for simple usage | N/A | Ready for Approval | Approved | REQ-015, AC-012, DEC-001/002/007b/008 | Approved within the direction; REQ-015 added |
 | SR-003 | Design | Architecture design on SR-002 | N/A | N/A (no design) | Design Ready | REQ-001..015 | design-spec.md; Medium / High |
+| SR-004 | Mixed | Architecture review ARCH-REV-001 (Fail) | ARCH-001, ARCH-002 | Requirements Approved (SR-002); design Ready (SR-003) | Requirements Approved (SR-004); design Ready (SR-004) | AC-006, AC-008, BEH-004, BEH-007, REQ-010 | AC-006/AC-008 made consistent with DEC-001; precedence and test plan stated; logging-policy test added; devDependencies and README rewrites decided |
 
 ## Revision Entries
 
@@ -64,3 +65,18 @@
 - Applied handoff-rule outcome: see `handoff.md`
 - Remaining gaps: none blocking
 - Next action: route per handoff rules
+
+### SR-004 — Architecture review ARCH-REV-001 corrections
+
+- Phase and classification: Mixed. ARCH-001 is a `Requirement Gap` (internal inconsistency); ARCH-002 is a `Design Impact`.
+- Triggering input: `design-review-report.md` (ARCH-REV-001, Fail), 2026-11-04
+- Triggering finding IDs: ARCH-001, ARCH-002, plus the non-blocking residual-risk points
+- Prior status: requirements Approved (SR-002), design Ready (SR-003)
+- Current status: requirements Approved (SR-004), design Ready (SR-004)
+- IDs affected: AC-006 (narrowed to SQLite targets), AC-008 (all non-SQLite forms and lifecycle states, bound client untouched, shutting-down precedence), BEH-004/BEH-007 rows, DS-001 narrative, Removal plan (`logging-policy.test.ts:81-104`), Guidance (AC-008 test plan, AC-005 fixture via raw SQL, README rewrites), File mapping (`devDependencies` shape fixed)
+- Intended behavior changed: `No`. AC-006 contradicted the already approved DEC-001; the correction aligns it with DEC-001 (rejection of all non-SQLite URLs). The two replaced outcomes (non-SQLite + WAL -> `WAL_UNSUPPORTED_PROVIDER`; bound SQLite then non-SQLite -> `DATASOURCE_CONFLICT`) follow directly from DEC-001 and are now explicit.
+- Approval impact: no renewed user approval needed (within DEC-001, Solution Designer within the direction; user informed in the conversation)
+- Affected design/review basis: ARCH-REV-001 applies to SR-002/SR-003; re-review is required on SR-004
+- Post-design classification: unchanged (Medium / High)
+- Applied handoff-rule outcome: re-review by `/software_engineering_team/architecture_reviewer` (see `handoff.md`)
+- Next action: architecture re-review

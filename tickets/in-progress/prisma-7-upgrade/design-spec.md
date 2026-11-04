@@ -2,8 +2,8 @@
 
 ## Solution And Approval Basis
 
-- Current solution revision ID: `SR-003`
-- Approved requirements baseline: `requirements-doc.md` at `SR-002`, approved by the Solution Designer within the direction, user informed. The user delegated the technical decisions on 2026-11-04 ("i trust you have good architecture technical understanding for this project") and added REQ-015 ("how user use it will still be intuitive and simple").
+- Current solution revision ID: `SR-004`
+- Approved requirements baseline: `requirements-doc.md` at `SR-004` (SR-002 approval; SR-004 corrects AC-006/AC-008 within DEC-001), approved by the Solution Designer within the direction, user informed. The user delegated the technical decisions on 2026-11-04 ("i trust you have good architecture technical understanding for this project") and added REQ-015 ("how user use it will still be intuitive and simple").
 - Behavior-defining supplements: none (`probes/` is evidence only)
 - User approval of the design: `Not required` (the direction does not ask for it)
 - Design status: `Ready`
@@ -67,10 +67,10 @@ Build the root client through a library-owned SQLite driver adapter. Reject non-
 | --- | --- | --- | --- | --- | --- | --- |
 | BEH-002 | System | REQ-003, REQ-015 / AC-002, AC-003, AC-012 | `initializePrisma` / first operation | `lifecycle.ts:67-71` | Adapter-built client; same inputs | DS-001, DS-002 |
 | BEH-003 | System | REQ-003 / AC-006 | memory URL | `datasource-target.ts:91-100` | Adapter `:memory:` | DS-001 |
-| BEH-004 | System | REQ-006 / AC-006 | explicit init | `lifecycle.ts` `performInitialization` | Unchanged | DS-001 |
+| BEH-004 | System | REQ-006 / AC-006 | explicit init on a SQLite target | `lifecycle.ts` `performInitialization` | Unchanged for SQLite targets. For non-SQLite input, the former `WAL_UNSUPPORTED_PROVIDER` (non-SQLite + WAL, `lifecycle.ts:283-288`) no longer applies: resolution rejects first (BEH-007). | DS-001 |
 | BEH-005 | Contract | REQ-004 / AC-004 | URL with query | `datasource-target.ts:102-111` | Adapter opens `expectedPath`; `bindingKey` unchanged | DS-001 |
 | BEH-006 | Data | REQ-005 / AC-005 | DateTime read/write | Prisma 5 INTEGER ms | `timestampFormat: 'unixepoch-ms'` | DS-001 |
-| BEH-007 | System | REQ-008 / AC-008 | non-SQLite URL | `datasource-target.ts:125-130` | Rejected at resolution: `UNSUPPORTED_DATASOURCE_PROVIDER` | DS-001, DS-002 |
+| BEH-007 | System | REQ-008 / AC-008 | non-SQLite URL | `datasource-target.ts:125-130` | Rejected at resolution with `UNSUPPORTED_DATASOURCE_PROVIDER`. `initialize` resolves at `lifecycle.ts:111-121`, after only the shutting-down check (`:103-109`) and before the conflict (`:132-135`, `:147-150`), logging-policy and WAL (`:283-288`) checks. A non-SQLite URL therefore yields this code in every lifecycle state except `shutting-down` (`CLIENT_NOT_READY`, unchanged). A bound client is left untouched (`:116-118` only sets `failed` from `idle`/`failed`). This replaces two former outcomes: non-SQLite + `enableWAL` (`WAL_UNSUPPORTED_PROVIDER`) and bound SQLite then non-SQLite (`DATASOURCE_CONFLICT`). | DS-001, DS-002 |
 | BEH-008/009 | Contract | REQ-006/007 / AC-006/007 | logging, transactions | as today | Unchanged | — |
 | BEH-010 | Contract | REQ-009, REQ-015 / AC-009, AC-012 | import/require | tsup externals, smoke | Adapter external peer; native addon lazy | DS-003 |
 | BEH-011/012 | Operational | REQ-010/011 / AC-010 | npm ci/test/build, CI | `run-tests.js`, `ci.yml` | `prepare` generate; no removed flags; no schema url | DS-004 |
@@ -138,7 +138,7 @@ Build the root client through a library-owned SQLite driver adapter. Reject non-
 
 | Spine ID | Short Narrative | Main Domain Subject Nodes | Governing Owner | Key Off-Spine Concerns |
 | --- | --- | --- | --- | --- |
-| DS-001 | The lifecycle resolves the target once. A non-SQLite URL now fails right there with `UNSUPPORTED_DATASOURCE_PROVIDER`, before any client exists. For SQLite, the factory asks the adapter policy for an adapter (physical path or `:memory:`, INTEGER-ms timestamps) and builds the client. Connection, identity and WAL proceed exactly as today. | datasource target, root client, readiness | `PrismaClientLifecycle` | adapter policy, logging policy, error catalog |
+| DS-001 | The lifecycle resolves the target once, before any conflict, logging-policy or WAL check. A non-SQLite URL now fails right there with `UNSUPPORTED_DATASOURCE_PROVIDER`, before any client exists and without touching a bound client. For SQLite, the factory asks the adapter policy for an adapter (physical path or `:memory:`, INTEGER-ms timestamps) and builds the client. Connection, identity and WAL proceed exactly as today. | datasource target, root client, readiness | `PrismaClientLifecycle` | adapter policy, logging policy, error catalog |
 | DS-002 | The first operation lazily resolves from the environment and builds the same way. Rejection becomes `PrismaInitializationError` with the new code through the existing `failureFrom`. | datasource target, root client | `PrismaClientLifecycle` | same |
 | DS-003 | Both bundles import the two Prisma packages as externals. The consumer's npm auto-installs them as peers. | package entrypoints | build config | — |
 | DS-004 | `prepare` restores the auto-generation that Prisma 5's postinstall used to provide, so every script and workflow after `npm ci` has a generated client. | generated client | `package.json` scripts | — |
@@ -171,7 +171,7 @@ Build the root client through a library-owned SQLite driver adapter. Reject non-
 | `url = env("DATABASE_URL")` in `prisma/schema.prisma` | P1012 on Prisma 7 | `prisma.config.ts` `datasource.url` (exists) | — |
 | `--skip-generate` in `scripts/run-tests.js` | Flag removed | `db push` (it no longer generates; the existing following `generate` step stays) | — |
 | CI step `npx prisma db push --skip-generate` and job env `DATABASE_URL` in `ci.yml` | Flag removed. The step was redundant with `npm test` (which pushes the test DB); after removal the env has no reader (generate does not need a URL, Reproduced). | `prepare` (generate), `npm test` (push) | — |
-| Tests asserting non-SQLite success, `other` target shape, `clientUrl` (`datasource-readiness.test.ts:37-75`, `client-lifecycle.test.ts:162-195` and the postgres-based conflict/rebind cases near `:250-360`) | Behavior removed or changed | Rejection tests, and conflict/rebind tests rewritten with two SQLite file targets | Keep their lifecycle intent (conflict, rebind, shutdown) |
+| Tests asserting non-SQLite success, `other` target shape, `clientUrl` (`datasource-readiness.test.ts:37-75`, `client-lifecycle.test.ts:162-195` and the postgres-based conflict/rebind cases near `:250-360`, `logging-policy.test.ts:81-104`) | Behavior removed or changed | Rejection tests; conflict/rebind tests rewritten with SQLite targets; the logging-policy test rewritten on a SQLite memory target (`file::memory:`, so the fake client needs no identity rows) with the same lazy-bind/conflict/rebind logging intent | Keep their lifecycle intent (conflict, rebind, shutdown, logging policy) |
 
 ## Return Or Event Spine(s) (If Applicable)
 
@@ -281,7 +281,7 @@ Factory (the existing `PrismaClientFactory` seam) with an Adapter (Prisma's driv
 | `src/lib/client/datasource-target.ts` | File (Modify) | as above | adapter imports |
 | `src/lib/client/lifecycle.ts` | File (Modify) | factory change only | path/timestamp policy |
 | `src/lib/client/initialization-error.ts` | File (Modify) | add code/message | URLs in messages |
-| `package.json` | File (Modify) | `peerDependencies`: `@prisma/client ^7.10.1`, `@prisma/adapter-better-sqlite3 ^7.10.1`. `devDependencies`: `prisma ^7.10.1` (plus the two peers only if `npm ls` shows npm does not install root peers). `scripts.prepare`: `prisma generate`. `engines.node`: `^20.19 \|\| ^22.12 \|\| >=24`. `version` unchanged. | version bump |
+| `package.json` | File (Modify) | `peerDependencies`: `@prisma/client ^7.10.1`, `@prisma/adapter-better-sqlite3 ^7.10.1`. `devDependencies`: `prisma ^7.10.1`, `@prisma/client ^7.10.1`, `@prisma/adapter-better-sqlite3 ^7.10.1` (listed explicitly so the repo's own install and lockfile are deterministic, independent of npm's root-peer handling). `scripts.prepare`: `prisma generate`. `engines.node`: `^20.19 \|\| ^22.12 \|\| >=24`. `version` unchanged. | version bump |
 | `package-lock.json` | File (Modify) | regenerated by npm; resolves 7.10.1 | — |
 | `prisma/schema.prisma` | File (Modify) | drop datasource `url`; add test model `Event { id Int @id @default(autoincrement()); label String; occurredAt DateTime }` for AC-005 | — |
 | `tsup.config.ts` | File (Modify) | `external` adds `@prisma/adapter-better-sqlite3` | — |
@@ -346,10 +346,21 @@ N/A
 ## Guidance For Implementation
 
 - Reproduction to start from: install 7.10.1 and run `npm test`. Construction fails with `Unknown property datasourceUrl` (`probes/construct-options.cjs`); `probes/datetime-continuity-read.mjs` shows the format regression that AC-005 must guard.
-- AC-005 test shape: on a fresh file DB pushed from the test schema, insert a row through raw SQL with `occurredAt` as an INTEGER ms value (the Prisma-5 representation). Create a second row through the library's root client. Assert `typeof(occurredAt)` = `integer` for both, and that `findMany({ where: { occurredAt: { gt: <earlier date> } } })` returns both.
+- AC-005 test shape: on a fresh temp file DB, create the `"Event"` table by raw SQL matching what `db push` produces (`"id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "label" TEXT NOT NULL, "occurredAt" DATETIME NOT NULL`), as the existing tests do for `User`. Initialize the library on that file and insert a row through raw SQL with `occurredAt` as an INTEGER ms value (the Prisma-5 representation). Create a second row through the library's root client. Assert `typeof(occurredAt)` = `integer` for both, and that `findMany({ where: { occurredAt: { gt: <earlier date> } } })` returns both.
 - AC-004: extend the existing query-parameter tests to assert that no file whose name contains `?` exists in the directory.
-- AC-008: explicit `initializePrisma({ datasourceUrl: 'postgresql://user:secret@host/db' })` rejects with `UNSUPPORTED_DATASOURCE_PROVIDER`, and the message/`String(error)` contains neither `secret` nor the host. Lazy: with `DATABASE_URL` set to a postgres URL, the first `rootPrismaClient` operation throws the same code.
+- AC-008 test plan (all expect `UNSUPPORTED_DATASOURCE_PROVIDER`; message/`String(error)` contains neither `secret` nor the host; the client factory is never called):
+  1. Explicit `initializePrisma({ datasourceUrl: 'postgresql://user:secret@host/db' })` from `idle`; the lifecycle is then `failed`.
+  2. The same with `enableWAL: true`. This replaces the `postgresql://` row of `client-lifecycle.test.ts:162-178`, which expected `WAL_UNSUPPORTED_PROVIDER`; the memory rows of that test stay as they are.
+  3. A SQLite client is bound (lazy and ready), then `initialize` is called with a postgres URL. This replaces the former `DATASOURCE_CONFLICT` expectation. Afterwards `getClientForOperation()` still returns the bound client.
+  4. Lazy: with `DATABASE_URL` set to a postgres URL, the first `getClientForOperation()` / `rootPrismaClient` operation throws the same code.
+  5. While `shutting-down`, `initialize` with a postgres URL still rejects `CLIENT_NOT_READY` (ordering unchanged).
 - AC-012: API/E2E validates with a real install of the packed tarball in an empty consumer **without** `--legacy-peer-deps` (npm resolves both peers), plus `prisma generate` and a minimal `initializePrisma` + query.
+- README sentences that become false must be rewritten, not only extended:
+  - "The selected value is always passed explicitly to the root `PrismaClient`" -> the library opens the selected SQLite file through its driver adapter.
+  - "Query parameters are preserved" -> query parameters are kept for target identity, but they do not change the opened file and have no effect on the connection.
+  - "This behavior-only release does not change the Prisma schema..." -> remove it or restate it for this change: no schema or data change; the DateTime representation is kept.
+  - The WAL sentence "not supported for non-SQLite or SQLite in-memory targets" -> non-SQLite is not supported at all (`UNSUPPORTED_DATASOURCE_PROVIDER`); WAL is unsupported for in-memory targets.
+  - The `PRISMA_DATASOURCE_PROVIDER=sqlite|postgresql|mysql` hint -> keep the filter helpers documented, but state that the library's client supports SQLite only.
 - README content (REQ-012/015): a short "Requirements and setup (Prisma 7)" section near the top with copy-paste snippets. It covers: SQLite only; dates stored as integers, with a warning to use `timestampFormat: 'unixepoch-ms'` for any other Prisma 7 client on the same database; URL query parameters no longer affect the connection; Node/TS minimums; the new error code in the code list; Prisma 5 users stay on 1.0.x. Update the "ESM and CommonJS Package Loading" paragraph that says no peer change is required. Leave the release section's version-specific text for the release decision, but remove the claim that it is "this already-versioned 1.0.10 release" only if it becomes misleading. Keep that edit minimal.
 - CHANGELOG: `## Unreleased` with a "Breaking" note: requires a major release.
 - DESIGN.md: update §E (adapter construction, SQLite-only invariant, timestamp format rationale), §Package ESM/CommonJS Boundary (adapter external peer), and the FAQ engine sentence.
