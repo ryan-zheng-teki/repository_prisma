@@ -1,0 +1,35 @@
+# Check: IMP-16 (mutation checks for the CR-001 tests)
+# Command: (a) in src/lib/client/sqlite-driver-adapter.ts, return the ungated adapter: sed "s/^  gateSqliteConnection($/  (/" ; vitest run src/tests/transaction-isolation.test.ts ; git checkout -- src/lib/client/sqlite-driver-adapter.ts
+#          (b) in src/lib/client/sqlite-connection-gate.ts, rollback no longer releases: sed "s/rollback: () => end(() => inner.rollback()),/rollback: () => inner.rollback(),/" ; vitest run src/tests/sqlite-connection-gate.test.ts ; git checkout -- src/lib/client/sqlite-connection-gate.ts
+# Commit: e5d2371 (mutations in the working tree only, then restored)
+# Environment: macOS 26.5.2, Node v22.23.1
+# Date: 2026-11-04T12:56Z
+
+## (a) gate removed
+23:  (
+     × keeps a request without a transaction out of another request's open transaction 375ms
+     ✓ commits two concurrent transactions 228ms
+     ✓ runs a nested write concurrently with an interactive transaction 218ms
+     ✓ runs a batch transaction concurrently with an interactive transaction 214ms
+     × fails a transaction that uses rootPrismaClient inside its own callback with Prisma's timeout (SCN-007) 7ms
+     ✓ fails a transaction queued past its maxWait and keeps the connection usable  817ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  2 failed | 4 passed (6)
+
+## (b) rollback does not release the lock
+58:    rollback: () => inner.rollback(),
+     ✓ forwards adapter information, connection info, savepoints and dispose unchanged 3ms
+     ✓ leaves optional methods absent when the inner adapter has none 0ms
+     ✓ runs plain operations one at a time in call order 18ms
+     ✓ holds plain operations while a transaction is open and runs its own statements directly 23ms
+     × queues transactions in order and releases the lock on rollback 2006ms
+     ✓ releases the lock when commit throws and reports the failure 7ms
+     × releases the lock when rollback throws and reports the failure 2002ms
+     ✓ releases the lock only once when a transaction ends twice 18ms
+     ✓ releases the lock when starting a transaction fails 7ms
+     ✓ releases the lock when a plain operation fails 7ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  2 failed | 8 passed (10)
+
+## restored
+working tree restored: src/lib/client/sqlite-driver-adapter.ts and src/lib/client/sqlite-connection-gate.ts unchanged from e5d2371

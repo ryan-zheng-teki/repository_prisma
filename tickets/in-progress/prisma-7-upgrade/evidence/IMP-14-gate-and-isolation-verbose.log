@@ -1,0 +1,32 @@
+# Check: IMP-14
+# Command: NO_COLOR=1 npx vitest run --reporter=verbose src/tests/sqlite-connection-gate.test.ts src/tests/transaction-isolation.test.ts
+# Commit: e5d2371 (worktree /Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade)
+# Environment: macOS 26.5.2, Node v22.23.1, npm 10.9.8
+# Date: 2026-11-04T12:56Z
+
+
+ RUN  v4.0.18 /Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade
+
+ ✓ src/tests/sqlite-connection-gate.test.ts > SQLite connection gate > forwards adapter information, connection info, savepoints and dispose unchanged 3ms
+ ✓ src/tests/sqlite-connection-gate.test.ts > SQLite connection gate > leaves optional methods absent when the inner adapter has none 0ms
+ ✓ src/tests/sqlite-connection-gate.test.ts > SQLite connection gate > runs plain operations one at a time in call order 18ms
+ ✓ src/tests/sqlite-connection-gate.test.ts > SQLite connection gate > holds plain operations while a transaction is open and runs its own statements directly 23ms
+ ✓ src/tests/sqlite-connection-gate.test.ts > SQLite connection gate > queues transactions in order and releases the lock on rollback 16ms
+ ✓ src/tests/sqlite-connection-gate.test.ts > SQLite connection gate > releases the lock when commit throws and reports the failure 6ms
+ ✓ src/tests/sqlite-connection-gate.test.ts > SQLite connection gate > releases the lock when rollback throws and reports the failure 6ms
+ ✓ src/tests/sqlite-connection-gate.test.ts > SQLite connection gate > releases the lock only once when a transaction ends twice 17ms
+ ✓ src/tests/sqlite-connection-gate.test.ts > SQLite connection gate > releases the lock when starting a transaction fails 6ms
+ ✓ src/tests/sqlite-connection-gate.test.ts > SQLite connection gate > releases the lock when a plain operation fails 5ms
+ ✓ src/tests/transaction-isolation.test.ts > transaction isolation between concurrent requests on one SQLite file > keeps a request without a transaction out of another request's open transaction 370ms
+ ✓ src/tests/transaction-isolation.test.ts > transaction isolation between concurrent requests on one SQLite file > commits two concurrent transactions 217ms
+ ✓ src/tests/transaction-isolation.test.ts > transaction isolation between concurrent requests on one SQLite file > runs a nested write concurrently with an interactive transaction 214ms
+ ✓ src/tests/transaction-isolation.test.ts > transaction isolation between concurrent requests on one SQLite file > runs a batch transaction concurrently with an interactive transaction 219ms
+ ✓ src/tests/transaction-isolation.test.ts > transaction isolation between concurrent requests on one SQLite file > fails a transaction that uses rootPrismaClient inside its own callback with Prisma's timeout (SCN-007) 1019ms
+ ✓ src/tests/transaction-isolation.test.ts > transaction isolation between concurrent requests on one SQLite file > fails a transaction queued past its maxWait and keeps the connection usable 821ms
+
+ Test Files  2 passed (2)
+      Tests  16 passed (16)
+   Start at  13:56:02
+   Duration  3.05s (transform 116ms, setup 0ms, import 158ms, tests 2.96s, environment 0ms)
+
+exit=0
