@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (breaking: requires a major release)
+## 2.0.0
 
 - **Breaking:** Requires Prisma 7. The peers are `@prisma/client ^7.10.1` and the new
   `@prisma/adapter-better-sqlite3 ^7.10.1` (native better-sqlite3), which npm 7+ and pnpm install

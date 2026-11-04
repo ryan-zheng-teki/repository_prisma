@@ -364,9 +364,8 @@ The test script normalizes relative `file:` URLs to absolute paths for cross-pla
 
 ## Release (Tag-Based)
 
-We use a tag-based release flow. The tag must match the `version` in `package.json`. The
-`Unreleased` changes in `CHANGELOG.md` are breaking, so they need a major version before they
-are released. Create and push the annotated release tag:
+We use a tag-based release flow. The tag must match the `version` in `package.json`. Create and
+push the annotated release tag:
 
 ```bash
 git tag -a vX.Y.Z -m "X.Y.Z"
