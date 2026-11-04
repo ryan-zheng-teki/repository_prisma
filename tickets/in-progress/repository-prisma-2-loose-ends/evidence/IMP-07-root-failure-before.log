@@ -1,0 +1,13 @@
+# Check: IMP-07 (reproduction: base commit fails test:package as root)
+# Command: git archive aa933e0 | docker run --rm node:24 bash -c 'npm ci; npm run test:package'; grep of the test:package output
+# Commit: aa933e0 (base, before the change)
+# Environment: Docker linux/aarch64 on macOS host, image node:24 (digest sha256:e7add2a490bb17d97b485b8641bd88455fff7839ade0f5eba493c3508124d413), Node v24.22.2, npm 11.19.1, uid 0
+# Date: 2026-11-04T16:39Z
+
+## container: Linux aarch64, node v24.22.2, npm 11.19.1, uid 0; base aa933e0
+npm-ci exit=0
+test-package exit=1
+35:Error: Command failed (/usr/local/bin/node cjs-smoke.cjs):
+36:AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+43:  actual: false,
+44:  expected: true,

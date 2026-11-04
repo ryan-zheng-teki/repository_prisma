@@ -1,0 +1,6 @@
+# Check: IMP-08
+# Command: git diff --check 5afd18d..e213742 (this implementation commit on top of the SR-001 package)
+# Commit: e213742
+# Date: 2026-11-04T16:39Z
+
+exit=0

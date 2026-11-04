@@ -1,0 +1,43 @@
+# Check: IMP-04
+# Command: npm run test:package as non-root (uid 501); then grep -c uuid dist/index.js dist/index.mjs
+# Commit: e213742 (worktree /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-2-loose-ends)
+# Environment: macOS 26.5.2, Node v22.23.1, npm 10.9.8, uid 501
+# Date: 2026-11-04T16:38Z
+
+
+> repository_prisma@2.0.0 test:package
+> npm run build && node scripts/run-package-smoke.js && node scripts/run-esm-cjs-interop.js
+
+
+> repository_prisma@2.0.0 build
+> tsup
+
+CLI Building entry: src/index.ts
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.1
+CLI Using tsup config: /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-2-loose-ends/tsup.config.ts
+CLI Target: es2018
+CLI Cleaning output folder
+CJS Build start
+ESM Build start
+CJS You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+ESM You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+CJS dist/index.js     31.85 KB
+CJS dist/index.js.map 64.01 KB
+CJS ⚡️ Build success in 15ms
+ESM dist/index.mjs     29.31 KB
+ESM dist/index.mjs.map 62.79 KB
+ESM ⚡️ Build success in 15ms
+DTS Build start
+DTS ⚡️ Build success in 1028ms
+DTS dist/index.d.ts  9.01 KB
+DTS dist/index.d.mts 9.01 KB
+
+added 1 package in 182ms
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","externalDriverAdapter":"pass","noNativeAddonOnImport":"pass","noQueryStringFiles":"pass","readonlyWal":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-package-smoke-ryBuN7"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-esm-cjs-interop-DaGoX2"}
+exit=0
+
+$ grep -c uuid dist/index.js dist/index.mjs
+dist/index.js:0
+dist/index.mjs:0

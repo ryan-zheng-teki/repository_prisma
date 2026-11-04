@@ -1,0 +1,38 @@
+# Check: IMP-03
+# Command: npm test (DATABASE_URL_TEST unset)
+# Commit: e213742 (worktree /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-2-loose-ends)
+# Environment: macOS 26.5.2, Node v22.23.1, npm 10.9.8, uid 501
+# Date: 2026-11-04T16:37Z
+
+
+> repository_prisma@2.0.0 test
+> node scripts/run-tests.js
+
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+Datasource "db": SQLite database "test.db" at "file:///Users/normy/autobyteus_org/worktrees/codex/repository-prisma-2-loose-ends/test.db"
+
+SQLite database test.db created at file:///Users/normy/autobyteus_org/worktrees/codex/repository-prisma-2-loose-ends/test.db
+
+🚀  Your database is now in sync with your Prisma schema. Done in 12ms
+
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+
+✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 42ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+
+
+ RUN  v4.1.12 /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-2-loose-ends
+
+
+ Test Files  11 passed (11)
+      Tests  113 passed (113)
+   Start at  17:38:00
+   Duration  3.35s (transform 770ms, setup 0ms, import 1.24s, tests 3.74s, environment 1ms)
+
+exit=0

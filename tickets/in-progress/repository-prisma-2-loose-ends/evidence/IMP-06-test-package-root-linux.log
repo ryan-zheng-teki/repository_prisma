@@ -1,0 +1,50 @@
+# Check: IMP-06 (test:package as root and as non-root in Linux; Node 24 toolchain)
+# Command: git archive e213742 | docker run --rm node:24 (image digest sha256:e7add2a490bb17d97b485b8641bd88455fff7839ade0f5eba493c3508124d413) bash run.sh
+#   run.sh as root: npm ci; npm run typecheck; npm test; npm run test:package; then as user node (uid 1000): npm run test:package
+# Commit: e213742
+# Environment: Docker 29.0.1 linux/aarch64 on macOS host, Node v24.22.2, npm 11.19.1
+# Date: 2026-11-04T16:39Z
+
+--- run.sh
+set -u
+echo "## container: $(uname -sm), node $(node -v), npm $(npm -v), image node:24"
+mkdir -p /work && cd /work && tar -xf /in/src.tar
+chown -R node:node /work
+echo; echo "## as root (uid $(id -u)): npm ci"
+npm ci --no-fund 2>&1 | tail -6; echo "npm-ci exit=${PIPESTATUS[0]}"
+echo; echo "## as root: npm run typecheck"; npm run typecheck >/dev/null 2>&1; echo "typecheck exit=$?"
+echo; echo "## as root: npm test"; NO_COLOR=1 npm test 2>&1 | grep -E "Test Files|Tests "; echo "npm-test exit=${PIPESTATUS[0]}"
+echo; echo "## as root: npm run test:package"; NO_COLOR=1 npm run test:package 2>&1 | grep -E '^skip:|"result"|Error|AssertionError'; echo "test-package exit=${PIPESTATUS[0]}"
+echo; echo "## as non-root user node (uid $(id -u node)): npm run test:package"
+chown -R node:node /work
+su node -s /bin/bash -c 'cd /work && NO_COLOR=1 npm run test:package 2>&1 | grep -E "^skip:|\"result\"|Error|AssertionError"; echo "test-package exit=${PIPESTATUS[0]}"'
+--- output
+## container: Linux aarch64, node v24.22.2, npm 11.19.1, image node:24
+
+## as root (uid 0): npm ci
+npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice
+npm-ci exit=0
+
+## as root: npm run typecheck
+typecheck exit=0
+
+## as root: npm test
+ Test Files  11 passed (11)
+      Tests  113 passed (113)
+npm-test exit=0
+
+## as root: npm run test:package
+skip: read-only WAL case (running as root; root ignores file permissions)
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","externalDriverAdapter":"pass","noNativeAddonOnImport":"pass","noQueryStringFiles":"pass","readonlyWal":"skipped-root","cleanup":"/tmp/repository-prisma-package-smoke-5PeOBr"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"/tmp/repository-prisma-esm-cjs-interop-zfQLGM"}
+test-package exit=0
+
+## as non-root user node (uid 1000): npm run test:package
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","externalDriverAdapter":"pass","noNativeAddonOnImport":"pass","noQueryStringFiles":"pass","readonlyWal":"pass","cleanup":"/tmp/repository-prisma-package-smoke-bbZwZc"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"/tmp/repository-prisma-esm-cjs-interop-VwgNmH"}
+test-package exit=0

@@ -1,0 +1,9 @@
+# Check: IMP-05
+# Command: npm pack --dry-run --json (manifest dependencies and file list)
+# Commit: e213742 (worktree /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-2-loose-ends)
+# Environment: macOS 26.5.2, Node v22.23.1, npm 10.9.8, uid 501
+# Date: 2026-11-04T16:38Z
+
+files: CHANGELOG.md, DESIGN.md, README.md, dist/index.d.mts, dist/index.d.ts, dist/index.js, dist/index.js.map, dist/index.mjs, dist/index.mjs.map, package.json
+package.json dependencies: null
+version: 2.0.0
