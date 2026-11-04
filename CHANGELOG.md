@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- README: npm 12+ and pnpm 10+ skip `better-sqlite3`'s native build by default; the setup section
+  shows the symptom and how to allow it (npm, pnpm 11+, pnpm 10). pnpm users add `@prisma/client`
+  directly. The earlier "pnpm installs the peers automatically" wording is corrected.
+- Repository: `allowScripts` approves only `better-sqlite3`'s install script (pinned) and denies
+  the others; CI installs with `--strict-allow-scripts`.
+- Repository: the package smoke is split into a runner and one module per check area, with no
+  behavior change; it also reads npm 12's `npm pack --json` output.
 - Remove the unused `uuid` runtime dependency: consumers no longer install it. No API change.
 - Fix the dev tooling advisories reported by `npm audit` (vitest 4.1.x and its vite, rollup and
   postcss chain); `npm audit` reports 0 vulnerabilities.
