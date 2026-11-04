@@ -2,19 +2,19 @@
 
 ## Review Round Meta
 
-- Upstream Requirements Doc: `/Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade/tickets/in-progress/prisma-7-upgrade/requirements-doc.md` (Approved, SR-002)
+- Upstream Requirements Doc: `/Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade/tickets/in-progress/prisma-7-upgrade/requirements-doc.md` (Approved, SR-004)
 - Upstream Investigation Notes: `/Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade/tickets/in-progress/prisma-7-upgrade/investigation-notes.md`
 - Upstream Solution Revision Record: `/Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade/tickets/in-progress/prisma-7-upgrade/solution-revision-record.md`
-- Reviewed Design Spec: `/Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade/tickets/in-progress/prisma-7-upgrade/design-spec.md` (SR-003)
+- Reviewed Design Spec: `/Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade/tickets/in-progress/prisma-7-upgrade/design-spec.md` (SR-004)
 - Supplemental Task Artifacts Reviewed: `probes/README.md`, the probe files, `probes/feasibility-patch.diff`, `follow-ups.md`
-- Relevant Solution Revision IDs: SR-002 (requirements), SR-003 (design)
+- Relevant Solution Revision IDs: SR-002 (requirements approval), SR-003 (initial design), SR-004 (AC-006/AC-008 correction and design revision)
 - Architecture Review Revision Record: `/Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade/tickets/in-progress/prisma-7-upgrade/architecture-review-revision-record.md`
-- Current Architecture Review Revision ID: `ARCH-REV-001`
-- Current Review Round: `1`
-- Trigger: Architecture Design Complete from the Solution Designer (handoff.md, 2026-11-04)
-- Prior Review Round Reviewed: N/A
-- Latest Authoritative Round: 1
-- Current-State Evidence Basis: worktree `codex/prisma-7-upgrade` at `2339722` (base `f2ffd5c`). Read: `src/lib/client/{lifecycle,datasource-target,initialization-error,sqlite-readiness}.ts`, `src/lib/{database,client,models}.ts`, `src/index.ts`, `src/tests/{client-lifecycle,datasource-readiness,public-initialization,logging-policy}.test.ts`, `scripts/*`, `prisma/schema.prisma`, `prisma.config.ts`, `package.json`, `tsup.config.ts`, `.github/workflows/{ci,release}.yml`, README. Adapter source `@prisma/adapter-better-sqlite3@7.10.1` `dist/index.js` (in `/tmp/prisma7-probe`): `timestampFormat` at `:412-419`, `createBetterSQLite3Client` at `:677-683`, the package `exports` with both `require` and `import`.
+- Current Architecture Review Revision ID: `ARCH-REV-002`
+- Current Review Round: `2`
+- Trigger: Revised package from the Solution Designer at SR-004 (commit `614bac4`, handoff.md "Round 2 Changes")
+- Prior Review Round Reviewed: 1 (ARCH-REV-001, Fail: ARCH-001, ARCH-002)
+- Latest Authoritative Round: 2
+- Current-State Evidence Basis: worktree `codex/prisma-7-upgrade` at `614bac4` (base `f2ffd5c`). Round 2 re-read the SR-004 diff and re-checked the cited `lifecycle.ts:103-121`, `:132-150`, `:283-288` and `logging-policy.test.ts:81-104` against the code. Round 1 read: Read: `src/lib/client/{lifecycle,datasource-target,initialization-error,sqlite-readiness}.ts`, `src/lib/{database,client,models}.ts`, `src/index.ts`, `src/tests/{client-lifecycle,datasource-readiness,public-initialization,logging-policy}.test.ts`, `scripts/*`, `prisma/schema.prisma`, `prisma.config.ts`, `package.json`, `tsup.config.ts`, `.github/workflows/{ci,release}.yml`, README. Adapter source `@prisma/adapter-better-sqlite3@7.10.1` `dist/index.js` (in `/tmp/prisma7-probe`): `timestampFormat` at `:412-419`, `createBetterSQLite3Client` at `:677-683`, the package `exports` with both `require` and `import`.
 
 ## Routing Classification Review
 
@@ -26,13 +26,13 @@
 
 ## Upstream Behavior And Production-Path Basis Confirmation
 
-- Overall Basis Status: `Contradicted` (one row, BEH-004/AC-006; see ARCH-001)
+- Overall Basis Status: `Confirmed`
 - Approved requirements / intended behavior understood: Yes. Upgrade to 7.10.1 with the same SQLite public API (REQ-003..007, REQ-015), non-SQLite rejected (DEC-001), DateTime continuity (REQ-005), and the query string ignored for the opened file (REQ-004).
 - Relevant existing behavior and evidence confirmed: Yes. There is one production construction site (`lifecycle.ts:67-71`). The three target kinds are at `datasource-target.ts:90-131`. `failureFrom` keeps the stage code (`lifecycle.ts:73-81`) and is used by both `initialize` (`:111-120`) and `bindLazyClient` (`:210-218`).
 - Scope guardrail confirmed: Yes (UC-001..004; out of scope: FU-001..003, schema migration and the consumer upgrade; preserved boundary and review authority as stated).
 - Approved change, preserved behavior, and outside scope understood: Yes.
 - Every prospective blocking `Design Impact` finding is traceable: Yes. The only blocking finding, ARCH-001, is a `Requirement Gap`.
-- Remaining material ambiguity: AC-006 conflicts with DEC-001/AC-008 for `enableWAL: true` on a non-SQLite URL (ARCH-001).
+- Remaining material ambiguity: None. AC-006 now covers SQLite targets only. AC-008 covers every non-SQLite form and lifecycle state, in line with DEC-001.
 - Statements about existing code the design relies on, opened at their cited lines:
   - `lifecycle.ts:67-71` factory: confirmed.
   - `datasource-target.ts:91-100`, `:102-111`, `:115-131`: confirmed.
@@ -40,18 +40,18 @@
   - "`clientUrl` only non-test reader is `lifecycle.ts:69`": confirmed by grep.
   - "`SAFE_ERROR_MESSAGES` is a `Record`, so the compiler enforces it": confirmed (`initialization-error.ts:28`).
   - "434 lines": the file has 437. Trivial; it does not affect any decision.
-  - "Removal plan lists every test asserting non-SQLite success": incomplete. `logging-policy.test.ts:81-104` is missing (ARCH-002).
-  - "BEH-004 unchanged": false for the non-SQLite + WAL input (ARCH-001).
+  - "Removal plan lists every test asserting non-SQLite success": complete at SR-004, now including `logging-policy.test.ts:81-104`. The `file::memory:` rewrite is sound: memory targets skip the identity check (`lifecycle.ts:296`), so the fake client needs no identity rows.
+  - Precedence at SR-004: resolution (`:111-121`) runs after only the shutting-down check (`:103-109`) and before the conflict (`:132-135`, `:147-150`), logging-policy and WAL (`:283-288`) checks. A resolution failure sets `failed` only from `idle`/`failed` (`:116-118`). All confirmed.
 
 | Behavior ID | Kind | Design Alignment With Approved Intent | Approved Trigger / Contract And Current-State Evidence | Target Outcome / Path / Spine Coherence | Status | Required Action |
 | --- | --- | --- | --- | --- | --- | --- |
 | BEH-001 | Contract | Pass | Pass | Pass | Confirmed | — |
 | BEH-002 | System | Pass | Pass | Pass | Confirmed | — |
 | BEH-003 | System | Pass | Pass | Pass | Confirmed | — |
-| BEH-004 | System | Fail | Pass | Unclear | Needs Correction | ARCH-001: today, non-SQLite + `enableWAL` yields `WAL_UNSUPPORTED_PROVIDER` (`lifecycle.ts:283-288`, test `client-lifecycle.test.ts:162-178`). AC-006 keeps that outcome, but the design produces `UNSUPPORTED_DATASOURCE_PROVIDER`. |
+| BEH-004 | System | Pass | Pass | Pass | Confirmed | Resolved (ARCH-001): AC-006 is SQLite-only, and the non-SQLite + WAL outcome moves to AC-008 |
 | BEH-005 | Contract | Pass | Pass | Pass | Confirmed | — |
 | BEH-006 | Data | Pass | Pass | Pass | Confirmed | Adapter source `:412-419` confirms that `unixepoch-ms` binds `Date` as `getTime()` |
-| BEH-007 | System | Pass | Pass | Pass | Confirmed | The precedence over the conflict and WAL checks must be stated (part of ARCH-001) |
+| BEH-007 | System | Pass | Pass | Pass | Confirmed | The precedence and the bound-client outcome are stated with citations; the AC-008 test plan has 5 cases |
 | BEH-008/009 | Contract | Pass | Pass | Pass | Confirmed | — |
 | BEH-010 | Contract | Pass | Pass | Pass | Confirmed | The adapter package exports both `require` and `import` |
 | BEH-011/012 | Operational | Pass | Pass | Pass | Confirmed | — |
@@ -133,7 +133,7 @@
 | `SqliteFileDatasourceTarget` | Pass | Pass | Pass | N/A | Pass | `bindingKey` keeps its exact former value |
 | `SqliteMemoryDatasourceTarget` | Pass | Pass | Pass | N/A | Pass | — |
 
-Derived consumers of a changed structure listed with a decision for each (Principle 11): `Fail`. `logging-policy.test.ts` resolves a `postgresql://` target and is not listed (ARCH-002).
+Derived consumers of a changed structure listed with a decision for each (Principle 11): `Pass`. `logging-policy.test.ts` was added at SR-004 (ARCH-002 resolved).
 
 Each domain word keeps one meaning (Principle 15): `Pass`.
 
@@ -160,7 +160,7 @@ Each domain word keeps one meaning (Principle 15): `Pass`.
 | `OtherDatasourceTarget` + branch | Pass | Pass | Pass | Pass | — |
 | `clientUrl` | Pass | Pass | Pass | Pass | Grep evidence given |
 | `datasourceUrl` construction, schema `url`, `--skip-generate`, CI step + env | Pass | Pass | Pass | Pass | Removing the env is safe: `npm test` sets its own `DATABASE_URL` (`run-tests.js:21-25`) |
-| Tests for removed behavior | Fail | Pass | Fail | Fail | `logging-policy.test.ts:81-104` is missing (ARCH-002) |
+| Tests for removed behavior | Pass | Pass | Pass | Pass | `logging-policy.test.ts:81-104` was added at SR-004 (ARCH-002 resolved) |
 
 ## Legacy / Backward-Compatibility Verdict
 
@@ -188,76 +188,41 @@ Each domain word keeps one meaning (Principle 15): `Pass`.
 
 ## Material Premise Validation (Only When Needed)
 
-None. Both findings rest on code paths that run in production today (`lifecycle.ts:111-120` before `:283`) and on existing tests. Neither depends on an assumed scenario.
+None. No finding or mechanism depends on an assumed scenario.
 
 ## Unresolved Approved-Behavior Or Current-State Gaps
 
 | Item | Why It Matters | Required Action | Status |
 | --- | --- | --- | --- |
-| AC-006 vs DEC-001/AC-008 (ARCH-001) | API/E2E would validate an outcome that the approved DEC-001 rules out | Solution Designer corrects AC-006 and states the precedence in the design | Open |
+| AC-006 vs DEC-001/AC-008 (ARCH-001) | API/E2E would validate an outcome that the approved DEC-001 rules out | Corrected at SR-004 | Resolved |
 
 ## Review Decision
 
-`Fail`
+`Pass`
 
 ## Findings
 
-### ARCH-001: AC-006 contradicts DEC-001 for non-SQLite URLs; the design does not state the resulting outcome changes
-
-- Type: `Requirement Gap` (an internal inconsistency in the approved requirements, mirrored by the design's "Unchanged")
-- Severity: Medium (blocking)
-- Protected IDs: AC-006, REQ-006, BEH-004; DEC-001, REQ-008, AC-008; AC-002 (alternate outcome)
-- Scope status: `Requirement Gap`. It can be corrected within the already approved DEC-001; no new behavior is proposed.
-- Changes approved behavior: No. DEC-001 already rejects non-SQLite at initialize and bind, so the correction only makes AC-006 consistent with it. No new user approval is expected unless the Solution Designer judges otherwise.
-- Affected behavior: `initializePrisma({ datasourceUrl: <non-SQLite>, enableWAL: true })`, and `initializePrisma` with a non-SQLite URL while a SQLite client is bound.
-- Evidence:
-  - AC-006 says "`enableWAL: true` on file/memory/**non-SQLite** … Same codes and outcomes as today".
-  - Today that input reaches the WAL gate in `performInitialization` and rejects with `WAL_UNSUPPORTED_PROVIDER` (`lifecycle.ts:283-288`). The test `client-lifecycle.test.ts:162-178` asserts this for `postgresql://…`.
-  - The design moves rejection into `resolveDatasourceTarget`, which `initialize` calls first (`lifecycle.ts:111-120`). The same input therefore now yields `UNSUPPORTED_DATASOURCE_PROVIDER`.
-  - The same precedence turns today's `DATASOURCE_CONFLICT` for "bound SQLite, then a non-SQLite URL" (`lifecycle.ts:147-150`, `:132-135`) into `UNSUPPORTED_DATASOURCE_PROVIDER`. The bound client stays usable because a resolution failure only sets `failed` from `idle`/`failed` (`:116-118`).
-  - The design's map says BEH-004 is "Unchanged" and records neither change. README line 145 says WAL is unsupported "for non-SQLite", and that sentence will need the new wording.
-- Required update:
-  - (a) Requirements: correct AC-006 so that non-SQLite inputs follow DEC-001/AC-008. Either drop non-SQLite from its precondition, or state that it yields `UNSUPPORTED_DATASOURCE_PROVIDER`.
-  - (b) Design: state in the BEH-004/BEH-007 rows and the DS-001 narrative that resolution precedes the conflict and WAL checks. A non-SQLite URL therefore yields `UNSUPPORTED_DATASOURCE_PROVIDER` in every lifecycle state, and a bound client is left untouched.
-  - (c) Design: name the `client-lifecycle.test.ts:162-178` WAL case and the bound-then-non-SQLite case in the test plan, with their new expected codes.
-- Why proportionate: these are text corrections that stop API/E2E from validating a contradicted outcome. No mechanism changes.
-- Recommended recipient: Solution Designer
-
-### ARCH-002: Test change inventory omits `logging-policy.test.ts`
-
-- Type: `Design Impact`
-- Severity: Low. It does not block on its own; fix it in the same revision.
-- Protected IDs: REQ-010 (full suite passes), AC-010; Principle 11 (derived consumers)
-- Scope status: `Within Approved Scope`
-- Changes approved behavior: No
-- Evidence: `src/tests/logging-policy.test.ts:81-104` lazy-binds and initializes `postgresql://user:password@localhost:5432/logging` through a fake factory. After the change, resolution rejects it, so the test fails. The Removal plan and the File mapping list only `datasource-readiness`, `client-lifecycle` and `public-initialization`.
-- Required update: add `logging-policy.test.ts` to the test inventory, rewritten on a SQLite file or memory target with the same logging-policy intent.
-- Why proportionate: one line in the inventory.
-- Recommended recipient: Solution Designer
+None open. ARCH-001 and ARCH-002 are resolved at SR-004 (see ARCH-REV-002 in `architecture-review-revision-record.md`).
 
 ## Classification
 
-`Requirement Gap` (ARCH-001, blocking), with one `Design Impact` (ARCH-002, Low) to fix in the same revision.
+N/A (Pass)
 
 ## Recommended Recipient
 
-Solution Designer (`/software_engineering_team/solution_designer`)
+Implementation Engineer (`/software_engineering_team/implementation_engineer`). The Solution Designer receives an informational notification.
 
 ## Residual Risks
 
-These are non-blocking and need no finding:
+These are non-blocking:
 
-- The `package.json` devDependencies shape is left conditional ("plus the two peers only if `npm ls` shows npm does not install root peers"). Either shape satisfies AC-001. Recommendation: decide one shape in the design, for example listing both peers in `devDependencies` so the lockfile is deterministic.
-- README sentences that become false must be rewritten in the docs pass, not only extended:
-  - "The selected value is always passed explicitly to the root `PrismaClient`"
-  - "Query parameters are preserved"
-  - "This behavior-only release does not change the Prisma schema"
-  - the `PRISMA_DATASOURCE_PROVIDER=sqlite|postgresql|mysql` hint, now that only SQLite clients can be built
-- AC-005 fixture: a test on a fresh temp file has no table pushed by the CLI. Creating `"Event"` by raw SQL (as the existing tests do for `User`), with a `DATETIME` column, matches what `db push` produces.
-- RSK-001 and RSK-002, and the single connection per client, stay as recorded by the Solution Designer.
+- The AC-008 test-plan header says "all expect `UNSUPPORTED_DATASOURCE_PROVIDER`". Case 5 (shutting-down) expects `CLIENT_NOT_READY`, as its own text and AC-008 say. Follow the case text.
+- The devDependencies shape, the AC-005 raw-SQL fixture and the five README rewrites are now decided in the design.
+- RSK-001 (consumer-built clients with ISO timestamps, FU-001), RSK-002 (native addon on consumer platforms) and the single connection per client stay as the Solution Designer recorded them.
+- Escalation remains as the design states. If implementation finds Prisma 7 behavior that breaks REQ-005/REQ-006 beyond the probes, or a CJS-entry failure, it returns a `Design Impact`.
 
 ## Latest Authoritative Result
 
-- Review Decision: `Fail`
+- Review Decision: `Pass`
 - Material-Premise Gate: `Pass` (no assumed premises)
-- Notes: The architecture is sound. Ownership, the adapter-policy file, the target-type tightening, the persisted-data decision, `prepare`, and the packaging externals all pass. The fail comes only from the AC-006 inconsistency (ARCH-001) and one missing test-inventory entry (ARCH-002). A focused revision should pass.
+- Notes: The behavior basis is confirmed and every structural check passes. The design is ready for implementation at SR-004 (commit `614bac4`).

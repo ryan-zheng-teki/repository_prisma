@@ -1,10 +1,19 @@
-# Handoff: prisma-7-upgrade — Architecture Design Complete (revised, SR-004)
+# Handoff: prisma-7-upgrade — Architecture Design Complete (revised, SR-005)
 
 - Package identifier: `prisma-7-upgrade` (Project Task `repository-prisma-1`, project `project_75b2027e-1264-44a0-99d7-92b5838eae81`)
 - Requested by: `/project_task_manager` (run `project_task_manager_843e78c72f40444ca701a6c2c0dfe98c`) on behalf of the user
 - Classification: `Architecture Design Complete`. `task_size = Medium`, `architectural_risk = High`.
-- Current solution revision: `SR-004` (requirements Approved at SR-004, design Ready at SR-004). Prior: SR-003, reviewed in ARCH-REV-001 (Fail).
-- Route applied: `/software_engineering_team/architecture_reviewer` (rule: architectural_risk=High). Recorded 2026-11-04 for SR-003, then again for SR-004 (re-review).
+- Current solution revision: `SR-005` (requirements Approved at SR-005, design Ready at SR-005). History: SR-003 failed ARCH-REV-001; SR-004 passed ARCH-REV-002; IR-001 (`a092a60`) failed code review CRR-001 with CR-001 (Design Impact).
+- Route applied: `/software_engineering_team/architecture_reviewer` (rule: architectural_risk=High). Recorded 2026-11-04 for SR-003, then for SR-004 (re-review), then for SR-005 (revised design after CR-001).
+
+## Round 3 Changes (response to code review CRR-001, CR-001)
+
+- Cause: the better-sqlite3 adapter has one connection, and plain queries skip its transaction mutex, so concurrent non-transactional work joins another request's open transaction. SR-003's Risks section wrongly treated this as throughput only.
+- Design D7 (`design-spec.md`, section "SR-005 Decision D7"): a library-owned SQLite connection gate (`src/lib/client/sqlite-connection-gate.ts`), applied inside `createSqliteDriverAdapter`. Plain queries take one FIFO lock per connection; a transaction holds it until commit/rollback (released exactly once). This is the same rule as Prisma's own libsql adapter. No public API change; the lifecycle is unchanged.
+- Requirements: AC-013 (concurrent isolation, under the unchanged REQ-007) and SCN-007 (`rootPrismaClient` inside a transaction callback waits, and the transaction then fails with Prisma's timeout; documented) were added. No renewed user approval is needed.
+- Prototype evidence (`probes/README.md` § CR-001): the CR-01 probe now matches 1.0.10; 96/96 tests pass; concurrent transactions and nested writes work.
+- Rejected: accepting the break, the libsql adapter (breaks `:memory:`), proxy-level gating (misses internal/batch transactions, breaks `PrismaPromise`), two clients.
+- Implementation guidance: gate release paths, the 4-case AC-013 test plan, docs.
 
 ## Round 2 Changes (response to ARCH-REV-001)
 

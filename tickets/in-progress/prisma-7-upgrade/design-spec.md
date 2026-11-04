@@ -2,8 +2,8 @@
 
 ## Solution And Approval Basis
 
-- Current solution revision ID: `SR-004`
-- Approved requirements baseline: `requirements-doc.md` at `SR-004` (SR-002 approval; SR-004 corrects AC-006/AC-008 within DEC-001), approved by the Solution Designer within the direction, user informed. The user delegated the technical decisions on 2026-11-04 ("i trust you have good architecture technical understanding for this project") and added REQ-015 ("how user use it will still be intuitive and simple").
+- Current solution revision ID: `SR-005` (Design Impact from code review CRR-001, CR-001)
+- Approved requirements baseline: `requirements-doc.md` at `SR-005` (SR-002 approval; SR-004 corrects AC-006/AC-008 within DEC-001; SR-005 adds AC-013/SCN-007 for the already preserved REQ-007), approved by the Solution Designer within the direction, user informed. The user delegated the technical decisions on 2026-11-04 ("i trust you have good architecture technical understanding for this project") and added REQ-015 ("how user use it will still be intuitive and simple").
 - Behavior-defining supplements: none (`probes/` is evidence only)
 - User approval of the design: `Not required` (the direction does not ask for it)
 - Design status: `Ready`
@@ -42,6 +42,9 @@ The library has a single production construction site for the raw root client: `
 | Adapter package exports | `node_modules/@prisma/adapter-better-sqlite3/package.json` | Real ESM build (`exports.import` -> `dist/index.mjs`), so a named ESM import is safe (unlike the CJS-generated `@prisma/client`) | D4 import style | — |
 | Peer auto-install | `/tmp/peer-autoinstall` (npm 10.9.8) | Both declared peers installed automatically | D5 peers, REQ-015 | pnpm behavior Read only (auto-install-peers default) |
 | Scratch suite | `probes/feasibility-patch.diff` | 83/83 tests, typecheck pass | Overall feasibility | — |
+| Code review CR-001 | `evidence/CR-01-tx-isolation-probe.{cjs,log}`; adapter `dist/index.js:523-545, 633-651, 667-681` | The better-sqlite3 adapter has one connection. `startTransaction` takes its private mutex and BEGINs; plain `queryRaw`/`executeRaw`/`executeScript` skip the mutex, so concurrent non-transactional work runs inside another request's open transaction (reads uncommitted rows; writes are lost on rollback) | D7 connection gate | — |
+| Gate prototype | `probes/README.md` § CR-001, `probes/cr01-*` | The gate restores 1.0.10 results in the CR-01 probe; 96/96 tests pass; concurrent transactions and nested writes work; root-in-transaction waits and the transaction fails with Prisma's timeout | D7 | — |
+| `@prisma/adapter-libsql@7.10.1` `dist/index-node.js:279-408` | Prisma's own libsql adapter: plain queries and `startTransaction` share one mutex held until commit/rollback | D7 follows Prisma's own rule for single-connection SQLite | — |
 
 ## Intended Change
 
@@ -49,7 +52,7 @@ Build the root client through a library-owned SQLite driver adapter. Reject non-
 
 ## Change Scope (Mandatory)
 
-- In scope: UC-001..UC-004. Root-client construction, datasource target resolution, initialization error codes, package manifest/lockfile/build/test/CI scripts, test schema, tests, README/DESIGN/CHANGELOG.
+- In scope: UC-001..UC-004. Root-client construction (including the connection gate, SR-005), datasource target resolution, initialization error codes, package manifest/lockfile/build/test/CI scripts, test schema, tests, README/DESIGN/CHANGELOG.
 - Derived consumers of changed structures:
   - `ResolvedDatasourceTarget` loses `other` and `clientUrl`. Readers: `lifecycle.ts` (factory, `hasSameTarget` via `bindingKey`, WAL gate on `kind`) is updated. `sqlite-readiness.ts` reads `expectedPath` only (unchanged). Tests in `datasource-readiness.test.ts` and `client-lifecycle.test.ts` are updated.
   - `PrismaInitializationErrorCode` gains a member. Readers: `SAFE_ERROR_MESSAGES` (must add the entry; it is a `Record`, so the compiler enforces it), the public type export (`src/index.ts`), README code list.
@@ -129,8 +132,8 @@ Build the root client through a library-owned SQLite driver adapter. Reject non-
 
 ## Primary Execution Spine(s)
 
-- DS-001: `App -> client.ts initializePrisma -> PrismaClientLifecycle.initialize -> resolveDatasourceTarget (file | memory | reject non-SQLite) -> defaultClientFactory -> createSqliteDriverAdapter -> PrismaClient({ adapter, log }) -> $connect -> sqlite-readiness (identity, WAL) -> Ready`
-- DS-002: `Repository/rootPrismaClient/prisma proxy -> forwarding proxy -> PrismaClientLifecycle.getClientForOperation -> bindLazyClient -> resolveDatasourceTarget -> defaultClientFactory -> createSqliteDriverAdapter -> PrismaClient -> Prisma query (adapter connects on first use)`
+- DS-001: `App -> client.ts initializePrisma -> PrismaClientLifecycle.initialize -> resolveDatasourceTarget (file | memory | reject non-SQLite) -> defaultClientFactory -> createSqliteDriverAdapter (adapter wrapped by the connection gate) -> PrismaClient({ adapter, log }) -> $connect -> sqlite-readiness (identity, WAL) -> Ready`
+- DS-002: `Repository/rootPrismaClient/prisma proxy -> forwarding proxy -> PrismaClientLifecycle.getClientForOperation -> bindLazyClient -> resolveDatasourceTarget -> defaultClientFactory -> createSqliteDriverAdapter (gated) -> PrismaClient -> Prisma query (adapter connects on first use; plain queries wait while a transaction holds the connection)`
 - DS-003: `Consumer import -> exports.import (dist/index.mjs) | exports.require (dist/index.js) -> external @prisma/client (default namespace) + external @prisma/adapter-better-sqlite3 (named) -> no native load until a Database is opened`
 - DS-004: `npm ci -> prepare: prisma generate (reads prisma.config.ts + schema) -> typecheck | test (db push, generate, vitest) | build (tsup) -> test:package (pack, smoke, interop)`
 
@@ -185,7 +188,8 @@ The lifecycle state machine is unchanged and not redrawn here (see `DESIGN.md` �
 
 | Concern | Spine | Serves | Responsibility | Why | Risk If Misplaced |
 | --- | --- | --- | --- | --- | --- |
-| SQLite adapter policy | DS-001/002 | factory in `PrismaClientLifecycle` | path/memory mapping, `timestampFormat: 'unixepoch-ms'` | One home for the data-continuity rule | Grows the 434-line lifecycle file with storage policy |
+| SQLite adapter policy | DS-001/002 | factory in `PrismaClientLifecycle` | path/memory mapping, `timestampFormat: 'unixepoch-ms'`, applies the connection gate | One home for how the library opens SQLite | Grows the 437-line lifecycle file with storage policy |
+| SQLite connection gate | DS-001/002 | SQLite adapter policy | One lock per connection: plain `queryRaw`/`executeRaw`/`executeScript` take it per call; `startTransaction` takes it and the returned transaction releases it exactly once on `commit`/`rollback` (success or failure); transaction queries pass through | Restores per-request transaction isolation on a single shared connection (REQ-007, AC-013) | Spread into lifecycle or proxies: misses Prisma-internal and batch transactions, and changes `PrismaPromise` return types |
 | Supported-provider rule | DS-001/002 | lifecycle | reject non-SQLite at resolution | Fail before any client exists, same for both entry forms | A check in the factory would give two different codes on the two paths |
 | Error catalog | DS-001/002 | lifecycle | new code + safe message | Stable public codes | — |
 
@@ -201,7 +205,7 @@ Callers use `client.ts` only. The adapter policy is internal to `src/lib/client/
 
 ## Dependency Rules
 
-- `lifecycle.ts` -> `sqlite-driver-adapter.ts` -> `@prisma/adapter-better-sqlite3`. `sqlite-driver-adapter.ts` depends only on the target types and the adapter package.
+- `lifecycle.ts` -> `sqlite-driver-adapter.ts` -> (`sqlite-connection-gate.ts`, `@prisma/adapter-better-sqlite3`). `sqlite-driver-adapter.ts` depends only on the target types, the gate and the adapter package. `sqlite-connection-gate.ts` depends on nothing at runtime. Its types derive from the adapter package (`PrismaBetterSqlite3`, `Awaited<ReturnType<PrismaBetterSqlite3['connect']>>`, and that adapter's `startTransaction` result), so no new package is needed. Forbidden: the gate knowing ALS, lifecycle state or targets.
 - `datasource-target.ts` -> `initialization-error.ts` (for the stage failure), `database.ts` (provider inference). No dependency on the adapter.
 - Forbidden: any other `src/lib` module importing the adapter package; `database.ts` depending on client internals.
 
@@ -209,7 +213,8 @@ Callers use `client.ts` only. The adapter policy is internal to `src/lib/client/
 
 | Interface | Subject | Responsibility | Identity Shape | Notes |
 | --- | --- | --- | --- | --- |
-| `createSqliteDriverAdapter(target: ResolvedDatasourceTarget): PrismaBetterSqlite3` | SQLite connection config | Build the adapter factory for a resolved SQLite target | discriminated `kind` | File: `{ url: target.expectedPath }`; memory: `{ url: ':memory:' }`; options `{ timestampFormat: 'unixepoch-ms' }` |
+| `createSqliteDriverAdapter(target: ResolvedDatasourceTarget)` returning a gated driver-adapter factory | SQLite connection config | Build the adapter factory for a resolved SQLite target | discriminated `kind` | File: `{ url: target.expectedPath }`; memory: `{ url: ':memory:' }`; options `{ timestampFormat: 'unixepoch-ms' }`; returns `gateSqliteConnection(new PrismaBetterSqlite3(...))`, so the lifecycle factory is unchanged |
+| `gateSqliteConnection(factory)` | one SQLite connection | Wrap a driver-adapter factory so `connect()` yields an adapter whose plain queries cannot interleave with an open transaction | adapter factory | Forwards `provider`, `adapterName`, `getConnectionInfo`, `dispose`, savepoint methods and `options` unchanged. The lock is FIFO, has no timeout of its own and no ALS knowledge. Prisma's `maxWait`/`timeout` bound waiting through the transaction. |
 | `resolveDatasourceTarget(explicitUrl?)` | datasource target | Select and classify; reject non-SQLite | URL string | Throws `InitializationStageFailure('UNSUPPORTED_DATASOURCE_PROVIDER', Error('The selected datasource is not SQLite.'))` (cause has no URL) |
 | `PrismaInitializationErrorCode` | public error code | adds `'UNSUPPORTED_DATASOURCE_PROVIDER'` | — | Message: `'repository_prisma supports SQLite datasources only; use a file: URL.'` |
 | `initializePrisma(options)` | public | unchanged signature | — | REQ-015 |
@@ -264,7 +269,8 @@ See Final mapping (no shared structure extraction was needed).
 
 | File | Owner | Concrete Concern |
 | --- | --- | --- |
-| `src/lib/client/sqlite-driver-adapter.ts` (Add) | client subsystem | SQLite adapter config for a resolved target |
+| `src/lib/client/sqlite-driver-adapter.ts` (Add, modified in SR-005) | client subsystem | SQLite adapter config for a resolved target, gated |
+| `src/lib/client/sqlite-connection-gate.ts` (Add, SR-005) | client subsystem | Transaction isolation on one shared SQLite connection |
 | `src/lib/client/datasource-target.ts` (Modify) | client subsystem | SQLite-only classification; remove `other` and `clientUrl` |
 | `src/lib/client/lifecycle.ts` (Modify) | `PrismaClientLifecycle` | factory: `{ adapter: createSqliteDriverAdapter(target), log }` |
 | `src/lib/client/initialization-error.ts` (Modify) | error catalog | new code + safe message |
@@ -277,7 +283,9 @@ Factory (the existing `PrismaClientFactory` seam) with an Adapter (Prisma's driv
 
 | Path | Kind | Responsibility | Must Not Contain |
 | --- | --- | --- | --- |
-| `src/lib/client/sqlite-driver-adapter.ts` | File (Add) | `createSqliteDriverAdapter` | lifecycle state, logging |
+| `src/lib/client/sqlite-driver-adapter.ts` | File (Add) | `createSqliteDriverAdapter` (applies the gate) | lifecycle state, logging |
+| `src/lib/client/sqlite-connection-gate.ts` | File (Add, SR-005) | `gateSqliteConnection` | ALS, lifecycle state, target policy, SQL |
+| `src/tests/transaction-isolation.test.ts` (or within `public-initialization.test.ts`) | File (Add, SR-005) | AC-013 tests (see Guidance) | — |
 | `src/lib/client/datasource-target.ts` | File (Modify) | as above | adapter imports |
 | `src/lib/client/lifecycle.ts` | File (Modify) | factory change only | path/timestamp policy |
 | `src/lib/client/initialization-error.ts` | File (Modify) | add code/message | URLs in messages |
@@ -340,15 +348,22 @@ N/A
 ## Risks
 
 - RSK-002 native addon on consumer platforms (Electron/Linux ARM64). Documented in the README; consumer upgrade is FU-001.
-- better-sqlite3 uses one connection per client (Prisma 5 used an engine pool). The tests and probes pass, including interactive transactions. A consumer with heavy concurrent reads may see different throughput; this is outside the library's contract.
+- Corrected in SR-005 (CR-001): better-sqlite3 uses one connection per client, whereas Prisma 5 used an engine pool. SR-003 wrongly called this a throughput concern outside the library's contract. Without a gate, concurrent non-transactional work joins another request's open transaction, which breaks REQ-007. The connection gate (D7) restores isolation. Remaining consequences: plain operations wait while any transaction is open, and transactions run one at a time. This matches Prisma's own libsql adapter and SQLite's single-writer model, at a throughput cost for read-heavy concurrent workloads. SCN-007: `rootPrismaClient` inside a transaction callback waits for that transaction, which then fails with Prisma's transaction timeout; this is documented.
 - npm `latest` = 8.0 RC: caret ranges `^7.10.1` exclude it; README tells consumers to install `prisma@7`.
 
 ## Guidance For Implementation
 
+- SR-005 connection gate (D7): implement `src/lib/client/sqlite-connection-gate.ts` per the Interface row. `probes/cr01-connection-gate-prototype.ts.txt` is a feasibility prototype, not the required code. Requirements: release the lock exactly once per transaction even if `commit` or `rollback` throws; release it if `startTransaction` throws; never hold it across a plain query's failure. Unit-test those paths with a fake inner adapter, plus a real-file test.
+- AC-013 tests (real SQLite file, public API):
+  1. The CR-01 shape (`evidence/CR-01-tx-isolation-probe.cjs`): while A's transaction is open, B (no transaction) sees no uncommitted rows, and B's write survives A's rollback.
+  2. Two concurrent `runInTransaction` calls both commit.
+  3. A nested write (Prisma-internal transaction) concurrent with an interactive transaction succeeds.
+  4. SCN-007: `rootPrismaClient` inside a transaction callback with `{ timeout: 1000 }` rejects with Prisma's transaction-timeout error, and the root client works afterwards (the test runner keeps the event loop alive).
+- Docs (SR-005): README "Advanced: Root Client Access" states the SCN-007 consequence. README/DESIGN state that plain operations wait while a transaction is open (one SQLite connection) and why. CHANGELOG mentions both. DESIGN §E names the gate.
 - Reproduction to start from: install 7.10.1 and run `npm test`. Construction fails with `Unknown property datasourceUrl` (`probes/construct-options.cjs`); `probes/datetime-continuity-read.mjs` shows the format regression that AC-005 must guard.
 - AC-005 test shape: on a fresh temp file DB, create the `"Event"` table by raw SQL matching what `db push` produces (`"id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "label" TEXT NOT NULL, "occurredAt" DATETIME NOT NULL`), as the existing tests do for `User`. Initialize the library on that file and insert a row through raw SQL with `occurredAt` as an INTEGER ms value (the Prisma-5 representation). Create a second row through the library's root client. Assert `typeof(occurredAt)` = `integer` for both, and that `findMany({ where: { occurredAt: { gt: <earlier date> } } })` returns both.
 - AC-004: extend the existing query-parameter tests to assert that no file whose name contains `?` exists in the directory.
-- AC-008 test plan (all expect `UNSUPPORTED_DATASOURCE_PROVIDER`; message/`String(error)` contains neither `secret` nor the host; the client factory is never called):
+- AC-008 test plan (cases 1-4 expect `UNSUPPORTED_DATASOURCE_PROVIDER`; case 5 expects `CLIENT_NOT_READY`; message/`String(error)` contains neither `secret` nor the host; the client factory is never called):
   1. Explicit `initializePrisma({ datasourceUrl: 'postgresql://user:secret@host/db' })` from `idle`; the lifecycle is then `failed`.
   2. The same with `enableWAL: true`. This replaces the `postgresql://` row of `client-lifecycle.test.ts:162-178`, which expected `WAL_UNSUPPORTED_PROVIDER`; the memory rows of that test stay as they are.
   3. A SQLite client is bound (lazy and ready), then `initialize` is called with a postgres URL. This replaces the former `DATASOURCE_CONFLICT` expectation. Afterwards `getClientForOperation()` still returns the bound client.
@@ -364,3 +379,15 @@ N/A
 - README content (REQ-012/015): a short "Requirements and setup (Prisma 7)" section near the top with copy-paste snippets. It covers: SQLite only; dates stored as integers, with a warning to use `timestampFormat: 'unixepoch-ms'` for any other Prisma 7 client on the same database; URL query parameters no longer affect the connection; Node/TS minimums; the new error code in the code list; Prisma 5 users stay on 1.0.x. Update the "ESM and CommonJS Package Loading" paragraph that says no peer change is required. Leave the release section's version-specific text for the release decision, but remove the claim that it is "this already-versioned 1.0.10 release" only if it becomes misleading. Keep that edit minimal.
 - CHANGELOG: `## Unreleased` with a "Breaking" note: requires a major release.
 - DESIGN.md: update §E (adapter construction, SQLite-only invariant, timestamp format rationale), §Package ESM/CommonJS Boundary (adapter external peer), and the FAQ engine sentence.
+
+## SR-005 Decision D7 — SQLite Connection Gate (CR-001)
+
+- Problem (Reproduced by code review, Read in the adapter source): one connection per client, with plain queries outside the transaction mutex. Concurrent requests therefore leak into each other's transactions.
+- Options:
+  - (a) A library-owned gate at the driver-adapter boundary. Chosen.
+  - (b) Accept the change. Rejected: it breaks REQ-007, the library's core contract.
+  - (c1) Switch to `@prisma/adapter-libsql`. Rejected. Its local client hands the connection to the transaction and lazily opens a new one, so `:memory:` targets lose their data (`@libsql/client` `sqlite3.js:177-180`). It would also redo the identity/WAL/timestamp validation and still serialize through its mutex.
+  - (c2) Gate at the library's proxies/ALS. Rejected: it misses Prisma-internal and batch transactions, and wrapping turns `PrismaPromise` into `Promise`, which breaks `$transaction([...])`.
+  - (c3) Two clients (one for transactions). Rejected: `:memory:` breaks, and the lifecycle would need two raw clients.
+- Why (a): the gate is the narrowest layer that sees every database access, including Prisma-internal transactions. It is the same rule Prisma applies in its own libsql adapter, and it is invisible to consumers (REQ-015). Prototype evidence: `probes/README.md` § CR-001.
+- Size/risk: unchanged (Medium / High). One more internal file and tests; no public API change.

@@ -3,14 +3,14 @@
 ## Document Status
 
 - Status: `Approved`
-- Current solution revision ID: `SR-004`
+- Current solution revision ID: `SR-005`
 - Package identifier: `prisma-7-upgrade`
 - Request / ticket: Project Task `repository-prisma-1`: upgrade Prisma (client and CLI) from 5.22.0 to the latest stable 7.x (7.10.1)
 - Requested by: `/project_task_manager` (run `project_task_manager_843e78c72f40444ca701a6c2c0dfe98c`), on behalf of the user
 - Requirements owner: Solution Designer
 - Date: 2026-11-04
 - Approved by and reference: `Solution Designer within the direction (user informed)`. Reference: the user's messages on 2026-11-04, "why wait here?", "regarding these technical things, i trust you have good architecture technical understanding for this project" and "at the same time, since its a library, how user use it will still be intuitive and simple" (the last adds REQ-015/AC-012). The user was informed in the conversation of each decision taken (DEC-001, DEC-002, DEC-007b, DEC-008).
-- Exact approved requirements baseline / solution revision: `SR-004`. SR-002 was approved within the direction. SR-004 corrects AC-006/AC-008 to be consistent with the already decided DEC-001 (architecture review ARCH-REV-001, finding ARCH-001); intended behavior is unchanged from DEC-001, so no renewed user approval is needed.
+- Exact approved requirements baseline / solution revision: `SR-005`. SR-005 adds AC-013 and SCN-007. AC-013 makes REQ-007's preserved transaction isolation between concurrent requests explicit (code review CRR-001, CR-001), and SCN-007 records a discouraged pattern; intended behavior is unchanged, so no renewed user approval is needed. Earlier: SR-002 was approved within the direction. SR-004 corrects AC-006/AC-008 to be consistent with the already decided DEC-001 (architecture review ARCH-REV-001, finding ARCH-001); intended behavior is unchanged from DEC-001, so no renewed user approval is needed.
 - Behavior-defining supplements and their approved versions: none. `probes/` is evidence only.
 
 ## Problem And Desired Outcome
@@ -121,6 +121,7 @@ None. The released-but-unmerged 1.0.10 line is handled by the base choice DEC-00
 | AC-008 | REQ-008 | SCN-005 | A non-SQLite URL in any form: `initializePrisma({ datasourceUrl: 'postgresql://...' })` with or without `enableWAL`; the same while a SQLite client is lazily bound, initializing or ready; lazy binding with a non-SQLite `DATABASE_URL` | Rejects with `UNSUPPORTED_DATASOURCE_PROVIDER` (DEC-001), and the message contains no URL or credentials. A SQLite client that is already bound stays bound and usable. From `idle`/`failed`, the lifecycle is `failed`, as for any resolution failure today. | While shutdown is in progress, `CLIENT_NOT_READY` keeps precedence (unchanged ordering) | New tests; the former `WAL_UNSUPPORTED_PROVIDER` (non-SQLite) and `DATASOURCE_CONFLICT` (bound SQLite then non-SQLite) expectations are replaced |
 | AC-009 | REQ-009 | SCN-003 | Packed tarball installed in an ESM and a CJS consumer with Prisma 7 peers | Both import; `dist` contains no bundled adapter or better-sqlite3 code; no `.env` loaded; no native addon loaded on import | — | `npm run test:package` incl. interop probe |
 | AC-010 | REQ-010, REQ-011 | SCN-004 | Clean checkout | All commands in REQ-010 pass; CI workflow commands match | — | Logged evidence |
+| AC-013 | REQ-007 | BEH-009, SCN-001 | Concurrent requests share the root client: request A has an open `runInTransaction`/`@Transactional` transaction; request B, outside any transaction, reads and writes through repositories, `prisma` or `rootPrismaClient` meanwhile | B never sees A's uncommitted writes; B's write is not part of A's transaction and survives A's rollback (as on 1.0.10/Prisma 5). Two concurrent transactions both complete. | B's operations may wait until A's transaction ends (SQLite has one writer). SCN-007: a root-client call inside A's own transaction callback waits for A and fails A with Prisma's transaction timeout. | Executable test on a real SQLite file through the public API (CR-01 probe shape), plus the edge cases |
 | AC-012 | REQ-015 | SCN-001, SCN-003 | A fresh consumer project follows only the README setup section | `npm install repository_prisma` (plus `prisma` as a dev dependency) installs `@prisma/client` and the adapter; the existing `initializePrisma({ datasourceUrl })` + repository code runs unchanged; no adapter import in consumer code | A non-SQLite URL gets an error whose message states that only SQLite is supported | Package smoke installs without `--legacy-peer-deps`; README review |
 | AC-011 | REQ-012, REQ-014 | all | Docs review | README/DESIGN/CHANGELOG and `engines` match the behavior; version unchanged; no tag | — | Docs review |
 
@@ -133,6 +134,7 @@ None. The released-but-unmerged 1.0.10 line is handled by the base choice DEC-00
 | SCN-003 | Contract | ESM or CJS consumer | Load the package | `import` / `require` | Prisma 7 peers installed | resolve entrypoint | Loads; no side effects | — | Supported Normal | `exports`; 1.0.10 interop | REQ-009, AC-009 |
 | SCN-004 | Operational | Maintainer / CI | Validate the package | `npm ci && npm test` etc., CI on push | Clean checkout | install, push schema, generate, typecheck, test, build, smoke | All pass | — | Supported Normal | scripts, `ci.yml` | REQ-010/011, AC-010 |
 | SCN-005 | System | Consumer with a non-SQLite schema | Use the library with Postgres/MySQL/etc. | `initializePrisma({ datasourceUrl: 'postgresql://...' })` or lazy bind | — | init | Per DEC-001 | — | Supported Explicit Edge (documented in README: WAL note, `PRISMA_DATASOURCE_PROVIDER`). No known consumer; never tested against a real DB. | README, `datasource-target.ts` | REQ-008, AC-008 |
+| SCN-007 | System | Application code inside a transaction callback | Calls `rootPrismaClient` directly instead of `prisma`/repositories | — | Inside `runInTransaction`/`@Transactional` | — | On 1.0.10, a root read ran outside the transaction. On Prisma 7 with the library's connection gate, it waits for the enclosing transaction, which then fails with Prisma's transaction timeout (Measured); the root client keeps working afterwards. | — | Technically Possible but Unsupported/Contrived: the README already says to avoid `rootPrismaClient` in transactional flows. The new consequence is documented in README and CHANGELOG. | README "Advanced: Root Client Access"; `probes/cr01-root-in-transaction.cjs` | AC-013 (alternate) |
 | SCN-006 | System | Consumer using Prisma's new `prisma-client` generator (custom output) | Use the library | — | Client not at `@prisma/client` | — | — | — | Technically Possible but Unsupported (the library imports `@prisma/client`; it never supported a custom output) | code | Out of scope, FU-002 |
 
 ## UI, Interaction, And Experience Requirements
@@ -200,7 +202,7 @@ None. The released-but-unmerged 1.0.10 line is handled by the base choice DEC-00
 | REQ-004 | UC-001 | BEH-005 | AC-004 | SCN-001 | probes |
 | REQ-005 | UC-001 | BEH-006 | AC-005 | SCN-001 | probes |
 | REQ-006 | UC-001 | BEH-004, BEH-008 | AC-006 | SCN-001 | probes |
-| REQ-007 | UC-001 | BEH-009 | AC-007 | SCN-001 | probes |
+| REQ-007 | UC-001 | BEH-009 | AC-007, AC-013 | SCN-001, SCN-007 | probes, CR-01 |
 | REQ-008 | UC-004 | BEH-007 | AC-008 | SCN-005 | guide |
 | REQ-009 | UC-002 | BEH-010 | AC-009 | SCN-003 | probes |
 | REQ-010 | UC-003 | BEH-011 | AC-010 | SCN-004 | probes |

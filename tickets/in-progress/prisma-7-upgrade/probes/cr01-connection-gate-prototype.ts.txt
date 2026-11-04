@@ -1,0 +1,65 @@
+import type {
+  IsolationLevel,
+  SqlDriverAdapter,
+  SqlDriverAdapterFactory,
+  SqlQuery,
+  Transaction,
+} from '@prisma/driver-adapter-utils';
+
+type Release = () => void;
+
+const createLock = () => {
+  let tail: Promise<void> = Promise.resolve();
+  return (): Promise<Release> => {
+    let release!: Release;
+    const next = new Promise<void>((resolve) => { release = resolve; });
+    const acquired = tail.then(() => release);
+    tail = tail.then(() => next);
+    return acquired;
+  };
+};
+
+const gateTransaction = (inner: Transaction, release: Release): Transaction => {
+  let released = false;
+  const releaseOnce = () => { if (!released) { released = true; release(); } };
+  return {
+    get provider() { return inner.provider; },
+    get adapterName() { return inner.adapterName; },
+    get options() { return inner.options; },
+    queryRaw: (q: SqlQuery) => inner.queryRaw(q),
+    executeRaw: (q: SqlQuery) => inner.executeRaw(q),
+    commit: async () => { try { await inner.commit(); } finally { releaseOnce(); } },
+    rollback: async () => { try { await inner.rollback(); } finally { releaseOnce(); } },
+    createSavepoint: inner.createSavepoint && ((n: string) => inner.createSavepoint!(n)),
+    rollbackToSavepoint: inner.rollbackToSavepoint && ((n: string) => inner.rollbackToSavepoint!(n)),
+    releaseSavepoint: inner.releaseSavepoint && ((n: string) => inner.releaseSavepoint!(n)),
+  } as Transaction;
+};
+
+const gateAdapter = (inner: SqlDriverAdapter): SqlDriverAdapter => {
+  const acquire = createLock();
+  const exclusive = async <T>(work: () => Promise<T>): Promise<T> => {
+    const release = await acquire();
+    try { return await work(); } finally { release(); }
+  };
+  return {
+    get provider() { return inner.provider; },
+    get adapterName() { return inner.adapterName; },
+    queryRaw: (q: SqlQuery) => exclusive(() => inner.queryRaw(q)),
+    executeRaw: (q: SqlQuery) => exclusive(() => inner.executeRaw(q)),
+    executeScript: (s: string) => exclusive(() => inner.executeScript(s)),
+    startTransaction: async (level?: IsolationLevel) => {
+      const release = await acquire();
+      try { return gateTransaction(await inner.startTransaction(level), release); }
+      catch (e) { release(); throw e; }
+    },
+    getConnectionInfo: inner.getConnectionInfo && (() => inner.getConnectionInfo!()),
+    dispose: () => inner.dispose(),
+  } as SqlDriverAdapter;
+};
+
+export const gateSqliteConnection = (factory: SqlDriverAdapterFactory): SqlDriverAdapterFactory => ({
+  get provider() { return factory.provider; },
+  get adapterName() { return factory.adapterName; },
+  connect: async () => gateAdapter(await factory.connect()),
+} as SqlDriverAdapterFactory);

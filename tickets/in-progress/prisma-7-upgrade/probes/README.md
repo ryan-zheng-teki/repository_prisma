@@ -22,3 +22,15 @@ CLI facts reproduced with 7.10.1:
   runs `generate`.
 - `prisma-client-js` still generates into `node_modules/.prisma/client` and is importable as
   `@prisma/client` (CJS `default.js`), so the 1.0.10 default-namespace import keeps working.
+
+## CR-001 follow-up probes (Solution Designer, 2026-11-04, SR-005)
+
+Scratch copy `/tmp/cr01-proto` = `git archive a092a60`, with the prototype gate (`cr01-connection-gate-prototype.ts.txt`) wired as `adapter: gateSqliteConnection(createSqliteDriverAdapter(target))`. Same toolchain as the worktree. The prototype is evidence of feasibility, not the implementation.
+
+| Probe | Command | Result |
+| --- | --- | --- |
+| Reviewer probe `evidence/CR-01-tx-isolation-probe.cjs` | `node CR-01-tx-isolation-probe.cjs /tmp/cr01-proto/dist/index.js` | Gated: `seenUncommitted: []`, `rowsAfter: ["independent-request@example.test"]`, identical to 1.0.10/Prisma 5. Ungated a092a60: sees `in-tx` and loses the independent write (reviewer log). |
+| Full suite on the gated prototype | `DATABASE_URL_TEST=file:/tmp/cr01-proto/test.db npm test -- --run` | 9 files / 96 tests passed; typecheck and build pass |
+| `cr01-edge-cases.cjs` | `node cr01-edge-cases.cjs <dist>` | Gated and ungated alike: two concurrent `runInTransaction` both commit (serialized, ~427 ms for 2×200 ms); a nested write (Prisma-internal transaction) concurrent with an interactive transaction succeeds |
+| `cr01-root-in-transaction.cjs` | `node cr01-root-in-transaction.cjs /tmp/cr01-proto/dist/index.js` | Gated: `rootPrismaClient` used inside a transaction callback waits for that transaction. The transaction then fails with Prisma's own timeout ("A commit cannot be executed on an expired transaction ... 1500 ms") after ~1504 ms, and the root client works afterwards. Without another handle keeping the event loop alive, Node exits while waiting, because Prisma's timeout timer does not keep the process alive. Ungated a092a60: the root read runs inside the transaction. |
+| Read `@prisma/adapter-libsql@7.10.1 dist/index-node.js:279-408` | — | Prisma's own libsql adapter has the same rule: plain `performIO` and `startTransaction` share one mutex, and the transaction holds it until commit/rollback |

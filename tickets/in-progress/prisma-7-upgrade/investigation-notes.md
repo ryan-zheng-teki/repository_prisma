@@ -11,7 +11,7 @@
 - Finalization target remote / branch: `origin` / `main`, as the Task requires ("finalized on the base branch"). Merging fast-forwards `main` over the released 1.0.10 commits (DEC-008).
 - Bootstrap result: Completed. `git worktree add -b codex/prisma-7-upgrade ... origin/codex/repository-prisma-esm-cjs-interop`; ticket folder `tickets/in-progress/prisma-7-upgrade`.
 - Bootstrap note: `git fetch origin` fails in this environment (`git@github.com: Permission denied (publickey)`). `git ls-remote origin` succeeds through the configured `github.com-ryan` host alias and confirmed remote `main` = `8ab582f` and remote ticket branch = `f2ffd5c`, both identical to the local remote-tracking refs. Delivery should re-check fetch/push access before finalization.
-- Current solution revision ID: `SR-002`
+- Current solution revision ID: `SR-005`
 - Authorities read (requirements reading gate; file and date): `references/requirements-engineering.md`, `references/finding-the-cause.md`, `references/ticket-scope.md` (2026-11-04)
 - Investigation status: Requirements investigation complete. Architecture investigation not started (follows approval).
 
@@ -184,3 +184,12 @@ Recorded 2026-11-04 after SR-002 approval. Design reading gate read: `references
 - Preserve the `PrismaClientFactory` seam used by tests.
 - Verify adapter error mapping for connection failures (for example a missing directory) and that `CONNECTION_FAILED` and the diagnostics still classify them.
 - Verify that `$disconnect` closes the better-sqlite3 handle (file release, WAL checkpoint) so `shutdownPrisma()` and rebinding still work. The tests passed in the scratch patch, but the design should confirm it.
+
+### SR-005 additions (code review CR-001, 2026-11-04)
+
+| Method / Source | Observation | Established | Design Use |
+| --- | --- | --- | --- |
+| Reviewer `evidence/CR-01-tx-isolation-probe.{cjs,log}` | 1.0.10/Prisma 5 (21-connection pool) isolates request B from A's open transaction. a092a60/Prisma 7 does not: B reads uncommitted rows, and B's write is lost on rollback. | Reproduced (by code reviewer) | D7 |
+| `node_modules/@prisma/adapter-better-sqlite3/dist/index.js:523-545, 633-651, 667-681` | Plain `executeIO`/`performIO` skip the private mutex that `startTransaction` takes | Read | D7 |
+| `@prisma/adapter-libsql@7.10.1 dist/index-node.js:279-408`; `@libsql/client lib-cjs/sqlite3.js:177-180` | libsql adapter serializes plain queries behind open transactions. libsql's local `transaction()` hands off the connection and lazily opens a new one (breaks `:memory:`). | Read | D7 option analysis |
+| Gate prototype in `/tmp/cr01-proto` (`probes/cr01-*`) | CR-01 probe restored; 96/96 tests; concurrent tx and nested writes OK; root-in-tx waits and the transaction then fails with Prisma's timeout; Prisma's timeout timer does not keep Node alive | Reproduced / Measured | D7, AC-013, SCN-007 |

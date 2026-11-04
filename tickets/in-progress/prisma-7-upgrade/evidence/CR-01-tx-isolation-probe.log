@@ -1,0 +1,27 @@
+# CR-01 transaction isolation probe (code review CRR-001), 2026-11-04, macOS, Node v22.23.1
+# Script: evidence/CR-01-tx-isolation-probe.cjs <dist/index.js>
+# Request A: runInTransaction { prisma.user.create(in-tx); await 300 ms; throw }
+# Request B (no transaction, separate async flow, starts 50 ms later): prisma.user.findMany(); prisma.user.create(independent-request)
+
+== base f2ffd5c (released 1.0.10, Prisma 5.22.0), built in a temporary detached worktree ==
+prisma:info Starting a sqlite pool with 21 connections.
+{
+  "txResult": "tx rejected: rollback-on-purpose",
+  "otherResult": {
+    "seenUncommitted": []
+  },
+  "rowsAfter": [
+    "independent-request@example.test"
+  ]
+}
+
+== a092a60 (Prisma 7.10.1, better-sqlite3 adapter), dist from npm run build ==
+{
+  "txResult": "tx rejected: rollback-on-purpose",
+  "otherResult": {
+    "seenUncommitted": [
+      "in-tx@example.test"
+    ]
+  },
+  "rowsAfter": []
+}
