@@ -41,7 +41,7 @@ Repository finalization only: fast-forward `main` and push. No release, tag or v
 
 | Acceptance-Criteria ID | Cases And Files Checked | What You Saw | Judgement (`Proven`/`Not Proven`/`User Check`) |
 | --- | --- | --- | --- |
-| AC-001 | API-02, API-05, then the post-merge CI run on `main` | `node=v24.22.2 ... arch=x86_64 user=uid=1000(node)`; `exit=0` for ci/typecheck/test/build; `Tests 113 passed (113)`; `ALL-STEPS-FAILED=0`. actionlint `Found 0 errors in 2 files`; v5 `using: node24`. Post-merge: see Finalization Record | Proven before the merge; the post-merge run is in the Finalization Record |
+| AC-001 | API-02, API-05, then the post-merge CI run on `main` | `node=v24.22.2 ... arch=x86_64 user=uid=1000(node)`; `exit=0` for ci/typecheck/test/build; `Tests 113 passed (113)`; `ALL-STEPS-FAILED=0`. actionlint `Found 0 errors in 2 files`; v5 `using: node24`. Post-merge run `41871781362`: `node-version: 24`, `node: v24.22.1`, no Node 20 deprecation annotation, success, 113/113 | Proven |
 | AC-002 | API-05, API-06, `release.yml` diff | `bundled npm before: 11.19.1` → `11.21.1` after `npm i -g npm@^11.5.1`; `npm ci`/build exit 0; dry-run publish `+ repository_prisma@2.0.1-e2e.0` exit 0 (unbumped 2.0.0 refused by the registry, as expected) | Proven |
 | AC-003 | API-03, API-02, API-04, DE-01 | root: `skip: read-only WAL case (running as root; root ignores file permissions)`, `"readonlyWal":"skipped-root"`, `"result":"pass"`, exit 0; non-root: `"readonlyWal":"pass"`; mutation: `AssertionError` at `run-package-smoke.js:600:10`, `mutated-exit=1` | Proven |
 | AC-004 | API-08, `docs-sync-report.md` | README release guide and DESIGN Design Cases as required | Proven |
@@ -78,34 +78,41 @@ None (version `2.0.0`, no tag).
 
 - Bootstrap context source: `handoff.md` § Workspace (finalization target `origin/main`)
 - Ticket branch: `codex/repository-prisma-2-loose-ends`
-- Ticket branch commit result: see Finalization Record
-- Ticket branch push result: see Finalization Record
+- Ticket branch commit result: `Completed`: archive commit `04a1364` on top of `b11d678`
+- Ticket branch push result: `Completed`: new remote branch `origin/codex/repository-prisma-2-loose-ends` = `04a1364`
 - Finalization target remote: `origin`
 - Finalization target branch: `main`
-- Target advanced after verification / acceptance: see Finalization Record
+- Target advanced after verification / acceptance: `No` (`origin/main` = `aa933e0` when fetched before the merge)
 - Delivery-owned edits protected before re-integration: `Not needed`
-- Re-integration before final merge result: see Finalization Record
-- Target branch update result: see Finalization Record
-- Merge into target result: see Finalization Record
-- Push target branch result: see Finalization Record
-- Repository finalization status: see Finalization Record
-- Blocker (if applicable): see Finalization Record
+- Re-integration before final merge result: `Not needed`
+- Target branch update result: `Completed`
+- Merge into target result: `Completed`: fast-forward `aa933e0..04a1364` in the shared checkout
+- Push target branch result: `Completed`: `aa933e0..04a1364  main -> main`
+- Repository finalization status: `Completed`
+- Blocker (if applicable): None
 
 ### Finalization Record
 
-(Filled in after the merge, the post-merge CI check and cleanup.)
+- Post-merge CI (AC-001, API-09 handed to delivery): run `41871781362` on `main@04a1364`, conclusion `success`, https://github.com/ryan-zheng-teki/repository_prisma/actions/runs/41871781362. Log: `evidence/DE-02-ci-main-04a1364.log`.
+  1. `node-version: 24` shown in the setup-node@v5 step.
+  2. Node v24.x used: `Found in cache @ /opt/hostedtoolcache/node/24.22.1/x64`, `node: v24.22.1`, `npm: 11.19.1`.
+  3. No "Node.js 20 is deprecated" annotation. The only annotation is GitHub's ubuntu-latest → Ubuntu 26 label notice. setup-node@v5 itself prints a Node `punycode` DEP0040 warning, which is benign and comes from the action, not from this repo.
+  4. The job succeeded: `npm ci` (`found 0 vulnerabilities`; the expected allowScripts warning, FU-002), typecheck, `Tests 113 passed (113)`, build.
+  Baseline for contrast: run `41855325943` on `aa933e0` had the Node 20 annotation and `Acquiring 20.20.2` (API-09).
+- Cleanup: `git worktree remove /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-2-loose-ends` (clean, HEAD `04a1364` = remote branch); `git worktree prune`; `git branch -d codex/repository-prisma-2-loose-ends`.
+- This record and DE-02 are committed directly on `main` in the shared checkout, staging only the ticket folder. The user's untracked `pnpm-lock.yaml` and `.claude/` are untouched.
 
 ## Release / Publication / Deployment
 
 - Applicable: `No`
 - Release/publication/deployment result: `Not required`
-- Pipelines triggered and their results: the `main` push triggers `ci.yml` only (see Finalization Record)
+- Pipelines triggered and their results: `ci.yml` run `41871781362` on `04a1364`: success. No tag, so `release.yml` did not run.
 - Release notes handoff result: `Not required`
 
 ## Post-Finalization Cleanup
 
 - Dedicated ticket worktree path: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-2-loose-ends`
-- Worktree cleanup, prune, local branch cleanup: see Finalization Record
+- Worktree cleanup, prune, local branch cleanup: `Completed`
 - Remote branch cleanup result: `Not required` (the remote ticket branch is kept, as for earlier tickets)
 
 ## Escalation / Reroute (Use Only If Final Handoff Cannot Complete)
@@ -136,11 +143,11 @@ DE-01 (delivery rerun), API-02..08, and the post-merge CI run (Finalization Reco
 
 ## Final Status
 
-- Verification complete (from the evidence, or the user's check where needed): see Finalization Record (AC-001 post-merge)
-- Repository finalization complete: see Finalization Record
+- Verification complete (from the evidence, or the user's check where needed): `Yes` (AC-001 confirmed on the post-merge run)
+- Repository finalization complete: `Yes`
 - Applicable release/deployment/rollout complete or not required: `Yes` (not required)
-- Applicable safe cleanup complete or not required: see Finalization Record
-- Unresolved blocker: see Finalization Record
-- Successful terminal package eligible for return: see Finalization Record
-- Terminal package sent to the Solution Designer: see Finalization Record
-- Terminal message/reference: see Finalization Record
+- Applicable safe cleanup complete or not required: `Yes`
+- Unresolved blocker: `None`
+- Successful terminal package eligible for return: `Yes`
+- Terminal package sent to the Solution Designer: `Yes`, after this record was pushed
+- Terminal message/reference: `Delivery Completed`, 2026-11-04, to the address from `get_handoff_rules`

@@ -2,7 +2,7 @@
 
 ## Status
 
-Verified from evidence and merged into `main`. No release, tag or version bump (version stays `2.0.0`). The post-merge CI result (AC-001) and the cleanup are recorded in `release-deployment-report.md` § Finalization Record.
+Verified from evidence and merged into `main` (`aa933e0..04a1364`, pushed). Post-merge CI run `41871781362` passed on Node v24.22.1 with no Node 20 deprecation annotation (AC-001). Cleanup is done. No release, tag or version bump (version stays `2.0.0`).
 
 ## Classification And Route
 

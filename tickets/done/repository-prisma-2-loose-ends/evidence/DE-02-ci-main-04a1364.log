@@ -1,0 +1,282 @@
+test	Set up job	﻿2026-11-04T16:52:02.7872478Z Current runner version: '2.338.2'
+test	Set up job	2026-11-04T16:52:02.7895616Z ##[group]Runner Image Provisioner
+test	Set up job	2026-11-04T16:52:02.7896345Z Hosted Compute Agent
+test	Set up job	2026-11-04T16:52:02.7896958Z Version: 20261021.618
+test	Set up job	2026-11-04T16:52:02.7897511Z Commit: 21505ad2541d5be6135ed84fc33697146cf75b8e
+test	Set up job	2026-11-04T16:52:02.7898147Z Build Date: 2026-10-21T00:45:21Z
+test	Set up job	2026-11-04T16:52:02.7898702Z Worker ID: {3ae3961b-1ba7-48eb-a694-b51ebbd64ce5}
+test	Set up job	2026-11-04T16:52:02.7899260Z Region: westus2
+test	Set up job	2026-11-04T16:52:02.7899789Z Cloud: Azure
+test	Set up job	2026-11-04T16:52:02.7900544Z ##[endgroup]
+test	Set up job	2026-11-04T16:52:02.7901804Z ##[group]Operating System
+test	Set up job	2026-11-04T16:52:02.7902330Z Ubuntu
+test	Set up job	2026-11-04T16:52:02.7902758Z 26.04.1
+test	Set up job	2026-11-04T16:52:02.7903639Z LTS
+test	Set up job	2026-11-04T16:52:02.7904071Z ##[endgroup]
+test	Set up job	2026-11-04T16:52:02.7904549Z ##[group]Runner Image
+test	Set up job	2026-11-04T16:52:02.7905059Z Image: ubuntu-26.04
+test	Set up job	2026-11-04T16:52:02.7905535Z Version: 20261025.179.1
+test	Set up job	2026-11-04T16:52:02.7906495Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261025.179/images/ubuntu/Ubuntu2604-Readme.md
+test	Set up job	2026-11-04T16:52:02.7907901Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261025.179
+test	Set up job	2026-11-04T16:52:02.7908697Z ##[endgroup]
+test	Set up job	2026-11-04T16:52:02.7909725Z ##[group]GITHUB_TOKEN Permissions
+test	Set up job	2026-11-04T16:52:02.7911556Z Contents: read
+test	Set up job	2026-11-04T16:52:02.7912081Z Metadata: read
+test	Set up job	2026-11-04T16:52:02.7912644Z Packages: read
+test	Set up job	2026-11-04T16:52:02.7913112Z ##[endgroup]
+test	Set up job	2026-11-04T16:52:02.7914935Z Secret source: Actions
+test	Set up job	2026-11-04T16:52:02.7915688Z Cache mode: write
+test	Set up job	2026-11-04T16:52:02.7916312Z Prepare workflow directory
+test	Set up job	2026-11-04T16:52:02.8186423Z Prepare all required actions
+test	Set up job	2026-11-04T16:52:02.8228709Z Getting action download info
+test	Set up job	2026-11-04T16:52:03.1428401Z Download action repository 'actions/checkout@v5' (SHA:fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09)
+test	Set up job	2026-11-04T16:52:03.4823143Z Download action repository 'actions/setup-node@v5' (SHA:a0853c24544627f65ddf259abe73b1d18a591444)
+test	Set up job	2026-11-04T16:52:04.1841925Z Complete job name: test
+test	Run actions/checkout@v5	﻿2026-11-04T16:52:04.2573128Z ##[group]Run actions/checkout@v5
+test	Run actions/checkout@v5	2026-11-04T16:52:04.2573903Z with:
+test	Run actions/checkout@v5	2026-11-04T16:52:04.2574337Z   repository: ryan-zheng-teki/repository_prisma
+test	Run actions/checkout@v5	2026-11-04T16:52:04.2578349Z   token: ***
+test	Run actions/checkout@v5	2026-11-04T16:52:04.2578731Z   ssh-strict: true
+test	Run actions/checkout@v5	2026-11-04T16:52:04.2579141Z   ssh-user: git
+test	Run actions/checkout@v5	2026-11-04T16:52:04.2579535Z   persist-credentials: true
+test	Run actions/checkout@v5	2026-11-04T16:52:04.2580222Z   clean: true
+test	Run actions/checkout@v5	2026-11-04T16:52:04.2580642Z   sparse-checkout-cone-mode: true
+test	Run actions/checkout@v5	2026-11-04T16:52:04.2581129Z   fetch-depth: 1
+test	Run actions/checkout@v5	2026-11-04T16:52:04.2581512Z   fetch-tags: false
+test	Run actions/checkout@v5	2026-11-04T16:52:04.2581902Z   show-progress: true
+test	Run actions/checkout@v5	2026-11-04T16:52:04.2582294Z   lfs: false
+test	Run actions/checkout@v5	2026-11-04T16:52:04.2582649Z   submodules: false
+test	Run actions/checkout@v5	2026-11-04T16:52:04.2583079Z   set-safe-directory: true
+test	Run actions/checkout@v5	2026-11-04T16:52:04.2583531Z   allow-unsafe-pr-checkout: false
+test	Run actions/checkout@v5	2026-11-04T16:52:04.2584224Z ##[endgroup]
+test	Run actions/checkout@v5	2026-11-04T16:52:04.5971408Z Syncing repository: ryan-zheng-teki/repository_prisma
+test	Run actions/checkout@v5	2026-11-04T16:52:04.5973230Z ##[group]Getting Git version info
+test	Run actions/checkout@v5	2026-11-04T16:52:04.5974142Z Working directory is '/home/runner/work/repository_prisma/repository_prisma'
+test	Run actions/checkout@v5	2026-11-04T16:52:04.5975471Z [command]/usr/bin/git version
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6115202Z git version 2.56.0
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6133803Z ##[endgroup]
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6147548Z Temporarily overriding HOME='/home/runner/work/_temp/047e2fd0-3037-4a3e-b291-8046cbcccce4' before making global git config changes
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6150497Z Adding repository directory to the temporary git global config as a safe directory
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6152910Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/repository_prisma/repository_prisma
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6221599Z Deleting the contents of '/home/runner/work/repository_prisma/repository_prisma'
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6224356Z ##[group]Initializing the repository
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6228661Z [command]/usr/bin/git init /home/runner/work/repository_prisma/repository_prisma
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6415296Z hint: Using 'master' as the name for the initial branch. This default branch name
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6418618Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6420314Z hint: to use in all of your new repositories, which will suppress this warning,
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6421580Z hint: call:
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6422351Z hint:
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6423343Z hint: 	git config --global init.defaultBranch <name>
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6424481Z hint:
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6425505Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6427041Z hint: 'development'. The just-created branch can be renamed via this command:
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6428285Z hint:
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6429046Z hint: 	git branch -m <name>
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6429869Z hint:
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6431933Z hint: Disable this message with "git config set advice.defaultBranchName false"
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6433665Z Initialized empty Git repository in /home/runner/work/repository_prisma/repository_prisma/.git/
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6437136Z [command]/usr/bin/git remote add origin https://github.com/ryan-zheng-teki/repository_prisma
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6489832Z ##[endgroup]
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6491338Z ##[group]Disabling automatic garbage collection
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6492643Z [command]/usr/bin/git config --local gc.auto 0
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6526754Z ##[endgroup]
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6528046Z ##[group]Setting up auth
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6540494Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+test	Run actions/checkout@v5	2026-11-04T16:52:04.6586728Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+test	Run actions/checkout@v5	2026-11-04T16:52:04.7082138Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test	Run actions/checkout@v5	2026-11-04T16:52:04.7113786Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+test	Run actions/checkout@v5	2026-11-04T16:52:04.7357047Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+test	Run actions/checkout@v5	2026-11-04T16:52:04.7388596Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+test	Run actions/checkout@v5	2026-11-04T16:52:04.7635752Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+test	Run actions/checkout@v5	2026-11-04T16:52:04.7681093Z ##[endgroup]
+test	Run actions/checkout@v5	2026-11-04T16:52:04.7682598Z ##[group]Fetching the repository
+test	Run actions/checkout@v5	2026-11-04T16:52:04.7690107Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +04a1364bb492c93ec16748f59c7cd6146da3fd3a:refs/remotes/origin/main
+test	Run actions/checkout@v5	2026-11-04T16:52:05.2987475Z From https://github.com/ryan-zheng-teki/repository_prisma
+test	Run actions/checkout@v5	2026-11-04T16:52:05.2990248Z  * [new ref]         04a1364bb492c93ec16748f59c7cd6146da3fd3a -> origin/main
+test	Run actions/checkout@v5	2026-11-04T16:52:05.2994764Z ##[endgroup]
+test	Run actions/checkout@v5	2026-11-04T16:52:05.2996552Z ##[group]Determining the checkout info
+test	Run actions/checkout@v5	2026-11-04T16:52:05.2998405Z ##[endgroup]
+test	Run actions/checkout@v5	2026-11-04T16:52:05.3002785Z [command]/usr/bin/git sparse-checkout disable
+test	Run actions/checkout@v5	2026-11-04T16:52:05.3052736Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+test	Run actions/checkout@v5	2026-11-04T16:52:05.3084430Z ##[group]Checking out the ref
+test	Run actions/checkout@v5	2026-11-04T16:52:05.3087603Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+test	Run actions/checkout@v5	2026-11-04T16:52:05.3304699Z Switched to a new branch 'main'
+test	Run actions/checkout@v5	2026-11-04T16:52:05.3308454Z branch 'main' set up to track 'origin/main'.
+test	Run actions/checkout@v5	2026-11-04T16:52:05.3375557Z ##[endgroup]
+test	Run actions/checkout@v5	2026-11-04T16:52:05.3378075Z [command]/usr/bin/git log -1 --format=%H
+test	Run actions/checkout@v5	2026-11-04T16:52:05.3401037Z 04a1364bb492c93ec16748f59c7cd6146da3fd3a
+test	Run actions/setup-node@v5	﻿2026-11-04T16:52:05.4408984Z ##[group]Run actions/setup-node@v5
+test	Run actions/setup-node@v5	2026-11-04T16:52:05.4410063Z with:
+test	Run actions/setup-node@v5	2026-11-04T16:52:05.4410750Z   node-version: 24
+test	Run actions/setup-node@v5	2026-11-04T16:52:05.4411482Z   cache: npm
+test	Run actions/setup-node@v5	2026-11-04T16:52:05.4412184Z   always-auth: false
+test	Run actions/setup-node@v5	2026-11-04T16:52:05.4413167Z   check-latest: false
+test	Run actions/setup-node@v5	2026-11-04T16:52:05.4420941Z   token: ***
+test	Run actions/setup-node@v5	2026-11-04T16:52:05.4421679Z   package-manager-cache: true
+test	Run actions/setup-node@v5	2026-11-04T16:52:05.4422523Z ##[endgroup]
+test	Run actions/setup-node@v5	2026-11-04T16:52:05.9459740Z (node:2157) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+test	Run actions/setup-node@v5	2026-11-04T16:52:05.9463393Z (Use `node --trace-deprecation ...` to show where the warning was created)
+test	Run actions/setup-node@v5	2026-11-04T16:52:05.9465889Z Found in cache @ /opt/hostedtoolcache/node/24.22.1/x64
+test	Run actions/setup-node@v5	2026-11-04T16:52:05.9467521Z ##[group]Environment details
+test	Run actions/setup-node@v5	2026-11-04T16:52:39.7396824Z node: v24.22.1
+test	Run actions/setup-node@v5	2026-11-04T16:52:39.7469199Z npm: 11.19.1
+test	Run actions/setup-node@v5	2026-11-04T16:52:39.7469734Z yarn: 1.22.22
+test	Run actions/setup-node@v5	2026-11-04T16:52:39.7471520Z ##[endgroup]
+test	Run actions/setup-node@v5	2026-11-04T16:52:39.7472373Z [command]/opt/hostedtoolcache/node/24.22.1/x64/bin/npm config get cache
+test	Run actions/setup-node@v5	2026-11-04T16:52:42.0075074Z /home/runner/.npm
+test	Run actions/setup-node@v5	2026-11-04T16:52:42.3217616Z npm cache is not found
+test	Run npm ci	﻿2026-11-04T16:52:42.3367605Z ##[group]Run npm ci
+test	Run npm ci	2026-11-04T16:52:42.3367885Z [36;1mnpm ci[0m
+test	Run npm ci	2026-11-04T16:52:42.3894202Z shell: /usr/bin/bash -e {0}
+test	Run npm ci	2026-11-04T16:52:42.3894483Z ##[endgroup]
+test	Run npm ci	2026-11-04T16:52:58.9108762Z npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
+test	Run npm ci	2026-11-04T16:53:05.2440094Z 
+test	Run npm ci	2026-11-04T16:53:05.2441071Z > repository_prisma@2.0.0 prepare
+test	Run npm ci	2026-11-04T16:53:05.2441529Z > prisma generate
+test	Run npm ci	2026-11-04T16:53:05.2441764Z 
+test	Run npm ci	2026-11-04T16:53:06.8516192Z Loaded Prisma config from prisma.config.ts.
+test	Run npm ci	2026-11-04T16:53:06.8516529Z 
+test	Run npm ci	2026-11-04T16:53:07.4092083Z Prisma schema loaded from prisma/schema.prisma.
+test	Run npm ci	2026-11-04T16:53:07.5127166Z 
+test	Run npm ci	2026-11-04T16:53:08.4254450Z ✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 58ms
+test	Run npm ci	2026-11-04T16:53:08.4254981Z 
+test	Run npm ci	2026-11-04T16:53:08.4255425Z Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+test	Run npm ci	2026-11-04T16:53:08.4255826Z 
+test	Run npm ci	2026-11-04T16:53:08.4255945Z 
+test	Run npm ci	2026-11-04T16:53:08.4255952Z 
+test	Run npm ci	2026-11-04T16:53:08.4256215Z added 273 packages, and audited 274 packages in 26s
+test	Run npm ci	2026-11-04T16:53:08.4256532Z 
+test	Run npm ci	2026-11-04T16:53:08.4256735Z 47 packages are looking for funding
+test	Run npm ci	2026-11-04T16:53:08.4257093Z   run `npm fund` for details
+test	Run npm ci	2026-11-04T16:53:08.4264121Z 
+test	Run npm ci	2026-11-04T16:53:08.4264359Z found 0 vulnerabilities
+test	Run npm ci	2026-11-04T16:53:08.4275075Z npm warn install-scripts 4 packages have install scripts not yet covered by allowScripts:
+test	Run npm ci	2026-11-04T16:53:08.4276059Z npm warn install-scripts   @prisma/engines@7.10.1 (postinstall: node scripts/postinstall.js)
+test	Run npm ci	2026-11-04T16:53:08.4277034Z npm warn install-scripts   better-sqlite3@12.11.1 (install: prebuild-install || node-gyp rebuild --release)
+test	Run npm ci	2026-11-04T16:53:08.4277915Z npm warn install-scripts   esbuild@0.27.2 (postinstall: node install.js)
+test	Run npm ci	2026-11-04T16:53:08.4278706Z npm warn install-scripts   prisma@7.10.1 (preinstall: node scripts/preinstall-entry.js)
+test	Run npm ci	2026-11-04T16:53:08.4279288Z npm warn install-scripts
+test	Run npm ci	2026-11-04T16:53:08.4280268Z npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+test	Run npm run typecheck	﻿2026-11-04T16:53:08.5833807Z ##[group]Run npm run typecheck
+test	Run npm run typecheck	2026-11-04T16:53:08.5834103Z [36;1mnpm run typecheck[0m
+test	Run npm run typecheck	2026-11-04T16:53:08.5862747Z shell: /usr/bin/bash -e {0}
+test	Run npm run typecheck	2026-11-04T16:53:08.5862971Z ##[endgroup]
+test	Run npm run typecheck	2026-11-04T16:53:08.7262994Z 
+test	Run npm run typecheck	2026-11-04T16:53:08.7263791Z > repository_prisma@2.0.0 typecheck
+test	Run npm run typecheck	2026-11-04T16:53:08.7264315Z > tsc -p tsconfig.json
+test	Run npm run typecheck	2026-11-04T16:53:08.7264515Z 
+test	Run npm test	﻿2026-11-04T16:53:10.3031666Z ##[group]Run npm test
+test	Run npm test	2026-11-04T16:53:10.3031901Z [36;1mnpm test[0m
+test	Run npm test	2026-11-04T16:53:10.3059120Z shell: /usr/bin/bash -e {0}
+test	Run npm test	2026-11-04T16:53:10.3059362Z ##[endgroup]
+test	Run npm test	2026-11-04T16:53:10.4694062Z 
+test	Run npm test	2026-11-04T16:53:10.4694837Z > repository_prisma@2.0.0 test
+test	Run npm test	2026-11-04T16:53:10.4695362Z > node scripts/run-tests.js
+test	Run npm test	2026-11-04T16:53:10.4695573Z 
+test	Run npm test	2026-11-04T16:53:11.4792987Z Loaded Prisma config from prisma.config.ts.
+test	Run npm test	2026-11-04T16:53:11.4793392Z 
+test	Run npm test	2026-11-04T16:53:11.5619219Z Prisma schema loaded from prisma/schema.prisma.
+test	Run npm test	2026-11-04T16:53:11.5627839Z Datasource "db": SQLite database "test.db" at "file:///home/runner/work/repository_prisma/repository_prisma/test.db"
+test	Run npm test	2026-11-04T16:53:11.5902129Z 
+test	Run npm test	2026-11-04T16:53:11.5903167Z SQLite database test.db created at file:///home/runner/work/repository_prisma/repository_prisma/test.db
+test	Run npm test	2026-11-04T16:53:11.6514111Z 
+test	Run npm test	2026-11-04T16:53:11.6515674Z 🚀  Your database is now in sync with your Prisma schema. Done in 62ms
+test	Run npm test	2026-11-04T16:53:11.6907552Z ┌─────────────────────────────────────────────────────────┐
+test	Run npm test	2026-11-04T16:53:11.6908197Z │  Update available 7.10.1 -> 8.0.0-rc.30                 │
+test	Run npm test	2026-11-04T16:53:11.6909012Z │                                                         │
+test	Run npm test	2026-11-04T16:53:11.6909639Z │  This is a major update - please follow the guide at    │
+test	Run npm test	2026-11-04T16:53:11.6910429Z │  https://pris.ly/d/major-version-upgrade                │
+test	Run npm test	2026-11-04T16:53:11.6910968Z │                                                         │
+test	Run npm test	2026-11-04T16:53:11.6911494Z │  Run the following to update                            │
+test	Run npm test	2026-11-04T16:53:11.6912100Z │    npm i --save-dev prisma@latest                       │
+test	Run npm test	2026-11-04T16:53:11.6912666Z │    npm i @prisma/client@latest                          │
+test	Run npm test	2026-11-04T16:53:11.6913257Z └─────────────────────────────────────────────────────────┘
+test	Run npm test	2026-11-04T16:53:11.6913643Z 
+test	Run npm test	2026-11-04T16:53:12.5170439Z Loaded Prisma config from prisma.config.ts.
+test	Run npm test	2026-11-04T16:53:12.5170768Z 
+test	Run npm test	2026-11-04T16:53:12.5945317Z Prisma schema loaded from prisma/schema.prisma.
+test	Run npm test	2026-11-04T16:53:13.0961057Z 
+test	Run npm test	2026-11-04T16:53:13.0962394Z ✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 57ms
+test	Run npm test	2026-11-04T16:53:13.0962849Z 
+test	Run npm test	2026-11-04T16:53:13.0963295Z Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+test	Run npm test	2026-11-04T16:53:13.0963717Z 
+test	Run npm test	2026-11-04T16:53:13.0963726Z 
+test	Run npm test	2026-11-04T16:53:14.1005577Z 
+test	Run npm test	2026-11-04T16:53:14.1016910Z [1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/home/runner/work/repository_prisma/repository_prisma[39m
+test	Run npm test	2026-11-04T16:53:14.1017522Z 
+test	Run npm test	2026-11-04T16:53:14.6273105Z  [32m✓[39m src/tests/client-lifecycle.test.ts [2m([22m[2m19 tests[22m[2m)[22m[32m 260[2mms[22m[39m
+test	Run npm test	2026-11-04T16:53:14.8655127Z  [32m✓[39m src/tests/sqlite-connection-gate.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 104[2mms[22m[39m
+test	Run npm test	2026-11-04T16:53:14.8767801Z  [32m✓[39m src/tests/public-initialization.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 502[2mms[22m[39m
+test	Run npm test	2026-11-04T16:53:15.0235514Z  [32m✓[39m src/tests/datasource-readiness.test.ts [2m([22m[2m22 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+test	Run npm test	2026-11-04T16:53:15.2031189Z  [32m✓[39m src/tests/transaction-context.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+test	Run npm test	2026-11-04T16:53:15.2305976Z  [32m✓[39m src/tests/integration.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 187[2mms[22m[39m
+test	Run npm test	2026-11-04T16:53:15.3597416Z  [32m✓[39m src/tests/logging-policy.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+test	Run npm test	2026-11-04T16:53:15.5452792Z  [32m✓[39m src/tests/forwarding-proxy.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+test	Run npm test	2026-11-04T16:53:15.5832302Z  [32m✓[39m src/tests/datetime-continuity.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 201[2mms[22m[39m
+test	Run npm test	2026-11-04T16:53:15.6695783Z  [32m✓[39m src/tests/database-filter.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+test	Run npm test	2026-11-04T16:53:18.7838400Z  [32m✓[39m src/tests/transaction-isolation.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 4403[2mms[22m[39m
+test	Run npm test	2026-11-04T16:53:18.7840368Z      [33m[2m✓[22m[39m keeps a request without a transaction out of another request's open transaction [33m 768[2mms[22m[39m
+test	Run npm test	2026-11-04T16:53:18.7841402Z      [33m[2m✓[22m[39m commits two concurrent transactions [33m 383[2mms[22m[39m
+test	Run npm test	2026-11-04T16:53:18.7842344Z      [33m[2m✓[22m[39m runs a nested write concurrently with an interactive transaction [33m 543[2mms[22m[39m
+test	Run npm test	2026-11-04T16:53:18.7843799Z      [33m[2m✓[22m[39m keeps concurrent plain requests isolated and loses no writes while transactions commit and roll back [33m 555[2mms[22m[39m
+test	Run npm test	2026-11-04T16:53:18.7845532Z      [33m[2m✓[22m[39m fails a transaction that uses rootPrismaClient inside its own callback with Prisma's timeout (SCN-007) [33m 1011[2mms[22m[39m
+test	Run npm test	2026-11-04T16:53:18.7846874Z      [33m[2m✓[22m[39m fails a transaction queued past its maxWait and keeps the connection usable [33m 929[2mms[22m[39m
+test	Run npm test	2026-11-04T16:53:18.7865188Z 
+test	Run npm test	2026-11-04T16:53:18.7869048Z [2m Test Files [22m [1m[32m11 passed[39m[22m[90m (11)[39m
+test	Run npm test	2026-11-04T16:53:18.7870424Z [2m      Tests [22m [1m[32m113 passed[39m[22m[90m (113)[39m
+test	Run npm test	2026-11-04T16:53:18.7871213Z [2m   Start at [22m 16:53:14
+test	Run npm test	2026-11-04T16:53:18.7872085Z [2m   Duration [22m 4.68s[2m (transform 334ms, setup 0ms, import 765ms, tests 5.70s, environment 1ms)[22m
+test	Run npm test	2026-11-04T16:53:18.7872943Z 
+test	Run npm run build	﻿2026-11-04T16:53:18.8314924Z ##[group]Run npm run build
+test	Run npm run build	2026-11-04T16:53:18.8315173Z [36;1mnpm run build[0m
+test	Run npm run build	2026-11-04T16:53:18.8342847Z shell: /usr/bin/bash -e {0}
+test	Run npm run build	2026-11-04T16:53:18.8343069Z ##[endgroup]
+test	Run npm run build	2026-11-04T16:53:18.9231745Z 
+test	Run npm run build	2026-11-04T16:53:18.9232424Z > repository_prisma@2.0.0 build
+test	Run npm run build	2026-11-04T16:53:18.9232742Z > tsup
+test	Run npm run build	2026-11-04T16:53:18.9232840Z 
+test	Run npm run build	2026-11-04T16:53:19.7291082Z [34mCLI[39m Building entry: src/index.ts
+test	Run npm run build	2026-11-04T16:53:19.7292814Z [34mCLI[39m Using tsconfig: tsconfig.json
+test	Run npm run build	2026-11-04T16:53:19.7293377Z [34mCLI[39m tsup v8.5.1
+test	Run npm run build	2026-11-04T16:53:19.7294184Z [34mCLI[39m Using tsup config: /home/runner/work/repository_prisma/repository_prisma/tsup.config.ts
+test	Run npm run build	2026-11-04T16:53:19.7324266Z [34mCLI[39m Target: es2018
+test	Run npm run build	2026-11-04T16:53:19.7336059Z [34mCLI[39m Cleaning output folder
+test	Run npm run build	2026-11-04T16:53:19.7344073Z [34mCJS[39m Build start
+test	Run npm run build	2026-11-04T16:53:19.7344583Z [34mESM[39m Build start
+test	Run npm run build	2026-11-04T16:53:19.7376798Z [33mCJS[39m [33mYou have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin[39m
+test	Run npm run build	2026-11-04T16:53:19.7378623Z [33mESM[39m [33mYou have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin[39m
+test	Run npm run build	2026-11-04T16:53:19.7628672Z [32mCJS[39m [1mdist/index.js     [22m[32m31.85 KB[39m
+test	Run npm run build	2026-11-04T16:53:19.7629507Z [32mCJS[39m [1mdist/index.js.map [22m[32m64.01 KB[39m
+test	Run npm run build	2026-11-04T16:53:19.7630294Z [32mCJS[39m ⚡️ Build success in 28ms
+test	Run npm run build	2026-11-04T16:53:19.7630760Z [32mESM[39m [1mdist/index.mjs     [22m[32m29.31 KB[39m
+test	Run npm run build	2026-11-04T16:53:19.7631143Z [32mESM[39m [1mdist/index.mjs.map [22m[32m62.79 KB[39m
+test	Run npm run build	2026-11-04T16:53:19.7631453Z [32mESM[39m ⚡️ Build success in 28ms
+test	Run npm run build	2026-11-04T16:53:20.2084097Z [34mDTS[39m Build start
+test	Run npm run build	2026-11-04T16:53:21.7078740Z [32mDTS[39m ⚡️ Build success in 1500ms
+test	Run npm run build	2026-11-04T16:53:21.7093060Z [32mDTS[39m [1mdist/index.d.ts  [22m[32m9.01 KB[39m
+test	Run npm run build	2026-11-04T16:53:21.7093693Z [32mDTS[39m [1mdist/index.d.mts [22m[32m9.01 KB[39m
+test	Post Run actions/setup-node@v5	﻿2026-11-04T16:53:21.7845024Z Post job cleanup.
+test	Post Run actions/setup-node@v5	2026-11-04T16:53:21.8967453Z (node:2612) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+test	Post Run actions/setup-node@v5	2026-11-04T16:53:21.8968672Z (Use `node --trace-deprecation ...` to show where the warning was created)
+test	Post Run actions/setup-node@v5	2026-11-04T16:53:21.9257875Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/repository_prisma/repository_prisma --files-from manifest.txt --use-compress-program zstdmt
+test	Post Run actions/setup-node@v5	2026-11-04T16:53:22.3973017Z (node:2612) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+test	Post Run actions/setup-node@v5	2026-11-04T16:53:23.3894489Z Sent 17170432 of 114270587 (15.0%), 16.4 MBs/sec
+test	Post Run actions/setup-node@v5	2026-11-04T16:53:24.3894936Z Sent 57540608 of 114270587 (50.4%), 27.4 MBs/sec
+test	Post Run actions/setup-node@v5	2026-11-04T16:53:25.3895512Z Sent 97976320 of 114270587 (85.7%), 31.1 MBs/sec
+test	Post Run actions/setup-node@v5	2026-11-04T16:53:26.3897952Z Sent 114270587 of 114270587 (100.0%), 27.2 MBs/sec
+test	Post Run actions/setup-node@v5	2026-11-04T16:53:26.7417009Z Cache saved with the key: node-cache-Linux-x64-npm-0ec990f6a001e08cce687be5d7407e4441a6851063729fd8a8d2b931b73e57b8
+test	Post Run actions/checkout@v5	﻿2026-11-04T16:53:26.7588638Z Post job cleanup.
+test	Post Run actions/checkout@v5	2026-11-04T16:53:26.8315818Z [command]/usr/bin/git version
+test	Post Run actions/checkout@v5	2026-11-04T16:53:26.8343670Z git version 2.56.0
+test	Post Run actions/checkout@v5	2026-11-04T16:53:26.8378329Z Temporarily overriding HOME='/home/runner/work/_temp/e82c37dc-7b72-4f37-9338-477aca8200aa' before making global git config changes
+test	Post Run actions/checkout@v5	2026-11-04T16:53:26.8379386Z Adding repository directory to the temporary git global config as a safe directory
+test	Post Run actions/checkout@v5	2026-11-04T16:53:26.8384386Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/repository_prisma/repository_prisma
+test	Post Run actions/checkout@v5	2026-11-04T16:53:26.8425207Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+test	Post Run actions/checkout@v5	2026-11-04T16:53:26.8459159Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+test	Post Run actions/checkout@v5	2026-11-04T16:53:26.8784308Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test	Post Run actions/checkout@v5	2026-11-04T16:53:26.8808648Z http.https://github.com/.extraheader
+test	Post Run actions/checkout@v5	2026-11-04T16:53:26.8819651Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+test	Post Run actions/checkout@v5	2026-11-04T16:53:26.8858873Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+test	Post Run actions/checkout@v5	2026-11-04T16:53:26.9228039Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+test	Post Run actions/checkout@v5	2026-11-04T16:53:26.9260760Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+test	Complete job	﻿2026-11-04T16:53:26.9663435Z Cleaning up orphan processes
