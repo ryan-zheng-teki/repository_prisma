@@ -1,0 +1,75 @@
+# Fresh consumer from the npm registry: repository_prisma@2.0.0 (published), README setup only. user normy uid 501
+# consumer-setup: dir=/tmp/rel-200/consumer-esm type=module node=v22.23.1 npm=10.9.8 os=Darwin arm64 date=2026-11-04T15:10:37Z
+package type: "module"
+npm config legacy-peer-deps=false
+$ npm install repository_prisma@2.0.0
+npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
+added 45 packages, and audited 46 packages in 5s
+10 packages are looking for funding
+  run `npm fund` for details
+found 0 vulnerabilities
+exit=0
+$ npm install -D prisma@7
+added 135 packages, and audited 181 packages in 5s
+27 packages are looking for funding
+  run `npm fund` for details
+found 0 vulnerabilities
+exit=0
+$ npm ls repository_prisma @prisma/client @prisma/adapter-better-sqlite3 better-sqlite3 prisma
+consumer-esm@1.0.0 /private/tmp/rel-200/consumer-esm
++-- prisma@7.10.1
+| `-- better-sqlite3@12.11.1
+`-- repository_prisma@2.0.0
+  +-- @prisma/adapter-better-sqlite3@7.10.1
+  | `-- better-sqlite3@12.11.1 deduped
+  `-- @prisma/client@7.10.1
+    `-- prisma@7.10.1 deduped
+exit=0
+$ npx prisma generate
+Loaded Prisma config from prisma.config.ts.
+Prisma schema loaded from prisma/schema.prisma.
+✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 44ms
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+exit=0
+$ env DATABASE_URL=file:./app.db npx prisma db push
+Loaded Prisma config from prisma.config.ts.
+Prisma schema loaded from prisma/schema.prisma.
+Datasource "db": SQLite database "app.db" at "file:./app.db"
+SQLite database app.db created at file:./app.db
+🚀  Your database is now in sync with your Prisma schema. Done in 14ms
+┌─────────────────────────────────────────────────────────┐
+│  Update available 7.10.1 -> 8.0.0-rc.30                 │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+exit=0
+grep for adapter imports in consumer code (expect none):
+no adapter import in consumer code
+SETUP-OK
+$ npm ls repository_prisma --json (resolved)
+2.0.0 https://registry.npmjs.org/repository_prisma/-/repository_prisma-2.0.0.tgz
+$ node app.mjs
+PASS opens ./app.db in cwd "/private/tmp/rel-200/consumer-esm/app.db"
+PASS create + findUnique with relation
+PASS update
+PASS delete
+PASS runInTransaction commit
+PASS runInTransaction rollback
+PASS DateTime stored as integer and read back {"t":"integer","c":"integer"}
+non-SQLite error: {"name":"PrismaInitializationError","code":"UNSUPPORTED_DATASOURCE_PROVIDER","message":"repository_prisma supports SQLite datasources only; use a file: URL.","instanceOf":true}
+PASS non-SQLite rejected with UNSUPPORTED_DATASOURCE_PROVIDER
+PASS message says SQLite only "repository_prisma supports SQLite datasources only; use a file: URL."
+PASS message leaks no URL/credentials
+{"result":"pass","checks":{"opens ./app.db in cwd":"pass","create + findUnique with relation":"pass","update":"pass","delete":"pass","runInTransaction commit":"pass","runInTransaction rollback":"pass","DateTime stored as integer and read back":"pass","non-SQLite rejected with UNSUPPORTED_DATASOURCE_PROVIDER":"pass","message says SQLite only":"pass","message leaks no URL/credentials":"pass"}}
+exit=0
+$ DATABASE_URL=file:./app.db node lazy.mjs
+{"DATABASE_URL_kind":"file","outcome":{"ok":true,"count":1}}
+exit=0
+$ DATABASE_URL=postgresql://app_user:s3cr3t-pw@db.internal.example:5432/appdb node lazy.mjs
+{"DATABASE_URL_kind":"postgresql","outcome":{"ok":false,"name":"PrismaInitializationError","code":"UNSUPPORTED_DATASOURCE_PROVIDER","message":"repository_prisma supports SQLite datasources only; use a file: URL.","isInitError":true,"leaks":false}}
+exit=0

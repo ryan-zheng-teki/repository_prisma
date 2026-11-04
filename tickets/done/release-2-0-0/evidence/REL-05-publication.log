@@ -1,0 +1,79 @@
+# Release publication verification — 2026-11-04T15:11:16Z
+$ gh run view 41853928151 (CI on main@c308d3c, before tagging)
+success c308d3c38bc5048a0f836f1a0989be9b7203dca4 https://github.com/ryan-zheng-teki/repository_prisma/actions/runs/41853928151
+
+$ git ls-remote --tags origin refs/tags/v2.0.0 refs/tags/v2.0.0^{}
+75d00bc6315e217a4cfb83f93469c35b7806ae2d	refs/tags/v2.0.0
+c308d3c38bc5048a0f836f1a0989be9b7203dca4	refs/tags/v2.0.0^{}
+
+$ gh run view 41854285574 (Release workflow)
+completed success v2.0.0 c308d3c38bc5048a0f836f1a0989be9b7203dca4 https://github.com/ryan-zheng-teki/repository_prisma/actions/runs/41854285574
+  Set up job: success
+  Run actions/checkout@v4: success
+  Run actions/setup-node@v4: success
+  Ensure npm >= 11.5.1: success
+  Run npm ci: success
+  Run npm run build: success
+  Run npm publish --provenance --access public: success
+  Post Run actions/setup-node@v4: success
+  Post Run actions/checkout@v4: success
+  Complete job: success
+
+$ release log: publish lines
+publish	Set up job	2026-11-04T15:06:31.0849826Z 26.04.1
+publish	Set up job	2026-11-04T15:06:31.0852761Z Version: 20261025.179.1
+publish	Run actions/checkout@v4	2026-11-04T15:06:32.0606772Z git version 2.56.0
+publish	Run actions/checkout@v4	2026-11-04T15:06:32.2375075Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +c308d3c38bc5048a0f836f1a0989be9b7203dca4:refs/tags/v2.0.0
+publish	Run actions/checkout@v4	2026-11-04T15:06:32.7404731Z  * [new ref]         c308d3c38bc5048a0f836f1a0989be9b7203dca4 -> v2.0.0
+publish	Run actions/checkout@v4	2026-11-04T15:06:32.7519288Z [command]/usr/bin/git checkout --progress --force refs/tags/v2.0.0
+publish	Run actions/checkout@v4	2026-11-04T15:06:32.7736457Z HEAD is now at c308d3c chore(release): 2.0.0
+publish	Run actions/setup-node@v4	2026-11-04T15:06:36.9501540Z node: v20.20.2
+publish	Run actions/setup-node@v4	2026-11-04T15:06:36.9502112Z npm: 10.8.2
+publish	Run actions/setup-node@v4	2026-11-04T15:06:36.9502333Z yarn: 1.22.22
+##[group]Run npm --version
+[36;1mnpm --version[0m
+[36;1mnpm --version[0m
+10.8.2
+11.5.1
+npm warn EBADENGINE   package: '@prisma/streams-local@0.1.11',
+✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 72ms
+[34mCLI[39m tsup v8.5.1
+[34mCLI[39m tsup v8.5.1
+✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 64ms
+npm notice
+npm notice 📦  repository_prisma@2.0.0
+npm notice Tarball Contents
+npm notice 3.6kB CHANGELOG.md
+npm notice 18.2kB DESIGN.md
+npm notice 16.2kB README.md
+npm notice 9.2kB dist/index.d.mts
+npm notice 9.2kB dist/index.d.ts
+npm notice 32.6kB dist/index.js
+npm notice 65.5kB dist/index.js.map
+
+$ npm view repository_prisma@2.0.0 ... --prefer-online
+{
+  "version": "2.0.0",
+  "dist.tarball": "https://registry.npmjs.org/repository_prisma/-/repository_prisma-2.0.0.tgz",
+  "dist.integrity": "sha512-yxTBsWmcszKzbPxNSUL9IsSITY6vrBTgTs99sXvgFLxeVycZ6ioOfkBIA6t/VEJpMtoqwoiAgDMqBLWimi/bnQ==",
+  "dist.shasum": "28f6b2044663abefc1b4056cea401409ed2e1b74",
+  "peerDependencies": {
+    "@prisma/client": "^7.10.1",
+    "@prisma/adapter-better-sqlite3": "^7.10.1"
+  },
+  "engines": {
+    "node": "^20.19 || ^22.12 || >=24"
+  },
+  "gitHead": "c308d3c38bc5048a0f836f1a0989be9b7203dca4",
+  "dist.attestations": {
+    "url": "https://registry.npmjs.org/-/npm/v1/attestations/repository_prisma@2.0.0",
+    "provenance": {
+      "predicateType": "https://slsa.dev/provenance/v1"
+    }
+  }
+}
+$ npm view repository_prisma dist-tags --json
+{
+  "latest": "2.0.0"
+}
+Note: the registry served latest=1.0.10 for ~50 s after the publish step (15:09:28Z, 15:09:37Z, 15:09:57Z); from 15:10:17Z latest=2.0.0 (propagation lag).

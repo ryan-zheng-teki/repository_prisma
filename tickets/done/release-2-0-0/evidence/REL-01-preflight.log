@@ -1,0 +1,41 @@
+# Release preflight 2.0.0 — 2026-11-04T15:03:14Z; HEAD 57a104d + release edits (uncommitted)
+# user: uid=501(normy) gid=20(staff) groups=20(staff),12(everyone),61(localaccounts),79(_appserverusr),80(admin),81(_appserveradm),33(_appstore),98(_lpadmin),100(_lpoperator),204(_developer),250(_analyticsusers),395(com.apple.access_ftp),398(com.apple.access_screensharing),399(com.apple.access_ssh),400(com.apple.access_remote_ae),701(com.apple.sharepoint.group.1)
+# node v22.23.1, npm 10.9.8, Darwin arm64
+9 vulnerabilities (2 moderate, 6 high, 1 critical)
+
+To address all issues, run:
+  npm audit fix
+
+Run `npm audit` for details.
+exit=0 (npm ci)
+repository_prisma@2.0.0 /Users/normy/autobyteus_org/worktrees/codex/release-2-0-0
++-- @prisma/adapter-better-sqlite3@7.10.1
++-- @prisma/client@7.10.1
+| `-- prisma@7.10.1 deduped
+`-- prisma@7.10.1
+
+exit=0 (typecheck)
+[2m Test Files [22m [1m[32m11 passed[39m[22m[90m (11)[39m
+[2m      Tests [22m [1m[32m113 passed[39m[22m[90m (113)[39m
+exit=0 (npm test)
+DTS ⚡️ Build success in 979ms
+DTS dist/index.d.ts  9.01 KB
+DTS dist/index.d.mts 9.01 KB
+exit=0 (build)
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","externalDriverAdapter":"pass","noNativeAddonOnImport":"pass","noQueryStringFiles":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-package-smoke-HVIJwP"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-esm-cjs-interop-7hlwH9"}
+exit=0 (test:package, non-root)
+<anonymous_script>:2
+✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 41ms
+^
+
+SyntaxError: Unexpected token '✔', "
+✔ Generate"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at Socket.<anonymous> ([eval]:1:70)
+    at Socket.emit (node:events:531:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:89:21)
+
+Node.js v22.23.1
+diff-check ok

@@ -1,0 +1,69 @@
+# npm pack --dry-run --ignore-scripts
+npm notice 3.6kB CHANGELOG.md
+npm notice 18.2kB DESIGN.md
+npm notice 16.2kB README.md
+npm notice 9.2kB dist/index.d.mts
+npm notice 9.2kB dist/index.d.ts
+npm notice 32.6kB dist/index.js
+npm notice 65.5kB dist/index.js.map
+npm notice 30.0kB dist/index.mjs
+npm notice 64.3kB dist/index.mjs.map
+npm notice 1.6kB package.json
+npm notice name: repository_prisma
+npm notice version: 2.0.0
+npm notice filename: repository_prisma-2.0.0.tgz
+npm notice total files: 10
+# npm audit --omit=dev
+# npm audit report
+
+uuid  13.0.0
+Severity: moderate
+uuid: Missing buffer bounds check in v3/v5/v6 when buf is provided - https://github.com/advisories/GHSA-w5hq-g745-h8pq
+fix available via `npm audit fix`
+node_modules/uuid
+
+1 moderate severity vulnerability
+
+To address all issues, run:
+  npm audit fix
+# npm audit (all)
+@vitest/mocker  <=4.1.11
+Severity: moderate
+fix available via `npm audit fix`
+node_modules/@vitest/mocker
+  node_modules/vitest
+nanoid  <=3.3.17
+Severity: high
+nanoid: non-secure generators can loop indefinitely with negative size - https://github.com/advisories/GHSA-28wg-ghj8-5hjv
+nanoid: custom generators can loop indefinitely when size is zero - https://github.com/advisories/GHSA-2v37-7h3g-55p8
+nanoid: Integer Overflow or Wraparound - https://github.com/advisories/GHSA-xwg4-73v4-xw9w
+fix available via `npm audit fix`
+node_modules/nanoid
+picomatch  4.0.0 - 4.0.3
+Severity: high
+fix available via `npm audit fix`
+node_modules/picomatch
+postcss  <=8.5.22
+Severity: high
+fix available via `npm audit fix`
+node_modules/postcss
+rollup  4.0.0 - 4.58.0
+Severity: high
+fix available via `npm audit fix`
+node_modules/rollup
+source-map-js  1.0.0 - 1.2.1
+Severity: high
+source-map-js allows event-loop denial of service through indexed source-map section offsets - https://github.com/advisories/GHSA-68fv-2mgg-jv7q
+fix available via `npm audit fix`
+node_modules/source-map-js
+uuid  13.0.0
+Severity: moderate
+uuid: Missing buffer bounds check in v3/v5/v6 when buf is provided - https://github.com/advisories/GHSA-w5hq-g745-h8pq
+fix available via `npm audit fix`
+node_modules/uuid
+vite  7.0.0 - 7.3.6
+Severity: high
+launch-editor: NTLMv2 hash disclosure via UNC path handling on Windows - https://github.com/advisories/GHSA-v6wh-96g9-6wx3
+launch-editor: escapeCmdArgs() omits % escaping on Windows - https://github.com/advisories/GHSA-698v-4r3x-3vcv
+launch-editor: Editor CLI flag misinterpretation causing arbitrary command execution for some editors - https://github.com/advisories/GHSA-r825-w8mm-5pxw
+launch-editor: `fs.existsSync()` existence check can be bypassed on Windows - https://github.com/advisories/GHSA-587h-7wmj-h5pm
