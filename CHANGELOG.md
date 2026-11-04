@@ -14,6 +14,14 @@
   consumers' code and the public API are unchanged.
 - `DateTime` values keep their INTEGER unix-millisecond representation
   (`timestampFormat: 'unixepoch-ms'`), so databases written by Prisma 5 need no migration.
+- Transactions stay isolated between concurrent requests, as on Prisma 5: the adapter has one
+  connection, so the library lets one transaction use it at a time. Work outside a transaction
+  waits while another request's transaction is open, and transactions queue. A queued
+  transaction fails with Prisma's `P2028` when its `maxWait` (default 2000 ms) expires; raise it
+  with `runInTransaction(fn, { maxWait })`.
+- **Breaking:** A `rootPrismaClient` call inside a transaction callback (already discouraged) now
+  waits for that transaction, which then fails with Prisma's transaction timeout. Use `prisma` or
+  a repository inside transactions.
 - SQLite URL query parameters no longer affect the connection; they still identify the target.
   The opened file never includes the query string.
 - Repository toolchain: the schema datasource has no `url` (the CLI reads `prisma.config.ts`),

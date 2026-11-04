@@ -116,7 +116,24 @@ The related internal files remain subordinate to this owner:
   `timestampFormat: 'unixepoch-ms'` keeps `DateTime` values as INTEGER unix milliseconds, the
   representation Prisma 5 used. The adapter's default (ISO-8601 text) would make range filters
   and ordering miss rows written by Prisma 5, so existing databases stay directly usable without a
-  migration. The adapter does not know lifecycle state.
+  migration. The adapter does not know lifecycle state. It wraps the adapter in the
+  connection gate.
+- `client/sqlite-connection-gate.ts` keeps transactions isolated on the adapter's single
+  connection. The better-sqlite3 adapter runs every operation of a client on one connection,
+  and only its transactions take the adapter's own lock. Without the gate, a plain query from
+  another request would run inside an open transaction: it would see uncommitted rows, and its
+  writes would be rolled back with that transaction. Prisma 5's engine pool gave such a query its
+  own connection. The gate gives the connection one FIFO lock. A plain `queryRaw`, `executeRaw`
+  or `executeScript` holds it for its call. `startTransaction` takes it, and the transaction
+  releases it exactly once on commit or rollback (even if that fails), or at once if starting
+  fails. Statements of the transaction run under the lock it already holds. The gate has no
+  timeout of its own, and knows no ALS, lifecycle state, target or SQL; Prisma's `maxWait` and
+  `timeout` bound waiting through the transaction. Gating at the adapter, the narrowest layer
+  that sees every database access, also covers Prisma-internal transactions (nested writes) and
+  batch `$transaction([...])`. Prisma's own libsql adapter applies the same rule.
+  Consequences: plain operations wait while a transaction is open, and transactions run one at a
+  time; a queued transaction fails with Prisma's `P2028` after its `maxWait`. A `rootPrismaClient`
+  call inside a transaction callback waits for that transaction, which then times out.
 - `client/sqlite-readiness.ts` owns `PRAGMA database_list`, WAL activation, and the independent
   journal-mode verification. It cannot publish or disconnect a client.
 - `client/initialization-error.ts` owns safe stable codes/messages and guarded opt-in diagnostics. It

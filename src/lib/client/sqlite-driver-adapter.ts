@@ -1,5 +1,9 @@
 import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import type { ResolvedDatasourceTarget } from './datasource-target';
+import {
+  gateSqliteConnection,
+  type SqliteDriverAdapterFactory,
+} from './sqlite-connection-gate';
 
 /**
  * Builds the Prisma 7 driver adapter the library uses to open a resolved SQLite target.
@@ -10,11 +14,15 @@ import type { ResolvedDatasourceTarget } from './datasource-target';
  * - `DateTime` values are stored as INTEGER unix milliseconds, the representation
  *   Prisma 5 used, so rows written before the upgrade keep filtering and ordering
  *   correctly.
+ * - The connection is gated, so work outside a transaction never runs inside another
+ *   request's open transaction (see `sqlite-connection-gate.ts`).
  */
 export const createSqliteDriverAdapter = (
   target: ResolvedDatasourceTarget
-): PrismaBetterSqlite3 =>
-  new PrismaBetterSqlite3(
-    { url: target.kind === 'sqlite-file' ? target.expectedPath : ':memory:' },
-    { timestampFormat: 'unixepoch-ms' }
+): SqliteDriverAdapterFactory =>
+  gateSqliteConnection(
+    new PrismaBetterSqlite3(
+      { url: target.kind === 'sqlite-file' ? target.expectedPath : ':memory:' },
+      { timestampFormat: 'unixepoch-ms' }
+    )
   );

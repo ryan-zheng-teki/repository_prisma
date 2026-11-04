@@ -146,6 +146,19 @@ Nested `runInTransaction` calls reuse the active AsyncLocalStorage transaction r
 than opening another physical transaction. Options on a nested call are ignored because
 the outer transaction boundary remains authoritative.
 
+On Prisma 7 the library's SQLite client uses one database connection. To keep concurrent
+requests isolated, the library lets one transaction use that connection at a time:
+
+- Operations outside a transaction (repositories, `prisma`, `rootPrismaClient`) wait while
+  another request's transaction is open. They never see its uncommitted rows, and their
+  writes are not undone if it rolls back.
+- Transactions queue. A queued transaction fails with Prisma's `P2028` error ("Unable to
+  start a transaction in the given time") when its `maxWait` expires (Prisma's default is
+  2000 ms). If transactions in your application can wait longer, raise it:
+  `runInTransaction(fn, { maxWait: 10_000 })`.
+
+Keep transactions short: while one is open, other database work waits.
+
 ### Optional: Context-Aware Prisma Client (No Repository)
 
 If you want to skip repositories for a quick script or advanced Prisma queries, use the exported
@@ -290,6 +303,9 @@ Type-only Prisma references are kept compile-time-only with explicit `import typ
 
 The exported `rootPrismaClient` is intended for app-level tasks (migrations, health checks, cleanup scripts).
 Avoid using it inside transactional flows, or you will bypass ALS and lose the implicit transaction behavior.
+Do not call it inside a transaction callback: the call waits for that same transaction to end,
+so the transaction fails with Prisma's transaction timeout (`P2028`). The root client keeps working
+afterwards. Use `prisma` or a repository inside transactions instead.
 
 `rootPrismaClient` and the context-aware `prisma` export are stable forwarding boundaries. Captured
 model delegates and methods resolve the current lifecycle/ALS client when invoked, including after
