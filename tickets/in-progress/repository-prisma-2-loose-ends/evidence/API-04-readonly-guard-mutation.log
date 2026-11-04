@@ -1,0 +1,49 @@
+# Case API-04
+# Code commit e213742 (HEAD 4ad013e differs only in tickets/). Scripts: evidence/API-scripts/. Recorded by api_e2e_engineer, 2026-11-04.
+# Temporary mutation in the worktree (restored; git diff empty afterwards). Env: macOS 26.5.2 arm64.
+
+# API-04 guard mutation: the generated child's read-only WAL guard forced to false while the parent decides readonlyWal='pass' (non-root, macOS uid 501); expect the parent's marker assertion to fail
+# Command: node scripts/run-package-smoke.js (dist from npm run build at e213742); Node v22.23.1; 2026-11-04T16:44:54Z
+diff --git a/scripts/run-package-smoke.js b/scripts/run-package-smoke.js
+index 059f9ef..a8e0392 100644
+--- a/scripts/run-package-smoke.js
++++ b/scripts/run-package-smoke.js
+@@ -527,7 +527,7 @@ const repo = require('repository_prisma');
+   assert.equal(String(Object.values(mode[0])[0]).toLowerCase(), 'wal');
+   await repo.shutdownPrisma();
+ 
+-  if (${readonlyWal === 'pass'}) {
++  if (false) {
+     const readonlyDirectory = path.join(${JSON.stringify(temporaryRoot)}, 'readonly-wal');
+     const readonlyDatabase = path.join(readonlyDirectory, ${JSON.stringify(walSecret)});
+     fs.mkdirSync(readonlyDirectory);
+
+$ node scripts/run-package-smoke.js (mutated)
+added 1 package in 208ms
+node:assert:150
+  throw new AssertionError(obj);
+  ^
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+false !== true
+    at Object.<anonymous> (/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-2-loose-ends/scripts/run-package-smoke.js:600:10)
+    at Module._compile (node:internal/modules/cjs/loader:1781:14)
+    at Object..js (node:internal/modules/cjs/loader:1913:10)
+    at Module.load (node:internal/modules/cjs/loader:1505:32)
+    at Function._load (node:internal/modules/cjs/loader:1309:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+    at node:internal/main/run_main_module:36:49 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+Node.js v22.23.1
+mutated-exit=1
+working tree restored (git diff empty for scripts/run-package-smoke.js)
+
+$ node scripts/run-package-smoke.js (restored, control)
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","externalDriverAdapter":"pass","noNativeAddonOnImport":"pass","noQueryStringFiles":"pass","readonlyWal":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-package-smoke-bdyO6Q"}
+restored-exit=0

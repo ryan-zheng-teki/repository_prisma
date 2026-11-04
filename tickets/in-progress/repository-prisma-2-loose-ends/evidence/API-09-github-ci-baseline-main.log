@@ -1,0 +1,36 @@
+# Case API-09
+# Code commit e213742 (HEAD 4ad013e differs only in tickets/). Scripts: evidence/API-scripts/. Recorded by api_e2e_engineer, 2026-11-04.
+# Baseline for AC-001 (pre-change main run). The AC-001 run itself happens after merge (delivery).
+
+# API-09 baseline: latest GitHub CI run on main (aa933e0, before this change); 2026-11-04T16:45:13Z
+$ gh run view 41855325943
+
+✓ main CI · 41855325943
+Triggered via push about 1 hour ago
+
+JOBS
+✓ test in 1m2s (ID 126662270627)
+
+ANNOTATIONS
+! Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+test: .github#2
+
+- "The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748"
+test: .github#1
+
+
+For more information about the job, try: gh run view --job=126662270627
+View this run on GitHub: https://github.com/ryan-zheng-teki/repository_prisma/actions/runs/41855325943
+
+$ gh run view 41855325943 --log | grep -iE "node.js 20|deprecat|node-version|Attempting to download|Found in cache|node: v|^.*node --version"
+test	UNKNOWN STEP	2026-11-04T15:12:38.5137810Z   node-version: 20
+test	UNKNOWN STEP	2026-11-04T15:12:38.6079118Z Attempting to download 20...
+test	UNKNOWN STEP	2026-11-04T15:12:38.6188126Z (node:2146) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+test	UNKNOWN STEP	2026-11-04T15:12:38.6189830Z (Use `node --trace-deprecation ...` to show where the warning was created)
+test	UNKNOWN STEP	2026-11-04T15:12:39.5296358Z Acquiring 20.20.2 - x64 from https://github.com/actions/node-versions/releases/download/20.20.2-23521894959/node-20.20.2-linux-x64.tar.gz
+test	UNKNOWN STEP	2026-11-04T15:12:42.0777204Z ##[group]Environment details
+test	UNKNOWN STEP	2026-11-04T15:12:42.5496463Z (node:2146) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+test	UNKNOWN STEP	2026-11-04T15:12:45.5922317Z npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
+test	UNKNOWN STEP	2026-11-04T15:13:36.1869334Z (node:2760) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+test	UNKNOWN STEP	2026-11-04T15:13:36.1869793Z (Use `node --trace-deprecation ...` to show where the warning was created)
+test	UNKNOWN STEP	2026-11-04T15:13:36.3898793Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

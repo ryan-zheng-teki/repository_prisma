@@ -1,0 +1,74 @@
+# Case API-03
+# Code commit e213742 (HEAD 4ad013e differs only in tickets/). Scripts: evidence/API-scripts/. Recorded by api_e2e_engineer, 2026-11-04.
+# Command: docker run --rm --platform linux/amd64 -e CI=true node:24-bookworm sh node24-steps.sh root-smoke (as ROOT). Source: git archive HEAD.
+
+# mode=root-smoke image=node:24-bookworm node=v24.22.2 npm=11.19.1 arch=x86_64 user=uid=0(root) gid=0(root) groups=0(root) CI=true date=2026-11-04T16:44:50Z
+
+$ npm ci
+npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
+
+> repository_prisma@2.0.0 prepare
+> prisma generate
+
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+
+✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 134ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+
+
+added 273 packages, and audited 274 packages in 18s
+
+47 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+npm warn install-scripts 4 packages have install scripts not yet covered by allowScripts:
+npm warn install-scripts   @prisma/engines@7.10.1 (postinstall: node scripts/postinstall.js)
+npm warn install-scripts   better-sqlite3@12.11.1 (install: prebuild-install || node-gyp rebuild --release)
+npm warn install-scripts   esbuild@0.27.2 (postinstall: node install.js)
+npm warn install-scripts   prisma@7.10.1 (preinstall: node scripts/preinstall-entry.js)
+npm warn install-scripts
+npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.
+exit=0 (npm ci)
+
+$ npm run test:package
+
+> repository_prisma@2.0.0 test:package
+> npm run build && node scripts/run-package-smoke.js && node scripts/run-esm-cjs-interop.js
+
+
+> repository_prisma@2.0.0 build
+> tsup
+
+CLI Building entry: src/index.ts
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.1
+CLI Using tsup config: /root/work/tsup.config.ts
+CLI Target: es2018
+CLI Cleaning output folder
+CJS Build start
+ESM Build start
+CJS You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+ESM You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+ESM dist/index.mjs     29.31 KB
+ESM dist/index.mjs.map 62.79 KB
+ESM ⚡️ Build success in 194ms
+CJS dist/index.js     31.85 KB
+CJS dist/index.js.map 64.01 KB
+CJS ⚡️ Build success in 195ms
+DTS Build start
+DTS ⚡️ Build success in 3162ms
+DTS dist/index.d.ts  9.01 KB
+DTS dist/index.d.mts 9.01 KB
+
+added 1 package in 585ms
+skip: read-only WAL case (running as root; root ignores file permissions)
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","externalDriverAdapter":"pass","noNativeAddonOnImport":"pass","noQueryStringFiles":"pass","readonlyWal":"skipped-root","cleanup":"/tmp/repository-prisma-package-smoke-LmE9Wq"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"/tmp/repository-prisma-esm-cjs-interop-0rTswA"}
+exit=0 (npm run test:package)
+
+ALL-STEPS-FAILED=0

@@ -1,0 +1,65 @@
+# Case API-08
+# Code commit e213742 (HEAD 4ad013e differs only in tickets/). Scripts: evidence/API-scripts/. Recorded by api_e2e_engineer, 2026-11-04.
+# Docs review support checks (the review itself is in the execution report).
+
+# API-08 docs review checks at e213742; 2026-11-04T16:45:30Z
+$ grep -n "^## \|^### E\|sqlite-connection-gate" DESIGN.md (section order; DC-001 "section E above" target)
+3:## 1. Overall Pattern
+17:## 2. File Responsibilities & Architecture
+24:### A. `src/lib/context.ts` (The State Manager)
+43:### B. `src/lib/prisma-manager.ts` (The Client Provider)
+54:### C. `src/lib/decorators.ts` (The API Surface)
+66:### D. `src/lib/base-repository.ts` (The Abstraction)
+80:### E. `src/lib/client.ts` and `src/lib/client/lifecycle.ts` (Root Lifecycle)
+121:- `client/sqlite-connection-gate.ts` keeps transactions isolated on the adapter's single
+149:### Package ESM/CommonJS Boundary
+168:### F. `src/lib/forwarding-proxy.ts` and `src/lib/prisma-proxy.ts` (Access Routing)
+184:## 3. Execution Flows
+186:### Root Initialization and SQLite Readiness
+216:### Transaction Routing
+255:## Design Cases
+261:### DC-001: Single SQLite connection and transaction isolation (Prisma 7 upgrade, CR-001)
+273:- **Fix:** the connection gate (`src/lib/client/sqlite-connection-gate.ts`, section E above), one
+278:## 5. FAQ / Architectural Decisions
+280:### Q: Can I define models as TypeScript Classes (Code-First)?
+288:### Q: Do I need `@Transactional` for every method?
+296:### Q: Do I need to initialize Prisma explicitly?
+307:### Q: How does `@Transactional` work in Node.js?
+317:### Q: Why not use `.delegate` directly?
+324:## 4. Usage Example
+328:### The Setup (Repository Layer)
+340:### The Business Logic (Service Layer)
+
+$ node -p version (package.json)
+2.0.0
+$ git tag --contains e213742 | wc -l
+       0
+
+$ npm ls vitest vite rollup postcss (CHANGELOG claim: vitest 4.1.x and its vite, rollup and postcss chain)
+repository_prisma@2.0.0 /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-2-loose-ends
++-- tsup@8.5.1
+| +-- fix-dts-default-cjs-exports@1.0.1
+| | `-- rollup@4.67.5 deduped
+| +-- postcss-load-config@6.0.1
+| | `-- postcss@8.5.32 deduped
+| +-- postcss@8.5.32
+| `-- rollup@4.67.5
+`-- vitest@4.1.12
+  +-- @vitest/mocker@4.1.12
+  | `-- vite@8.3.5 deduped
+  `-- vite@8.3.5
+    `-- postcss@8.5.32 deduped
+
+
+$ git show aa933e0:package-lock.json | versions of vitest/vite/rollup/postcss before
+node_modules/vitest 4.0.18
+node_modules/vite 7.3.1
+node_modules/rollup 4.56.0
+node_modules/postcss 8.5.6
+node_modules/uuid 13.0.0
+$ (after)
+node_modules/vitest 4.1.12
+node_modules/vite 8.3.5
+node_modules/rollup 4.67.5
+node_modules/postcss 8.5.32
+node_modules/uuid undefined

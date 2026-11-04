@@ -1,0 +1,70 @@
+# Case API-05
+# Code commit e213742 (HEAD 4ad013e differs only in tickets/). Scripts: evidence/API-scripts/. Recorded by api_e2e_engineer, 2026-11-04.
+# Static checks: actionlint (docker rhysd/actionlint:latest), action.yml runs.using for checkout/setup-node v4 and v5 via gh api, npm view.
+
+# API-05 static workflow checks; 2026-11-04T16:43:28Z
+
+$ docker run --rm -v .github/workflows:/repo/.github/workflows:ro -w /repo rhysd/actionlint:latest -color=false -verbose
+Unable to find image 'rhysd/actionlint:latest' locally
+latest: Pulling from rhysd/actionlint
+d36b61b7f131: Pulling fs layer
+326a15d5e1c2: Pulling fs layer
+bf23c343872e: Pulling fs layer
+d8ad8cd72600: Pulling fs layer
+d8ad8cd72600: Download complete
+d8ad8cd72600: Pull complete
+326a15d5e1c2: Download complete
+326a15d5e1c2: Pull complete
+bf23c343872e: Download complete
+bf23c343872e: Pull complete
+d36b61b7f131: Download complete
+d36b61b7f131: Pull complete
+Digest: sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
+Status: Downloaded newer image for rhysd/actionlint:latest
+verbose: Linting all workflow files in repository: /repo
+no project was found in any parent directories of "/repo". check workflows directory is put correctly in your Git repository
+exit=3
+
+$ gh api repos/actions/checkout/contents/action.yml?ref=v4 (runs.using)
+runs:
+  using: node20
+  main: dist/index.js
+
+$ gh api repos/actions/checkout/contents/action.yml?ref=v5 (runs.using)
+runs:
+  using: node24
+  main: dist/index.js
+
+$ gh api repos/actions/setup-node/contents/action.yml?ref=v4 (runs.using)
+runs:
+  using: 'node20'
+  main: 'dist/setup/index.js'
+
+$ gh api repos/actions/setup-node/contents/action.yml?ref=v5 (runs.using)
+runs:
+  using: 'node24'
+  main: 'dist/setup/index.js'
+
+$ npm view 'npm@^11.5.1' version | tail -1
+npm@11.21.1 '11.21.1'
+$ npm view 'npm@11' version | tail -1
+npm@11.21.1 '11.21.1'
+
+# actionlint rerun with explicit files (the first call needs a git root in the container)
+$ docker run --rm -v $PWD/.github:/repo/.github:ro -w /repo rhysd/actionlint:latest -color=false -verbose .github/workflows/ci.yml .github/workflows/release.yml
+verbose: Linting 2 files
+verbose: Linting .github/workflows/ci.yml
+verbose: Found 0 parse errors in 0 ms for .github/workflows/ci.yml
+verbose: Linting .github/workflows/release.yml
+verbose: Found 0 parse errors in 0 ms for .github/workflows/release.yml
+verbose: Found total 0 errors in 24 ms for .github/workflows/ci.yml
+verbose: Found total 0 errors in 27 ms for .github/workflows/release.yml
+verbose: Found 0 errors in 2 files
+exit=0
+
+# control: actionlint on a copy of ci.yml with an unknown input (expect an error)
+.github/workflows/ci.yml:15:11: input "node-versionn" is not defined in action "actions/setup-node@v5". available inputs are "always-auth", "architecture", "cache", "cache-dependency-path", "check-latest", "mirror", "mirror-token", "node-version", "node-version-file", "package-manager-cache", "registry-url", "scope", "token" [action]
+   |
+15 |           node-versionn: 24
+   |           ^~~~~~~~~~~~~~
+exit=1

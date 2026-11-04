@@ -1,0 +1,65 @@
+import { realpathSync } from 'node:fs';
+import { initializePrisma, shutdownPrisma, rootPrismaClient, prisma, runInTransaction, BaseRepository, Models, PrismaInitializationError } from 'repository_prisma';
+const require_realpath = (p) => realpathSync(p);
+class UserRepository extends BaseRepository.forModel(Models.User) {}
+class PostRepository extends BaseRepository.forModel(Models.Post) {}
+class EventRepository extends BaseRepository.forModel(Models.Event) {}
+const users = new UserRepository();
+const posts = new PostRepository();
+const events = new EventRepository();
+const results = {};
+const check = (name, ok, detail) => { results[name] = ok ? 'pass' : 'FAIL'; console.log(`${ok ? 'PASS' : 'FAIL'} ${name}${detail === undefined ? '' : ' ' + JSON.stringify(detail)}`); };
+
+const main = async () => {
+  // README code, unchanged: no driver adapter in consumer code.
+  await initializePrisma({ datasourceUrl: 'file:./app.db' });
+  const [main] = await rootPrismaClient.$queryRawUnsafe('PRAGMA database_list');
+  check('opens ./app.db in cwd', main.file === require_realpath(process.cwd() + '/app.db'), main.file);
+
+  // Repository CRUD
+  const user = await users.create({ data: { email: 'alice@example.test' } });
+  await posts.create({ data: { title: 'hello', authorId: user.id } });
+  const found = await users.findUnique({ where: { email: 'alice@example.test' }, include: { posts: true } });
+  check('create + findUnique with relation', found && found.posts.length === 1 && found.posts[0].title === 'hello');
+  await users.update({ where: { id: user.id }, data: { email: 'alice2@example.test' } });
+  check('update', (await users.findFirst({ where: { id: user.id } })).email === 'alice2@example.test');
+  await posts.deleteMany({ where: { authorId: user.id } });
+  await users.delete({ where: { id: user.id } });
+  check('delete', (await users.count()) === 0 && (await posts.count()) === 0);
+
+  // Implicit transactions: commit and rollback
+  await runInTransaction(async () => {
+    const u = await users.create({ data: { email: 'tx@example.test' } });
+    await posts.create({ data: { title: 'in tx', authorId: u.id } });
+  });
+  check('runInTransaction commit', (await users.count()) === 1 && (await posts.count()) === 1);
+  const rollback = await runInTransaction(async () => {
+    await users.create({ data: { email: 'rolled@example.test' } });
+    throw new Error('rollback on purpose');
+  }).then(() => 'resolved', (error) => error.message);
+  check('runInTransaction rollback', rollback === 'rollback on purpose' && (await users.count({ where: { email: 'rolled@example.test' } })) === 0);
+
+  // prisma proxy and DateTime
+  const when = new Date('2026-01-02T03:04:05.678Z');
+  await prisma.event.create({ data: { label: 'e1', occurredAt: when } });
+  const [stored] = await rootPrismaClient.$queryRawUnsafe('SELECT typeof("occurredAt") AS t, typeof("createdAt") AS c FROM "Event"');
+  const back = await events.findFirst({ where: { label: 'e1' } });
+  check('DateTime stored as integer and read back', stored.t === 'integer' && stored.c === 'integer' && back.occurredAt.toISOString() === when.toISOString(), stored);
+
+  await shutdownPrisma();
+
+  // Unsupported datasource: plain message, no URL or credentials
+  const secretUrl = 'postgresql://app_user:s3cr3t-pw@db.internal.example:5432/appdb';
+  const rejected = await initializePrisma({ datasourceUrl: secretUrl }).then(() => null, (error) => error);
+  const text = rejected ? `${rejected.message} | ${String(rejected)}` : '';
+  console.log('non-SQLite error:', JSON.stringify({ name: rejected && rejected.name, code: rejected && rejected.code, message: rejected && rejected.message, instanceOf: rejected instanceof PrismaInitializationError }));
+  check('non-SQLite rejected with UNSUPPORTED_DATASOURCE_PROVIDER', rejected instanceof PrismaInitializationError && rejected.code === 'UNSUPPORTED_DATASOURCE_PROVIDER');
+  check('message says SQLite only', /SQLite/.test(rejected.message) && /only/.test(rejected.message), rejected.message);
+  check('message leaks no URL/credentials', !/s3cr3t|app_user|db\.internal|postgresql/.test(text));
+  await shutdownPrisma();
+
+  const failed = Object.entries(results).filter(([, v]) => v !== 'pass');
+  console.log(JSON.stringify({ result: failed.length === 0 ? 'pass' : 'fail', checks: results }));
+  process.exitCode = failed.length === 0 ? 0 : 1;
+};
+await main();
