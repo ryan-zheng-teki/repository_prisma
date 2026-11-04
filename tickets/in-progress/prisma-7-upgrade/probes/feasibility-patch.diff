@@ -1,0 +1,91 @@
+--- /Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade/src/lib/client/lifecycle.ts	2026-11-04 12:03:34
++++ src/lib/client/lifecycle.ts	2026-11-04 12:09:17
+@@ -1,4 +1,5 @@
+ import PrismaClientPackage from '@prisma/client';
++import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
+ import type { PrismaClient as PrismaClientType } from '@prisma/client';
+ import type { ResolvedDatasourceTarget } from './datasource-target';
+ import { resolveDatasourceTarget } from './datasource-target';
+@@ -66,7 +67,10 @@
+ 
+ const defaultClientFactory: PrismaClientFactory = (target, logQueries) =>
+   new PrismaClientRuntime({
+-    datasourceUrl: target.clientUrl,
++    adapter: new PrismaBetterSqlite3(
++      { url: target.kind === 'sqlite-file' ? target.expectedPath : ':memory:' },
++      { timestampFormat: 'unixepoch-ms' }
++    ),
+     log: queryLogLevels(logQueries),
+   });
+ 
+--- /Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade/prisma/schema.prisma	2026-11-04 12:03:34
++++ prisma/schema.prisma	2026-11-04 12:04:23
+@@ -4,7 +4,6 @@
+ 
+ datasource db {
+   provider = "sqlite"
+-  url      = env("DATABASE_URL")
+ 
+ }
+ 
+--- /Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade/scripts/run-tests.js	2026-11-04 12:03:34
++++ scripts/run-tests.js	2026-11-04 12:09:17
+@@ -36,6 +36,6 @@
+   }
+ };
+ 
+-run(npxCmd, ['prisma', 'db', 'push', '--skip-generate']);
++run(npxCmd, ['prisma', 'db', 'push']);
+ run(npxCmd, ['prisma', 'generate']);
+ run(npxCmd, ['vitest']);
+--- /Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade/tsup.config.ts	2026-11-04 12:03:34
++++ tsup.config.ts	2026-11-04 12:09:37
+@@ -8,5 +8,5 @@
+   clean: true,
+   target: 'es2018',
+   platform: 'node',
+-  external: ['@prisma/client', 'uuid'],
++  external: ['@prisma/client', '@prisma/adapter-better-sqlite3', 'uuid'],
+ });
+--- /Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade/scripts/run-package-smoke.js	2026-11-04 12:03:34
++++ scripts/run-package-smoke.js	2026-11-04 12:09:37
+@@ -138,6 +138,11 @@
+     path.join(repoRoot, 'node_modules', '@prisma', 'client'),
+     path.join(consumerDirectory, 'node_modules', '@prisma', 'client')
+   );
++  for (const dep of [['@prisma', 'adapter-better-sqlite3'], ['@prisma', 'driver-adapter-utils'], ['@prisma', 'client-runtime-utils'], ['@prisma', 'debug'], ['better-sqlite3'], ['bindings'], ['file-uri-to-path']]) {
++    const target = path.join(repoRoot, 'node_modules', ...dep);
++    const link = path.join(consumerDirectory, 'node_modules', ...dep);
++    if (fs.existsSync(target) && !fs.existsSync(link)) symlinkDirectory(target, link);
++  }
+ 
+   const importCanary = 'repository-prisma-import-canary';
+   const importCanaryKey = 'REPOSITORY_PRISMA_IMPORT_CANARY';
+--- /Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade/src/tests/public-initialization.test.ts	2026-11-04 12:03:34
++++ src/tests/public-initialization.test.ts	2026-11-04 12:09:17
+@@ -11,6 +11,7 @@
+ import path from 'node:path';
+ import { randomUUID } from 'node:crypto';
+ import PrismaClientPackage from '@prisma/client';
++import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
+ import { afterEach, describe, expect, it } from 'vitest';
+ import {
+   initializePrisma,
+@@ -210,7 +211,7 @@
+     const directory = await temporaryDirectory();
+     const databasePath = path.join(directory, 'existing.db');
+     const datasourceUrl = `file:${databasePath}`;
+-    const seedClient = new PrismaClientRuntime({ datasourceUrl });
++    const seedClient = new PrismaClientRuntime({ adapter: new PrismaBetterSqlite3({ url: datasourceUrl }) });
+     await seedClient.$executeRawUnsafe(
+       'CREATE TABLE existing_probe (id INTEGER PRIMARY KEY, value TEXT NOT NULL);'
+     );
+@@ -246,7 +247,7 @@
+     temporaryDirectories.push(directory);
+     const databasePath = path.join(directory, 'als.db');
+     const schemaDatabaseUrl = `file:${databasePath}`;
+-    const schemaClient = new PrismaClientRuntime({ datasourceUrl: schemaDatabaseUrl });
++    const schemaClient = new PrismaClientRuntime({ adapter: new PrismaBetterSqlite3({ url: schemaDatabaseUrl }) });
+     await schemaClient.$executeRawUnsafe(
+       'CREATE TABLE "User" ("id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "email" TEXT NOT NULL);'
+     );
