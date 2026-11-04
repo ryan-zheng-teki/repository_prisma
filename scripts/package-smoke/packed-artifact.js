@@ -11,7 +11,9 @@ const checkPackedArtifact = (context) => {
     { capture: true }
   );
   // `npm pack` runs the `prepare` script (prisma generate), whose output precedes the JSON.
-  const packRecords = JSON.parse(packResult.stdout.slice(packResult.stdout.search(/^\[/m)));
+  // npm 10 and 11 print an array of records; npm 12 prints an object keyed by package name.
+  const packJson = JSON.parse(packResult.stdout.slice(packResult.stdout.search(/^[[{]/m)));
+  const packRecords = Array.isArray(packJson) ? packJson : Object.values(packJson);
   assert.equal(packRecords.length, 1);
   const packRecord = packRecords[0];
   const includedPaths = new Set(packRecord.files.map((file) => file.path));
