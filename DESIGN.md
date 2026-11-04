@@ -252,6 +252,29 @@ sequenceDiagram
     DB-->>User: Return
 ```
 
+## Design Cases
+
+Each case records a design mistake found in this project and what it taught: the problem, how it
+was found, the assumption that was wrong, the fix, and the lesson. Read the cases before designing
+or reviewing a change of the same shape. New cases are appended with the next `DC-` number.
+
+### DC-001: Single SQLite connection and transaction isolation (Prisma 7 upgrade, CR-001)
+
+- **Problem:** On Prisma 7, the better-sqlite3 driver adapter runs every operation of a client on
+  one connection, and only its transactions take the adapter's own lock. A query from another
+  request, outside any transaction, ran inside an open transaction: it read uncommitted rows, and
+  its write was rolled back with that transaction. Prisma 5's engine pool had given it its own
+  connection.
+- **How it was found:** code review reproduced it with two concurrent requests through the public
+  API (one inside `runInTransaction`, one without a transaction), and compared the result with
+  the released 1.0.10.
+- **Wrong assumption:** the first design treated the single connection as a throughput concern
+  outside the library's contract, based on tests that ran requests one after another.
+- **Fix:** the connection gate (`src/lib/client/sqlite-connection-gate.ts`, section E above), one
+  lock per connection that a transaction holds until it ends.
+- **Lesson:** trace each entry form of a mechanism (concurrent as well as sequential requests)
+  through the real dependency before declaring a risk outside the contract.
+
 ## 5. FAQ / Architectural Decisions
 
 ### Q: Can I define models as TypeScript Classes (Code-First)?

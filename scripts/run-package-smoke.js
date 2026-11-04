@@ -496,6 +496,13 @@ process.stdout.write('esm-policy-probe-ok\\n');
   const cjsDatabase = path.join(temporaryRoot, 'consumer-cjs.db');
   const cjsSecret = 'cjs-secret-datasource.db';
   const walSecret = 'readonly-wal-secret.db';
+  // Root ignores file permissions, so the read-only WAL case cannot fail as root.
+  const readonlyWal = process.platform === 'win32'
+    ? 'skipped-win32'
+    : process.getuid?.() === 0 ? 'skipped-root' : 'pass';
+  if (readonlyWal === 'skipped-root') {
+    console.log('skip: read-only WAL case (running as root; root ignores file permissions)');
+  }
   const cjsScript = `
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -520,7 +527,7 @@ const repo = require('repository_prisma');
   assert.equal(String(Object.values(mode[0])[0]).toLowerCase(), 'wal');
   await repo.shutdownPrisma();
 
-  if (process.platform !== 'win32') {
+  if (${readonlyWal === 'pass'}) {
     const readonlyDirectory = path.join(${JSON.stringify(temporaryRoot)}, 'readonly-wal');
     const readonlyDatabase = path.join(readonlyDirectory, ${JSON.stringify(walSecret)});
     fs.mkdirSync(readonlyDirectory);
@@ -558,6 +565,7 @@ const repo = require('repository_prisma');
     const finalMode = await repo.rootPrismaClient.$queryRawUnsafe('PRAGMA journal_mode;');
     assert.equal(String(Object.values(finalMode[0])[0]).toLowerCase(), 'delete');
     await repo.shutdownPrisma();
+    process.stdout.write('readonly-wal-ok\\n');
   }
 
   let unsupported;
@@ -589,6 +597,7 @@ const repo = require('repository_prisma');
     capture: true,
   });
   assert.match(cjsResult.stdout, /cjs-package-smoke-ok/);
+  assert.equal(cjsResult.stdout.includes('readonly-wal-ok'), readonlyWal === 'pass');
   assert.equal(cjsResult.stdout.includes(cjsSecret), false);
   assert.equal(cjsResult.stderr.includes(cjsSecret), false);
   assert.equal(cjsResult.stdout.includes(walSecret), false);
@@ -721,6 +730,7 @@ void PrismaInitializationError;
       externalDriverAdapter: 'pass',
       noNativeAddonOnImport: 'pass',
       noQueryStringFiles: 'pass',
+      readonlyWal,
       cleanup: temporaryRoot,
     })
   );

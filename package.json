@@ -38,9 +38,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "uuid": "^13.0.0"
-  },
   "peerDependencies": {
     "@prisma/adapter-better-sqlite3": "^7.10.1",
     "@prisma/client": "^7.10.1"
@@ -49,10 +46,9 @@
     "@prisma/adapter-better-sqlite3": "^7.10.1",
     "@prisma/client": "^7.10.1",
     "@types/node": "^25.0.10",
-    "@types/uuid": "^10.0.0",
     "prisma": "^7.10.1",
-    "tsup": "^8.5.0",
     "ts-node": "^10.9.2",
+    "tsup": "^8.5.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
   },

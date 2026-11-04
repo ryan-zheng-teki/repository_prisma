@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- Remove the unused `uuid` runtime dependency: consumers no longer install it. No API change.
+- Fix the dev tooling advisories reported by `npm audit` (vitest 4.1.x and its vite, rollup and
+  postcss chain); `npm audit` reports 0 vulnerabilities.
+- CI and the release workflow run on Node 24 (`actions/checkout@v5`, `actions/setup-node@v5`).
+  The release workflow upgrades npm to `^11.5.1` for trusted publishing instead of pinning it.
+- `npm run test:package` passes as root: the read-only WAL case is skipped, with the reason
+  printed, because root ignores file permissions.
+
 ## 2.0.0
 
 - **Breaking:** Requires Prisma 7. The peers are `@prisma/client ^7.10.1` and the new

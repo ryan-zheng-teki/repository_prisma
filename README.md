@@ -364,8 +364,22 @@ The test script normalizes relative `file:` URLs to absolute paths for cross-pla
 
 ## Release (Tag-Based)
 
-We use a tag-based release flow. The tag must match the `version` in `package.json`. Create and
-push the annotated release tag:
+We use a tag-based release flow. Releases are finalized on `main`: the release commit (the
+`version` in `package.json` and `package-lock.json`, plus its `CHANGELOG.md` section) lands on
+`main`, and the tag points to that commit. The tag must match the `version` in `package.json`.
+
+Before tagging, on the release commit, in order:
+
+1. Fresh install: `rm -rf node_modules && npm ci`.
+2. `npm run typecheck`
+3. `npm test`
+4. `npm run build`
+5. `npm run test:package`, as a non-root user. As root, the read-only WAL case is skipped
+   (the smoke prints why and reports `"readonlyWal":"skipped-root"`).
+6. `npm pack --dry-run`: check the file list (`dist`, `README.md`, `DESIGN.md`, `CHANGELOG.md`).
+7. CI is green on `main` for the release commit.
+
+Then create and push the annotated release tag:
 
 ```bash
 git tag -a vX.Y.Z -m "X.Y.Z"
@@ -381,6 +395,10 @@ git push origin main --tags
 
 Pushing a tag like `v1.2.3` triggers GitHub Actions to build and publish.
 Trusted Publishing is enabled for this package.
+
+After publishing, check that the Release workflow succeeded and that
+`npm view repository_prisma dist-tags version` shows the new version (the registry can take about a
+minute). Never move a pushed tag or unpublish a version; fix forward with a new release.
 
 Source changes are not published until this tag-based release flow is explicitly performed; updating
 initialization behavior or documentation alone does not publish a release.
