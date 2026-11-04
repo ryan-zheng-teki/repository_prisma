@@ -1,0 +1,17 @@
+# Delivery rerun on b11d678 — 2026-11-04T16:50:16Z; user normy uid 501; node v22.23.1 npm 10.9.8 Darwin arm64
+  run `npm fund` for details
+
+found 0 vulnerabilities
+exit=0 (npm ci)
+found 0 vulnerabilities
+
+exit=0 (typecheck)
+ Test Files  11 passed (11)
+      Tests  113 passed (113)
+exit=0 (npm test)
+exit=0 (build)
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","externalDriverAdapter":"pass","noNativeAddonOnImport":"pass","noQueryStringFiles":"pass","readonlyWal":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-package-smoke-q0ddmB"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-esm-cjs-interop-1Gg4Ah"}
+exit=0 (test:package)
+diff-check ok
+       1
