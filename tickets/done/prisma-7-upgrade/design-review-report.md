@@ -2,19 +2,24 @@
 
 ## Review Round Meta
 
-- Upstream Requirements Doc: `/Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade/tickets/in-progress/prisma-7-upgrade/requirements-doc.md` (Approved, SR-004)
+- Upstream Requirements Doc: `/Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade/tickets/in-progress/prisma-7-upgrade/requirements-doc.md` (Approved, SR-005)
 - Upstream Investigation Notes: `/Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade/tickets/in-progress/prisma-7-upgrade/investigation-notes.md`
 - Upstream Solution Revision Record: `/Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade/tickets/in-progress/prisma-7-upgrade/solution-revision-record.md`
-- Reviewed Design Spec: `/Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade/tickets/in-progress/prisma-7-upgrade/design-spec.md` (SR-004)
-- Supplemental Task Artifacts Reviewed: `probes/README.md`, the probe files, `probes/feasibility-patch.diff`, `follow-ups.md`
-- Relevant Solution Revision IDs: SR-002 (requirements approval), SR-003 (initial design), SR-004 (AC-006/AC-008 correction and design revision)
+- Reviewed Design Spec: `/Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade/tickets/in-progress/prisma-7-upgrade/design-spec.md` (SR-005)
+- Supplemental Task Artifacts Reviewed: `probes/README.md` (including § CR-001), the probe files, `probes/cr01-connection-gate-prototype.ts.txt`, `probes/cr01-edge-cases.cjs`, `probes/cr01-root-in-transaction.cjs`, `probes/feasibility-patch.diff`, `follow-ups.md`; as context, `code-review-report.md` (CRR-001, CR-001) and `evidence/CR-01-tx-isolation-probe.{cjs,log}`
+- Relevant Solution Revision IDs: SR-002 (requirements approval), SR-003 (initial design), SR-004 (AC-006/AC-008 correction and design revision), SR-005 (connection gate D7, AC-013, SCN-007; triggered by code review CR-001)
 - Architecture Review Revision Record: `/Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade/tickets/in-progress/prisma-7-upgrade/architecture-review-revision-record.md`
-- Current Architecture Review Revision ID: `ARCH-REV-002`
-- Current Review Round: `2`
-- Trigger: Revised package from the Solution Designer at SR-004 (commit `614bac4`, handoff.md "Round 2 Changes")
-- Prior Review Round Reviewed: 1 (ARCH-REV-001, Fail: ARCH-001, ARCH-002)
-- Latest Authoritative Round: 2
-- Current-State Evidence Basis: worktree `codex/prisma-7-upgrade` at `614bac4` (base `f2ffd5c`). Round 2 re-read the SR-004 diff and re-checked the cited `lifecycle.ts:103-121`, `:132-150`, `:283-288` and `logging-policy.test.ts:81-104` against the code. Round 1 read: Read: `src/lib/client/{lifecycle,datasource-target,initialization-error,sqlite-readiness}.ts`, `src/lib/{database,client,models}.ts`, `src/index.ts`, `src/tests/{client-lifecycle,datasource-readiness,public-initialization,logging-policy}.test.ts`, `scripts/*`, `prisma/schema.prisma`, `prisma.config.ts`, `package.json`, `tsup.config.ts`, `.github/workflows/{ci,release}.yml`, README. Adapter source `@prisma/adapter-better-sqlite3@7.10.1` `dist/index.js` (in `/tmp/prisma7-probe`): `timestampFormat` at `:412-419`, `createBetterSQLite3Client` at `:677-683`, the package `exports` with both `require` and `import`.
+- Current Architecture Review Revision ID: `ARCH-REV-003`
+- Current Review Round: `3`
+- Trigger: Revised package from the Solution Designer at SR-005 (commit `779fcb0`, handoff.md "Round 3 Changes"), after code review CRR-001 failed IR-001 (`a092a60`) with CR-001 (Design Impact: transaction isolation on a single SQLite connection)
+- Prior Review Round Reviewed: 2 (ARCH-REV-002, Pass at SR-004)
+- Latest Authoritative Round: 3
+- Current-State Evidence Basis: worktree `codex/prisma-7-upgrade` at `779fcb0` (base `f2ffd5c`; IR-001 at `a092a60`). Round 3 read the SR-005 diff (`f1df63b..779fcb0`) and checked the gate design against these sources (all under `/tmp/prisma7-probe/node_modules`, 7.10.1):
+  - `@prisma/adapter-better-sqlite3` `dist/index.js:515-545` (`queryRaw`/`executeRaw` go through `performIO`/`executeIO` and take no mutex) and `:633-651` (`startTransaction` takes the private mutex, then `BEGIN`).
+  - `@prisma/adapter-libsql` `dist/index-node.js:286-401` (one mutex shared by `performIO`, `executeScript` and `startTransaction`).
+  - The `@prisma/client` runtime `client.js` transaction manager: default `maxWait` 2000 ms; `startTransaction` is raced against `maxWait`; a transaction that starts late is discarded through `ROLLBACK` + `rollback()`.
+  - `src/lib/{context,decorators,prisma-manager,base-repository}.ts`: nested `runInTransaction`/`@Transactional` reuse the ALS transaction, and repositories use `getPrismaClient()`.
+  Round 2: Round 2 re-read the SR-004 diff and re-checked the cited `lifecycle.ts:103-121`, `:132-150`, `:283-288` and `logging-policy.test.ts:81-104` against the code. Round 1 read: Read: `src/lib/client/{lifecycle,datasource-target,initialization-error,sqlite-readiness}.ts`, `src/lib/{database,client,models}.ts`, `src/index.ts`, `src/tests/{client-lifecycle,datasource-readiness,public-initialization,logging-policy}.test.ts`, `scripts/*`, `prisma/schema.prisma`, `prisma.config.ts`, `package.json`, `tsup.config.ts`, `.github/workflows/{ci,release}.yml`, README. Adapter source `@prisma/adapter-better-sqlite3@7.10.1` `dist/index.js` (in `/tmp/prisma7-probe`): `timestampFormat` at `:412-419`, `createBetterSQLite3Client` at `:677-683`, the package `exports` with both `require` and `import`.
 
 ## Routing Classification Review
 
@@ -32,7 +37,10 @@
 - Scope guardrail confirmed: Yes (UC-001..004; out of scope: FU-001..003, schema migration and the consumer upgrade; preserved boundary and review authority as stated).
 - Approved change, preserved behavior, and outside scope understood: Yes.
 - Every prospective blocking `Design Impact` finding is traceable: Yes. The only blocking finding, ARCH-001, is a `Requirement Gap`.
-- Remaining material ambiguity: None. AC-006 now covers SQLite targets only. AC-008 covers every non-SQLite form and lifecycle state, in line with DEC-001.
+- Remaining material ambiguity: None.
+  - AC-006 covers SQLite targets only; AC-008 covers every non-SQLite form and lifecycle state (DEC-001).
+  - AC-013 makes REQ-007's preserved isolation between concurrent requests testable.
+  - SCN-007 is classified Technically Possible but Unsupported. The README already says to avoid `rootPrismaClient` in transactional flows (README "Advanced: Root Client Access"), and its new consequence is documented, not required.
 - Statements about existing code the design relies on, opened at their cited lines:
   - `lifecycle.ts:67-71` factory: confirmed.
   - `datasource-target.ts:91-100`, `:102-111`, `:115-131`: confirmed.
@@ -52,7 +60,8 @@
 | BEH-005 | Contract | Pass | Pass | Pass | Confirmed | — |
 | BEH-006 | Data | Pass | Pass | Pass | Confirmed | Adapter source `:412-419` confirms that `unixepoch-ms` binds `Date` as `getTime()` |
 | BEH-007 | System | Pass | Pass | Pass | Confirmed | The precedence and the bound-client outcome are stated with citations; the AC-008 test plan has 5 cases |
-| BEH-008/009 | Contract | Pass | Pass | Pass | Confirmed | — |
+| BEH-008 | Contract | Pass | Pass | Pass | Confirmed | — |
+| BEH-009 | Contract | Pass | Pass | Pass | Confirmed | SR-005: the CR-001 contradiction is addressed by D7. Every library transaction entry (`runInTransaction` `context.ts:31-43`, `@Transactional` `decorators.ts:18-28`) reuses an existing ALS transaction before starting one, and repositories and `prisma` use `getPrismaClient()`. So no library path calls the gated root connection from inside its own transaction; only SCN-007 (direct `rootPrismaClient`) does. |
 | BEH-010 | Contract | Pass | Pass | Pass | Confirmed | The adapter package exports both `require` and `import` |
 | BEH-011/012 | Operational | Pass | Pass | Pass | Confirmed | — |
 | BEH-013 | Contract | Pass | Pass | Pass | Confirmed | — |
@@ -78,7 +87,8 @@
 | Spine ID | Scope | Spine Is Readable? | Narrative Is Clear? | Facade Vs Governing Owner Is Clear? | Main Domain Subject Naming Is Clear? | One Owner Per Node, In Call Order? | Off-Spine Concerns Stay Off Main Line? | Verdict |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | DS-001 | Explicit init | Pass | Pass | Pass | Pass | Pass (minor: the WAL-provider gate `lifecycle.ts:283` comes before `$connect` and is omitted, but it is unchanged) | Pass | Pass |
-| DS-002 | Lazy bind | Pass | Pass | Pass | Pass | Pass | Pass | Pass |
+| DS-002 | Lazy bind | Pass | Pass | Pass | Pass | Pass | Pass (the gate sits inside the adapter policy, off the main line) | Pass |
+| Gate (bounded local) | Lock lifecycle inside the adapter connection | Pass (in the Off-spine row, the Interface row and the Guidance release paths, not in the Bounded Local Spines section) | Pass | N/A | Pass | Pass. Plain call: acquire, run, release in `finally`. Transaction: acquire, inner `startTransaction` (release on throw), pass-through queries, then `commit`/`rollback` with the release exactly once. | Pass | Pass |
 | DS-003 | Package load | Pass | Pass | N/A | Pass | Pass | Pass | Pass |
 | DS-004 | Toolchain | Pass | Pass | N/A | Pass | Pass | Pass | Pass |
 
@@ -88,6 +98,7 @@
 | --- | --- | --- | --- | --- | --- |
 | `client.ts` -> `PrismaClientLifecycle` | Pass | Pass | Pass | Pass | The target types are internal (not exported from `src/index.ts`), so removing `OtherDatasourceTarget` changes no public export |
 | `sqlite-driver-adapter.ts` | Pass | Pass | Pass | Pass | Only the lifecycle imports it. Tests build their own fixture adapters. |
+| `sqlite-connection-gate.ts` | Pass (`gateSqliteConnection(factory)`) | Pass (the lock and the transaction wrapper are private) | Pass (only `sqlite-driver-adapter.ts` applies it; the lifecycle factory is unchanged) | Pass | No ALS, lifecycle, target or SQL knowledge (forbidden in the design) |
 
 ## Dependency Direction / Forbidden Shortcut Verdict
 
@@ -95,6 +106,7 @@
 | --- | --- | --- | --- | --- | --- |
 | lifecycle -> sqlite-driver-adapter -> adapter package | Pass | Pass | Pass | Pass | — |
 | datasource-target -> initialization-error, database | Pass | Pass | Pass | Pass | No adapter dependency |
+| sqlite-driver-adapter -> sqlite-connection-gate | Pass | Pass (the gate must not know ALS, lifecycle or targets) | Pass | Pass | Gate types come from the adapter package, so there is no new dependency. The prototype imports `@prisma/driver-adapter-utils`, a transitive dependency; the design rightly does not adopt that. |
 
 ## Interface Boundary Verdict
 
@@ -104,6 +116,7 @@
 | `resolveDatasourceTarget(explicitUrl?)` | Pass | Pass | Pass | Low | Pass |
 | `PrismaInitializationErrorCode` + `UNSUPPORTED_DATASOURCE_PROVIDER` | Pass | Pass | N/A | Low | Pass |
 | `PrismaClientFactory` seam | Pass | Pass | Pass | Low | Pass (signature unchanged) |
+| `gateSqliteConnection(factory)` | Pass (one SQLite connection) | Pass | Pass | Low | Pass. It forwards `provider`, `adapterName`, `getConnectionInfo`, `dispose`, savepoints and `options`. |
 
 ## Existing Capability / Subsystem Reuse Verdict
 
@@ -112,6 +125,7 @@
 | Adapter construction | Pass | Pass | Pass (it owns the path/memory mapping and the timestamp-format rule) | Pass | — |
 | Rejection + code | Pass | Pass | N/A | Pass | Extends the existing classification and catalog |
 | Generation in toolchain | Pass | Pass | N/A | Pass | `prepare` covers local, CI and release `npm ci` |
+| Transaction isolation on one connection | Pass. The options were the libsql adapter, proxy/ALS gating, two clients, and accepting the break. | Pass. The rejection reasons are evidence-backed: `:memory:` loss in libsql's local `transaction()`, and proxy gating misses internal and batch transactions and turns `PrismaPromise` into `Promise`. | Pass. It follows Prisma's own libsql rule (verified, `index-node.js:286-401`). | Pass | — |
 
 ## Subsystem / Capability-Area Allocation Verdict
 
@@ -141,7 +155,9 @@ Each domain word keeps one meaning (Principle 15): `Pass`.
 
 | File | Responsibility Is Singular And Clear? | Responsibility Matches The Intended Owner/Boundary? | Re-Tightened After Extraction? | Verdict | Notes |
 | --- | --- | --- | --- | --- | --- |
-| `sqlite-driver-adapter.ts` (Add) | Pass | Pass | N/A | Pass | — |
+| `sqlite-driver-adapter.ts` (Add) | Pass | Pass | N/A | Pass | Applies the gate |
+| `sqlite-connection-gate.ts` (Add, SR-005) | Pass | Pass | N/A | Pass | — |
+| `src/tests/transaction-isolation.test.ts` (Add, SR-005) | Pass | Pass | N/A | Pass | AC-013 cases 1-4, plus gate unit tests with a fake inner adapter |
 | `datasource-target.ts` | Pass | Pass | N/A | Pass | — |
 | `lifecycle.ts` | Pass | Pass | N/A | Pass | Stays under 500 lines |
 | `initialization-error.ts` | Pass | Pass | N/A | Pass | — |
@@ -152,6 +168,7 @@ Each domain word keeps one meaning (Principle 15): `Pass`.
 | Path / Item | Target Placement Is Clear? | Folder Matches Owning Boundary? | Mixed-Layer Or Over-Split Risk | Verdict | Notes |
 | --- | --- | --- | --- | --- | --- |
 | `src/lib/client/sqlite-driver-adapter.ts` | Pass | Pass | Low | Pass | — |
+| `src/lib/client/sqlite-connection-gate.ts` | Pass | Pass | Low | Pass | — |
 
 ## Removal / Decommission Completeness Verdict
 
@@ -179,6 +196,7 @@ Each domain word keeps one meaning (Principle 15): `Pass`.
 | Area | Sequence Is Realistic? | Temporary Seams Are Explicit? | Cleanup / Removal Is Explicit? | Verdict |
 | --- | --- | --- | --- | --- |
 | Manifest -> schema -> runtime -> toolchain -> tests -> docs -> fresh `npm ci` evidence | Pass | Pass (none) | Pass | Pass |
+| SR-005 delta on top of IR-001: add the gate, apply it in `createSqliteDriverAdapter`, add AC-013 and gate unit tests, update docs | Pass | Pass (none) | Pass | Pass |
 
 ## Example Adequacy Verdict
 
@@ -188,7 +206,29 @@ Each domain word keeps one meaning (Principle 15): `Pass`.
 
 ## Material Premise Validation (Only When Needed)
 
-None. No finding or mechanism depends on an assumed scenario.
+### `PREM-001` — A transaction queued behind another longer than its `maxWait` leaks the gate lock
+
+- Related approved requirement or established contract: REQ-007, AC-013 ("two concurrent transactions both complete")
+- Relevant behavior ID(s): BEH-009
+- Initiating basis kind: `System`
+- Independent product-supported initiating trigger: two concurrent requests in a consumer server, each calling `runInTransaction`/`@Transactional` (SCN-001), where the first transaction runs longer than the second's `maxWait` (default 2000 ms)
+- Support evidence: a supported normal workflow (requirements SCN-001, AC-013)
+- Forward path: B calls `$transaction`. Prisma's transaction manager races `adapter.startTransaction` against `maxWait`, and the gate's `startTransaction` waits for A's lock. `maxWait` expires and B rejects with P2028 "Unable to start a transaction in the given time". When A releases, B's late `startTransaction` resolves, and Prisma's discard path runs `executeRaw(ROLLBACK)` and then `rollback()` on it (`client.js` transaction manager, verified).
+- Lifecycle preconditions and material consequence: the gate's transaction wrapper releases the lock on `rollback()`. So the lock is not leaked, provided the wrapper releases on rollback even when the inner rollback throws (the design requires exactly this). B fails with P2028, where on Prisma 5 it could have succeeded on another pooled connection.
+- Reachability: `Reachable`
+- Review consequence / proportionate response: there is no design defect, because the required release-on-rollback path covers it. AC-013's "both complete" holds only when the first transaction ends within the second's `maxWait`. This is recorded as a residual risk with a docs/test recommendation; it is not a blocking finding.
+
+### `PREM-002` — `rootPrismaClient` used inside a transaction callback (SCN-007)
+
+- Related approved requirement or established contract: README "Advanced: Root Client Access" ("Avoid using it inside transactional flows")
+- Relevant behavior ID(s): BEH-009
+- Initiating basis kind: `User` (application code)
+- Independent trigger: an application calls `rootPrismaClient` directly inside a `runInTransaction` callback
+- Support evidence: the README discourages the pattern. FU-001 records that the known consumer must audit for it.
+- Forward path: the root query goes to the gated connection, which waits for the enclosing transaction. Prisma's `timeout` expires and the transaction fails.
+- Lifecycle preconditions and material consequence: the enclosing transaction fails; the root client works afterwards (Measured, `probes/cr01-root-in-transaction.cjs`).
+- Reachability: `Reachable`, but the scenario is `Technically Possible but Unsupported` (requirements SCN-007)
+- Review consequence: no in-scope machinery is required. With one connection, the only alternatives are to join the transaction (the CR-001 leak) or to wait. The consequence is documented in README and CHANGELOG, and the consumer audit is in FU-001.
 
 ## Unresolved Approved-Behavior Or Current-State Gaps
 
@@ -202,7 +242,7 @@ None. No finding or mechanism depends on an assumed scenario.
 
 ## Findings
 
-None open. ARCH-001 and ARCH-002 are resolved at SR-004 (see ARCH-REV-002 in `architecture-review-revision-record.md`).
+None open. ARCH-001 and ARCH-002 stay resolved (ARCH-REV-002). SR-005 adds no new finding (see ARCH-REV-003).
 
 ## Classification
 
@@ -214,15 +254,19 @@ Implementation Engineer (`/software_engineering_team/implementation_engineer`). 
 
 ## Residual Risks
 
-These are non-blocking:
+These are non-blocking recommendations for the implementer and the Solution Designer:
 
-- The AC-008 test-plan header says "all expect `UNSUPPORTED_DATASOURCE_PROVIDER`". Case 5 (shutting-down) expects `CLIENT_NOT_READY`, as its own text and AC-008 say. Follow the case text.
-- The devDependencies shape, the AC-005 raw-SQL fixture and the five README rewrites are now decided in the design.
-- RSK-001 (consumer-built clients with ISO timestamps, FU-001), RSK-002 (native addon on consumer platforms) and the single connection per client stay as the Solution Designer recorded them.
-- Escalation remains as the design states. If implementation finds Prisma 7 behavior that breaks REQ-005/REQ-006 beyond the probes, or a CJS-entry failure, it returns a `Design Impact`.
+- **Queued transactions and `maxWait` (PREM-001).** Under the gate, transactions run one at a time. A queued transaction fails with Prisma's P2028 "Unable to start a transaction in the given time" once its `maxWait` (default 2000 ms) expires.
+  - README/DESIGN should say this, next to the "plain operations wait" text, and point to `runInTransaction(fn, { maxWait })`.
+  - Recommended extra gate test: a queued transaction times out at `maxWait`. Afterwards a plain query and a new transaction succeed, which proves Prisma's discard path released the lock.
+- **SCN-007 (PREM-002).** A direct `rootPrismaClient` call inside a transaction now makes that transaction time out. On 1.0.10, a read ran outside the transaction. The known consumer must audit for this pattern (FU-001).
+- **Bounded Local Spines section.** The design's Bounded Local Spines section still names only the lifecycle state machine. The gate's lock lifecycle is fully specified elsewhere (Off-spine row, Interface row, Guidance release paths). That is sufficient, but listing it there would help readers.
+- **Throughput.** Plain operations now wait while any transaction is open, and read-only transactions no longer run in parallel. This trade-off is documented, and it matches Prisma's own libsql adapter.
+- **Earlier risks.** RSK-001 (consumer-built clients with ISO timestamps, FU-001) and RSK-002 (native addon on consumer platforms) remain as recorded.
+- **Escalation.** It remains as the design states. If implementation finds a Prisma 7 path that issues a plain adapter query while that same request's transaction holds the gate, it returns a `Design Impact`. That would be a deadlock until timeout. The prototype's 96/96 tests and the libsql precedent indicate no such path.
 
 ## Latest Authoritative Result
 
 - Review Decision: `Pass`
-- Material-Premise Gate: `Pass` (no assumed premises)
-- Notes: The behavior basis is confirmed and every structural check passes. The design is ready for implementation at SR-004 (commit `614bac4`).
+- Material-Premise Gate: `Pass` (PREM-001 is Reachable, with no defect, because the required release-on-rollback covers it; PREM-002 is Reachable but Unsupported and documented)
+- Notes: The SR-005 connection gate is the right layer: the narrowest one that sees every database access, including Prisma-internal and batch transactions. Its ownership is clean (inside the adapter policy, with no ALS or lifecycle knowledge), and it matches Prisma's own libsql rule. AC-013 is a valid testable form of the preserved REQ-007. The design is ready for the implementation revision at SR-005 (commit `779fcb0`).

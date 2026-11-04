@@ -1,0 +1,37 @@
+++ npm ls prisma @prisma/client @prisma/adapter-better-sqlite3
+++ head -8
+repository_prisma@1.0.10 /Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade
++-- @prisma/adapter-better-sqlite3@7.10.1
++-- @prisma/client@7.10.1
+| `-- prisma@7.10.1 deduped
+`-- prisma@7.10.1
+
+++ npm run typecheck
+
+> repository_prisma@1.0.10 typecheck
+> tsc -p tsconfig.json
+
+++ echo 'exit=0 (typecheck)'
+exit=0 (typecheck)
+++ env -u DATABASE_URL -u DATABASE_URL_TEST npm test
+++ tail -8
+     [33m[2m✓[22m[39m fails a transaction that uses rootPrismaClient inside its own callback with Prisma's timeout (SCN-007) [33m 1019[2mms[22m[39m
+     [33m[2m✓[22m[39m fails a transaction queued past its maxWait and keeps the connection usable [33m 825[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m11 passed[39m[22m[90m (11)[39m
+[2m      Tests [22m [1m[32m113 passed[39m[22m[90m (113)[39m
+[2m   Start at [22m 14:21:24
+[2m   Duration [22m 3.46s[2m (transform 1.23s, setup 0ms, import 1.73s, tests 3.90s, environment 1ms)[22m
+
+++ echo 'exit=0 (test)'
+exit=0 (test)
+++ npm run build
+++ echo 'exit=0 (build)'
+exit=0 (build)
+++ npm run test:package
+++ tail -3
+added 2 packages in 363ms
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","externalDriverAdapter":"pass","noNativeAddonOnImport":"pass","noQueryStringFiles":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-package-smoke-rj4SrC"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-esm-cjs-interop-gwHRx6"}
+++ echo 'exit=0 (test:package)'
+exit=0 (test:package)

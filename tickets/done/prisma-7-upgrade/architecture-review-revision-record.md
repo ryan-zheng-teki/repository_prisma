@@ -8,6 +8,7 @@ The latest `design-review-report.md` remains authoritative.
 | --- | --- | --- | --- | --- | --- |
 | ARCH-REV-001 | Round 1 / Architecture Design Complete | SR-002, SR-003 | N/A | Fail | ARCH-001, ARCH-002 |
 | ARCH-REV-002 | Round 2 / Revised package at SR-004 | SR-004 | Fail | Pass | ARCH-001, ARCH-002 (resolved) |
+| ARCH-REV-003 | Round 3 / SR-005 after code review CR-001 | SR-005 | Pass | Pass | None new |
 
 ## Revision Entries
 
@@ -51,3 +52,34 @@ None.
 - Material classification changes: None (Medium / High)
 - Recommended recipient: Implementation Engineer; the Solution Designer gets an informational notification
 - Remaining risks or uncertainty: The AC-008 test-plan header says "all expect `UNSUPPORTED_DATASOURCE_PROVIDER`", but case 5 expects `CLIENT_NOT_READY`; follow the case text. RSK-001 and RSK-002 remain as recorded.
+
+### ARCH-REV-003: Review of the SR-005 SQLite connection gate (after code review CR-001)
+
+- Canonical design review report: `/Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade/tickets/in-progress/prisma-7-upgrade/design-review-report.md`
+- Review round and trigger: Round 3. Code review CRR-001 failed IR-001 (`a092a60`) with CR-001 (Design Impact). The Solution Designer then revised the package to SR-005 (commit `779fcb0`, `handoff.md` "Round 3 Changes").
+- Triggering role, report path, and finding IDs: Solution Designer (SR-005), in response to the code reviewer's `code-review-report.md`, CR-001. No architecture finding triggered this round.
+- Relevant solution revision IDs: SR-005
+- Prior authoritative decision: `Pass` (ARCH-REV-002, SR-004)
+- Current authoritative decision: `Pass`
+- What changed in the review result:
+  - The new connection gate (D7), AC-013 and SCN-007 were reviewed against the adapter and Prisma runtime sources.
+  - Verified: better-sqlite3 plain IO skips the mutex; the libsql adapter shares one mutex; Prisma races `startTransaction` against `maxWait` and discards late transactions by rollback.
+  - Verified: the library's transaction entries reuse an existing ALS transaction.
+  - Added verdict rows for the gate. Recorded PREM-001 (Reachable, covered by the required release-on-rollback, so no defect) and PREM-002 (SCN-007, Reachable but Unsupported, documented).
+  - Unaffected verdicts from ARCH-REV-002 stay valid.
+  - SR-003's single-connection risk statement, which ARCH-REV-001/002 accepted as a throughput matter, was wrong. This round corrects that review gap.
+
+#### Prior Finding Resolution
+
+| Finding ID | Prior Status | Current Status | Related Revision References | Verification Evidence |
+| --- | --- | --- | --- | --- |
+| ARCH-001 | Resolved (ARCH-REV-002) | Resolved | SR-004, SR-005 | AC-006/AC-008 unchanged in SR-005 |
+| ARCH-002 | Resolved (ARCH-REV-002) | Resolved | SR-004 | Unchanged |
+
+- New or remaining finding IDs: None
+- Material classification changes: None (Medium / High)
+- Recommended recipient: Implementation Engineer (implementation revision at SR-005); the Solution Designer gets an informational notification
+- Remaining risks or uncertainty:
+  - Document `maxWait`/P2028 for queued transactions, and add a lock-release test for a transaction that times out at `maxWait` (PREM-001).
+  - SCN-007 consumer audit (FU-001).
+  - List the gate under Bounded Local Spines (optional).
