@@ -1,0 +1,1 @@
+{ "compilerOptions": { "target": "ES2022", "module": "CommonJS", "moduleResolution": "Node10", "strict": true, "noEmit": true, "experimentalDecorators": true, "skipLibCheck": false, "types": [], "esModuleInterop": true }, "files": ["app-types.ts"] }

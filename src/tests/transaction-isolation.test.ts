@@ -5,6 +5,10 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { initializePrisma, rootPrismaClient, shutdownPrisma } from '../lib/client';
 import { runInTransaction } from '../lib/context';
 import { prisma } from '../lib/prisma-proxy';
+import { BaseRepository } from '../lib/base-repository';
+import { Models } from '../lib/models';
+
+class UserRepository extends BaseRepository.forModel(Models.User) {}
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -130,6 +134,66 @@ describe.sequential('transaction isolation between concurrent requests on one SQ
       'batch-2@example.test',
       'interactive@example.test',
     ]);
+  });
+
+  it('keeps concurrent plain requests isolated and loses no writes while transactions commit and roll back', async () => {
+    await initializeDatabase();
+    const users = new UserRepository();
+    const plainCount = 30;
+    const transactionCount = 6;
+
+    // Odd-numbered transactions roll back, so their rows must never be seen or kept.
+    const transactions = Array.from({ length: transactionCount }, (_, index) =>
+      (async () => {
+        await sleep(index * 15);
+        await runInTransaction(async () => {
+          await users.create({ data: { email: `tx-${index}@example.test` } });
+          await sleep(25);
+          await prisma.user.create({ data: { email: `tx-${index}-second@example.test` } });
+          if (index % 2 === 1) {
+            throw new Error(`rollback ${index}`);
+          }
+        });
+      })()
+    );
+    // Plain requests rotate through the three public ways to reach the root client.
+    const plainRequests = Array.from({ length: plainCount }, (_, index) =>
+      (async () => {
+        await sleep(index * 4);
+        const read =
+          index % 3 === 0
+            ? users.findMany({ select: { email: true } })
+            : index % 3 === 1
+              ? prisma.user.findMany({ select: { email: true } })
+              : rootPrismaClient.user.findMany({ select: { email: true } });
+        const seen = (await read).map((user: { email: string }) => user.email);
+        const data = { email: `plain-${index}@example.test` };
+        await (index % 2 === 0 ? users.create({ data }) : prisma.user.create({ data }));
+        return seen;
+      })()
+    );
+
+    const transactionResults = await Promise.allSettled(transactions);
+    const seenByPlainRequests = (await Promise.all(plainRequests)).flat();
+
+    const rolledBack = (email: string) => /^tx-[135](-second)?@/.test(email);
+    expect(transactionResults.map((result) => result.status)).toEqual([
+      'fulfilled',
+      'rejected',
+      'fulfilled',
+      'rejected',
+      'fulfilled',
+      'rejected',
+    ]);
+    expect(seenByPlainRequests.filter(rolledBack)).toEqual([]);
+    const expected = [
+      ...Array.from({ length: plainCount }, (_, index) => `plain-${index}@example.test`),
+      ...[0, 2, 4].flatMap((index) => [
+        `tx-${index}@example.test`,
+        `tx-${index}-second@example.test`,
+      ]),
+    ].sort();
+    expect((await emails()).sort()).toEqual(expected);
   });
 
   it('fails a transaction that uses rootPrismaClient inside its own callback with Prisma\'s timeout (SCN-007)', async () => {

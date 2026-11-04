@@ -1,0 +1,88 @@
+# Case API-06
+# Code commit e5d2371 (HEAD f91b676; HEAD differs only in tickets/). Tarball: npm pack of the worktree build, repository_prisma-1.0.10.tgz sha256 f0fb025f71c2f2895e28e42a83f726fc65f6ac1ef564d665ff0f524ebcb2152a. Scripts: evidence/API-scripts/. Recorded by api_e2e_engineer, 2026-11-04.
+# Steps: consumer-setup.sh <tgz> /tmp/rp-e2e/consumer-cjs commonjs, node app.cjs, lazy.cjs with file: and postgresql DATABASE_URL. Env ENV-1.
+
+# consumer-setup: dir=/tmp/rp-e2e/consumer-cjs type=commonjs node=v22.23.1 npm=10.9.8 os=Darwin arm64 date=2026-11-04T13:08:04Z
+package type: "commonjs"
+npm config legacy-peer-deps=false
+
+$ npm install /tmp/rp-e2e/pack/repository_prisma-1.0.10.tgz
+npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
+
+added 45 packages, and audited 46 packages in 2s
+
+10 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+exit=0
+
+$ npm install -D prisma@7
+
+added 135 packages, and audited 181 packages in 4s
+
+27 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+exit=0
+
+$ npm ls repository_prisma @prisma/client @prisma/adapter-better-sqlite3 better-sqlite3 prisma
+consumer-cjs@1.0.0 /private/tmp/rp-e2e/consumer-cjs
++-- prisma@7.10.1
+| `-- better-sqlite3@12.11.1
+`-- repository_prisma@1.0.10
+  +-- @prisma/adapter-better-sqlite3@7.10.1
+  | `-- better-sqlite3@12.11.1 deduped
+  `-- @prisma/client@7.10.1
+    `-- prisma@7.10.1 deduped
+
+exit=0
+
+$ npx prisma generate
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+
+✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 45ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+
+exit=0
+
+$ env DATABASE_URL=file:./app.db npx prisma db push
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+Datasource "db": SQLite database "app.db" at "file:./app.db"
+
+SQLite database app.db created at file:./app.db
+
+🚀  Your database is now in sync with your Prisma schema. Done in 15ms
+
+exit=0
+grep for adapter imports in consumer code (expect none):
+no adapter import in consumer code
+SETUP-OK
+
+$ node app.cjs
+PASS opens ./app.db in cwd "/private/tmp/rp-e2e/consumer-cjs/app.db"
+PASS create + findUnique with relation
+PASS update
+PASS delete
+PASS runInTransaction commit
+PASS runInTransaction rollback
+PASS DateTime stored as integer and read back {"t":"integer","c":"integer"}
+non-SQLite error: {"name":"PrismaInitializationError","code":"UNSUPPORTED_DATASOURCE_PROVIDER","message":"repository_prisma supports SQLite datasources only; use a file: URL.","instanceOf":true}
+PASS non-SQLite rejected with UNSUPPORTED_DATASOURCE_PROVIDER
+PASS message says SQLite only "repository_prisma supports SQLite datasources only; use a file: URL."
+PASS message leaks no URL/credentials
+{"result":"pass","checks":{"opens ./app.db in cwd":"pass","create + findUnique with relation":"pass","update":"pass","delete":"pass","runInTransaction commit":"pass","runInTransaction rollback":"pass","DateTime stored as integer and read back":"pass","non-SQLite rejected with UNSUPPORTED_DATASOURCE_PROVIDER":"pass","message says SQLite only":"pass","message leaks no URL/credentials":"pass"}}
+app-exit=0
+$ DATABASE_URL=file:./app.db node lazy.cjs
+{"DATABASE_URL_kind":"file","outcome":{"ok":true,"count":1}}
+exit=0
+$ DATABASE_URL=postgresql://app_user:s3cr3t-pw@db.internal.example:5432/appdb node lazy.cjs
+{"DATABASE_URL_kind":"postgresql","outcome":{"ok":false,"name":"PrismaInitializationError","code":"UNSUPPORTED_DATASOURCE_PROVIDER","message":"repository_prisma supports SQLite datasources only; use a file: URL.","isInitError":true,"leaks":false}}
+exit=0

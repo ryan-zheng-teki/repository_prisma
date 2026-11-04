@@ -1,0 +1,32 @@
+# Case API-04
+# Code commit e5d2371 (HEAD f91b676; HEAD differs only in tickets/). Tarball: npm pack of the worktree build, repository_prisma-1.0.10.tgz sha256 f0fb025f71c2f2895e28e42a83f726fc65f6ac1ef564d665ff0f524ebcb2152a. Scripts: evidence/API-scripts/. Recorded by api_e2e_engineer, 2026-11-04.
+# Control: base 1.0.10 (f2ffd5c) npm ci + npm run test:package as ROOT in node:20-bookworm (base-root-smoke.sh), to classify the root-only smoke failure. (The final 'test:package exit=0' line is the exit of tail, not of npm.)
+
+# Base 1.0.10 (f2ffd5c) test:package as root; node v20.20.2; uid=0(root) gid=0(root) groups=0(root); 2026-11-04T13:10:30Z
+npm ci exit=0
+prisma:info Starting a sqlite pool with 21 connections.
+prisma:info Starting a sqlite pool with 21 connections.
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+false !== true
+
+    at /tmp/repository-prisma-package-smoke-Snxjno/consumer/cjs-smoke.cjs:49:12 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: 'strictEqual'
+}
+
+    at run (/work/scripts/run-package-smoke.js:31:11)
+    at Object.<anonymous> (/work/scripts/run-package-smoke.js:532:21)
+    at Module._compile (node:internal/modules/cjs/loader:1521:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+    at Module.load (node:internal/modules/cjs/loader:1266:32)
+    at Module._load (node:internal/modules/cjs/loader:1091:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12)
+    at node:internal/main/run_main_module:28:49
+
+Node.js v20.20.2
+test:package exit=0

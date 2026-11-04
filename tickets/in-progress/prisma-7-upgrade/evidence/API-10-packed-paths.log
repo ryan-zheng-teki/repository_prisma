@@ -1,0 +1,14 @@
+# Case API-10
+# Code commit e5d2371 (HEAD f91b676; HEAD differs only in tickets/). Tarball: npm pack of the worktree build, repository_prisma-1.0.10.tgz sha256 f0fb025f71c2f2895e28e42a83f726fc65f6ac1ef564d665ff0f524ebcb2152a. Scripts: evidence/API-scripts/. Recorded by api_e2e_engineer, 2026-11-04.
+# Steps: cwd /tmp/rp-e2e/path-probe; node /tmp/rp-e2e/consumer-esm/path-probe.mjs. Env ENV-1.
+
+# API-10 AC-004 through the packed ESM entry (consumer-esm install); cwd=/tmp/rp-e2e/path-probe; macOS Node v22.23.1; 2026-11-04T13:12:04Z
+$ node /tmp/rp-e2e/consumer-esm/path-probe.mjs
+PASS relative with spaces + query: url="file:./data dir/app one.db?connection_limit=1" main="<cwd>/data dir/app one.db"
+PASS literal %20 + query: url="file:./data dir/literal%20name.db?socket_timeout=5&connection_limit=1" main="<cwd>/data dir/literal%20name.db" decodedNameExists=false
+PASS symlink alias + query: url="file:./alias.db?connection_limit=1" main="<cwd>/physical.db"
+PASS absolute with spaces + query + WAL: url="file:<cwd>/abs space dir/abs db.db?connection_limit=1" main="<cwd>/abs space dir/abs db.db"
+files whose name contains "?": []
+tree: ["abs space dir","abs space dir/abs db.db","alias.db","data dir","data dir/app one.db","data dir/literal%20name.db","physical.db"]
+{"result":"pass"}
+exit=0

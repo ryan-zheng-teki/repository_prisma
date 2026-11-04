@@ -1,0 +1,53 @@
+# API-03 repository checks after API-02 (AC-010 repo side, all suites)
+# Commands: npm run typecheck; npm test (DATABASE_URL_TEST unset); then 10 repeated runs of transaction-isolation.test.ts
+# Commit: e5d2371 (+ API-02 test change in working tree); Env: ENV-1 macOS 26.5.2 arm64, Node v22.23.1, npm 10.9.8; Date: 2026-11-04T13:05:20Z
+
+$ npm run typecheck
+
+> repository_prisma@1.0.10 typecheck
+> tsc -p tsconfig.json
+
+typecheck-exit=0
+
+$ npm test
+
+> repository_prisma@1.0.10 test
+> node scripts/run-tests.js
+
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+Datasource "db": SQLite database "test.db" at "file:///Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade/test.db"
+
+The database is already in sync with the Prisma schema.
+
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+
+✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 50ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+
+
+ RUN  v4.0.18 /Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade
+
+
+ Test Files  11 passed (11)
+      Tests  113 passed (113)
+   Start at  14:05:24
+   Duration  3.38s (transform 1.26s, setup 0ms, import 1.77s, tests 3.75s, environment 1ms)
+
+npm-test-exit=0
+
+repeat 1:       Tests  7 passed (7)
+repeat 2:       Tests  7 passed (7)
+repeat 3:       Tests  7 passed (7)
+repeat 4:       Tests  7 passed (7)
+repeat 5:       Tests  7 passed (7)
+repeat 6:       Tests  7 passed (7)
+repeat 7:       Tests  7 passed (7)
+repeat 8:       Tests  7 passed (7)
+repeat 9:       Tests  7 passed (7)
+repeat 10:       Tests  7 passed (7)

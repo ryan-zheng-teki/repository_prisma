@@ -1,0 +1,49 @@
+# API-02 mutation check: createSqliteDriverAdapter returns the UNGATED adapter (gateSqliteConnection replaced by identity); only the new load test runs
+# Command: npx vitest run src/tests/transaction-isolation.test.ts -t 'loses no writes'
+# Commit: e5d2371 + API-02 test + temporary mutation (restored afterwards); Env: ENV-1; Date: 2026-11-04T13:05:11Z
+ src/lib/client/sqlite-driver-adapter.ts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+ RUN  v4.0.18 /Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade
+ ❯ src/tests/transaction-isolation.test.ts (7 tests | 1 failed | 6 skipped) 234ms
+     ↓ keeps a request without a transaction out of another request's open transaction
+     ↓ commits two concurrent transactions
+     ↓ runs a nested write concurrently with an interactive transaction
+     ↓ runs a batch transaction concurrently with an interactive transaction
+     × keeps concurrent plain requests isolated and loses no writes while transactions commit and roll back 233ms
+     ↓ fails a transaction that uses rootPrismaClient inside its own callback with Prisma's timeout (SCN-007)
+     ↓ fails a transaction queued past its maxWait and keeps the connection usable
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/tests/transaction-isolation.test.ts > transaction isolation between concurrent requests on one SQLite file > keeps concurrent plain requests isolated and loses no writes while transactions commit and roll back
+AssertionError: expected [ 'tx-1@example.test', …(11) ] to deeply equal []
+- Expected
++ Received
+- []
++ [
++   "tx-1@example.test",
++   "tx-1@example.test",
++   "tx-1@example.test",
++   "tx-1@example.test",
++   "tx-1@example.test",
++   "tx-1@example.test",
++   "tx-1@example.test",
++   "tx-3@example.test",
++   "tx-3@example.test",
++   "tx-3@example.test",
++   "tx-3@example.test",
++   "tx-3@example.test",
++ ]
+ ❯ src/tests/transaction-isolation.test.ts:188:52
+    186|       'rejected',
+    187|     ]);
+    188|     expect(seenByPlainRequests.filter(rolledBack)).toEqual([]);
+       |                                                    ^
+    189|     const expected = [
+    190|       ...Array.from({ length: plainCount }, (_, index) => `plain-${ind…
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 skipped (7)
+   Start at  14:05:11
+   Duration  509ms (transform 119ms, setup 0ms, import 175ms, tests 234ms, environment 0ms)
+mutation-run-exit=1
+working tree restored (git diff empty for src/lib/client/sqlite-driver-adapter.ts)

@@ -1,0 +1,21 @@
+# API-02 durable load test (AC-013)
+# Command: npx vitest run src/tests/transaction-isolation.test.ts --reporter=verbose
+# Commit: e5d2371 + API-02 working-tree test change; Env: ENV-1 macOS 26.5.2 arm64, Node v22.23.1, npm 10.9.8; Date: 2026-11-04T13:04:58Z
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade[39m
+
+ [32m✓[39m src/tests/transaction-isolation.test.ts[2m > [22mtransaction isolation between concurrent requests on one SQLite file[2m > [22mkeeps a request without a transaction out of another request's open transaction[33m 385[2mms[22m[39m
+ [32m✓[39m src/tests/transaction-isolation.test.ts[2m > [22mtransaction isolation between concurrent requests on one SQLite file[2m > [22mcommits two concurrent transactions[32m 221[2mms[22m[39m
+ [32m✓[39m src/tests/transaction-isolation.test.ts[2m > [22mtransaction isolation between concurrent requests on one SQLite file[2m > [22mruns a nested write concurrently with an interactive transaction[32m 217[2mms[22m[39m
+ [32m✓[39m src/tests/transaction-isolation.test.ts[2m > [22mtransaction isolation between concurrent requests on one SQLite file[2m > [22mruns a batch transaction concurrently with an interactive transaction[32m 210[2mms[22m[39m
+ [32m✓[39m src/tests/transaction-isolation.test.ts[2m > [22mtransaction isolation between concurrent requests on one SQLite file[2m > [22mkeeps concurrent plain requests isolated and loses no writes while transactions commit and roll back[32m 192[2mms[22m[39m
+ [32m✓[39m src/tests/transaction-isolation.test.ts[2m > [22mtransaction isolation between concurrent requests on one SQLite file[2m > [22mfails a transaction that uses rootPrismaClient inside its own callback with Prisma's timeout (SCN-007)[33m 1013[2mms[22m[39m
+ [32m✓[39m src/tests/transaction-isolation.test.ts[2m > [22mtransaction isolation between concurrent requests on one SQLite file[2m > [22mfails a transaction queued past its maxWait and keeps the connection usable[33m 809[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m7 passed[39m[22m[90m (7)[39m
+[2m   Start at [22m 14:04:59
+[2m   Duration [22m 3.69s[2m (transform 483ms, setup 0ms, import 535ms, tests 3.05s, environment 0ms)[22m
+
+exit=0

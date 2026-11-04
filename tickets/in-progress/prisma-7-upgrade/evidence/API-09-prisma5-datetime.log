@@ -1,0 +1,87 @@
+# Case API-09
+# Code commit e5d2371 (HEAD f91b676; HEAD differs only in tickets/). Tarball: npm pack of the worktree build, repository_prisma-1.0.10.tgz sha256 f0fb025f71c2f2895e28e42a83f726fc65f6ac1ef564d665ff0f524ebcb2152a. Scripts: evidence/API-scripts/. Recorded by api_e2e_engineer, 2026-11-04.
+# Steps: Prisma 5.22.0 project: db push + probes/datetime-continuity-write-p5.cjs + dt-write-p5-more.cjs; consumer-dt (README setup, Prisma 7.10.1): dt-read-p7.mjs; Prisma 5.22 dt-read-p5.cjs. Env ENV-1.
+
+# API-09 AC-005 with a database created and written by Prisma 5.22.0, opened by the packed library on Prisma 7.10.1; macOS Node v22.23.1; 2026-11-04T13:11:28Z
+$ npm install prisma@5.22.0 @prisma/client@5.22.0
+
+found 0 vulnerabilities
+$ DATABASE_URL=file:/tmp/rp-e2e/p5/dt.db npx prisma db push  (Prisma prisma                  : 5.22.0)
+SQLite database dt.db created at file:/tmp/rp-e2e/p5/dt.db
+🚀  Your database is now in sync with your Prisma schema. Done in 11ms
+[2K[1A[2K[G✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 41ms
+exit=0
+$ node datetime-continuity-write-p5.cjs (ticket probe)
+[
+  {
+    id: 1,
+    label: 'p5',
+    t: 'integer',
+    at: 2026-01-02T03:04:05.678Z,
+    tc: 'integer'
+  }
+]
+[
+  {
+    id: 1,
+    label: 'p5',
+    createdAt: 2026-11-04T13:11:34.650Z,
+    at: 2026-01-02T03:04:05.678Z
+  }
+]
+exit=0
+$ node dt-write-p5-more.cjs
+[
+  {
+    id: 1,
+    label: 'p5',
+    t: 'integer',
+    at: 2026-01-02T03:04:05.678Z,
+    tc: 'integer'
+  },
+  {
+    id: 2,
+    label: 'p5-2025-06',
+    t: 'integer',
+    at: 2025-06-01T12:00:00.000Z,
+    tc: 'integer'
+  },
+  {
+    id: 3,
+    label: 'p5-2026-03',
+    t: 'integer',
+    at: 2026-03-15T08:30:00.250Z,
+    tc: 'integer'
+  }
+]
+exit=0
+
+# consumer-dt: README setup on Prisma 7 from the tarball, then the probe schema with the datasource url removed
+consumer-setup exit=0 (1 SETUP-OK)
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "sqlite"
+}
+model Event {
+  id        Int      @id @default(autoincrement())
+  label     String
+  createdAt DateTime @default(now())
+  at        DateTime
+}
+✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 51ms
+$ node dt-read-p7.mjs /tmp/rp-e2e/p5/dt.db
+PASS reads Prisma-5 rows as the same instants [{"label":"p5","at":"2026-01-02T03:04:05.678Z"},{"label":"p5-2025-06","at":"2025-06-01T12:00:00.000Z"},{"label":"p5-2026-03","at":"2026-03-15T08:30:00.250Z"}]
+PASS equality filter matches a Prisma-5 row [{"label":"p5"}]
+PASS all rows stored as integer (at and createdAt) [{"label":"p5","t":"integer","tc":"integer"},{"label":"p5-2025-06","t":"integer","tc":"integer"},{"label":"p5-2026-03","t":"integer","tc":"integer"},{"label":"p7-lib","t":"integer","tc":"integer"}]
+PASS gt returns old and new rows [{"label":"p5"},{"label":"p5-2026-03"},{"label":"p7-lib"}]
+PASS lt returns the expected rows [{"label":"p5-2025-06"},{"label":"p5"},{"label":"p5-2026-03"}]
+PASS orderBy across old and new rows [{"label":"p7-lib"},{"label":"p5-2026-03"},{"label":"p5"},{"label":"p5-2025-06"}]
+PASS @default(now()) createdAt range covers old and new rows 4
+{"result":"pass","checks":{"reads Prisma-5 rows as the same instants":"pass","equality filter matches a Prisma-5 row":"pass","all rows stored as integer (at and createdAt)":"pass","gt returns old and new rows":"pass","lt returns the expected rows":"pass","orderBy across old and new rows":"pass","@default(now()) createdAt range covers old and new rows":"pass"}}
+exit=0
+
+$ (Prisma 5.22) node dt-read-p5.cjs
+{"prisma5ReadsAll":[{"label":"p5-2025-06","at":"2025-06-01T12:00:00.000Z"},{"label":"p5","at":"2026-01-02T03:04:05.678Z"},{"label":"p5-2026-03","at":"2026-03-15T08:30:00.250Z"},{"label":"p7-lib","at":"2026-06-01T00:00:00.000Z"}],"prisma5GtAfter2025":["p5","p5-2026-03","p7-lib"]}
+exit=0

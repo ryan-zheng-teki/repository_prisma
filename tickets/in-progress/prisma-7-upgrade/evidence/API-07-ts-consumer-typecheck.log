@@ -1,0 +1,27 @@
+# Case API-07
+# Code commit e5d2371 (HEAD f91b676; HEAD differs only in tickets/). Tarball: npm pack of the worktree build, repository_prisma-1.0.10.tgz sha256 f0fb025f71c2f2895e28e42a83f726fc65f6ac1ef564d665ff0f524ebcb2152a. Scripts: evidence/API-scripts/. Recorded by api_e2e_engineer, 2026-11-04.
+# Steps: tsc -p tsconfig.json with typescript@5.4.5 and typescript@5 (5.9.3) on app-types.ts in consumer-esm (NodeNext) and consumer-cjs (CommonJS/Node10), then a negative control. Env ENV-1.
+
+# API-07 TypeScript consumer typecheck; macOS Node v22.23.1; 2026-11-04T13:08:52Z
+
+$ (consumer-esm, tsconfig "module": "NodeNext") npx -y -p typescript@5.4.5 tsc -p tsconfig.json
+Version 5.4.5
+exit=0
+
+$ (consumer-esm, tsconfig "module": "NodeNext") npx -y -p typescript@5 tsc -p tsconfig.json
+Version 5.9.3
+exit=0
+
+$ (consumer-cjs, tsconfig "module": "CommonJS") npx -y -p typescript@5.4.5 tsc -p tsconfig.json
+Version 5.4.5
+exit=0
+
+$ (consumer-cjs, tsconfig "module": "CommonJS") npx -y -p typescript@5 tsc -p tsconfig.json
+Version 5.9.3
+exit=0
+
+$ negative control (consumer-esm): id typed as string, unknown error code; npx -p typescript@5.4.5 tsc -p tsconfig.negative.json (expect errors)
+app-types-negative.ts(38,9): error TS2322: Type 'number' is not assignable to type 'string'.
+app-types-negative.ts(39,70): error TS2322: Type 'string' is not assignable to type 'number | IntFilter<"User"> | undefined'.
+app-types-negative.ts(47,11): error TS2367: This comparison appears to be unintentional because the types 'PrismaInitializationErrorCode' and '"NOT_A_REAL_CODE"' have no overlap.
+exit=2

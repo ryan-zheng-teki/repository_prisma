@@ -1,0 +1,35 @@
+# Case API-08
+# Code commit e5d2371 (HEAD f91b676; HEAD differs only in tickets/). Tarball: npm pack of the worktree build, repository_prisma-1.0.10.tgz sha256 f0fb025f71c2f2895e28e42a83f726fc65f6ac1ef564d665ff0f524ebcb2152a. Scripts: evidence/API-scripts/. Recorded by api_e2e_engineer, 2026-11-04.
+# Steps: in consumer-esm: node cr01-esm.mjs; node load-probe.mjs (DELETE 8 s, WAL 8 s); then an UNGATED CONTROL copy (not shipped code). Env ENV-1.
+
+# API-08 AC-013 through the packed ESM entry (consumer-esm, tarball sha256 f0fb025f...); macOS Node v22.23.1; 2026-11-04T13:09:53Z
+
+created /tmp/rp-e2e/consumer-esm/dbs/cr01.db via prisma db push (exit 0)
+$ node cr01-esm.mjs dbs/cr01.db
+{
+  "entry": "file:///private/tmp/rp-e2e/consumer-esm/node_modules/repository_prisma/dist/index.mjs",
+  "txResult": "tx rejected: rollback-on-purpose",
+  "otherResult": {
+    "seenUncommitted": []
+  },
+  "rowsAfter": [
+    "independent-request@example.test"
+  ]
+}
+exit=0
+
+created /tmp/rp-e2e/consumer-esm/dbs/load-0.db via prisma db push (exit 0)
+$ node load-probe.mjs dbs/load-0.db 0 8000
+{"result":"pass","journalMode":"delete","durationMs":8000,"plainRequests":1023,"reads":1023,"transactions":{"started":603,"committed":302,"rolledBack":301,"otherErrors":{},"maxWaitToStartMs":62},"plainLatencyMs":{"p50":63,"p99":109,"max":130},"violations":{"rolledBackSeen":0,"uncommittedSeen":0,"lostPlainWrites":0,"lostCommitted":0,"keptRolledBack":0,"rowCountMatches":true}}
+exit=0
+
+created /tmp/rp-e2e/consumer-esm/dbs/load-1.db via prisma db push (exit 0)
+$ node load-probe.mjs dbs/load-1.db 1 8000
+{"result":"pass","journalMode":"wal","durationMs":8000,"plainRequests":1261,"reads":1261,"transactions":{"started":638,"committed":319,"rolledBack":319,"otherErrors":{},"maxWaitToStartMs":73},"plainLatencyMs":{"p50":48,"p99":105,"max":113},"violations":{"rolledBackSeen":0,"uncommittedSeen":0,"lostPlainWrites":0,"lostCommitted":0,"keptRolledBack":0,"rowCountMatches":true}}
+exit=0
+
+# CONTROL (not the shipped code): copy of consumer-esm with dist/index.mjs line 427 patched to skip gateSqliteConnection; shows the probe detects violations
+var createSqliteDriverAdapter = (target) => ((f) => f)(
+$ node load-probe.mjs dbs/ctl.db 0 3000   (ungated control)
+{"result":"FAIL","journalMode":"delete","durationMs":3000,"plainRequests":3793,"reads":3793,"transactions":{"started":212,"committed":106,"rolledBack":106,"otherErrors":{},"maxWaitToStartMs":58},"plainLatencyMs":{"p50":1,"p99":2,"max":26},"violations":{"rolledBackSeen":1756,"uncommittedSeen":1997,"lostPlainWrites":1756,"lostCommitted":0,"keptRolledBack":0,"rowCountMatches":false}}
+exit=1

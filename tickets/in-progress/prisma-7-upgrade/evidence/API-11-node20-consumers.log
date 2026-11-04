@@ -1,0 +1,145 @@
+# Case API-11
+# Code commit e5d2371 (HEAD f91b676; HEAD differs only in tickets/). Tarball: npm pack of the worktree build, repository_prisma-1.0.10.tgz sha256 f0fb025f71c2f2895e28e42a83f726fc65f6ac1ef564d665ff0f524ebcb2152a. Scripts: evidence/API-scripts/. Recorded by api_e2e_engineer, 2026-11-04.
+# Command: docker run --rm --user node node:20-bookworm sh api11-node20-consumers.sh (tarball mounted read-only). Env ENV-3. Note: 'exit=' after 'node app.* | tail -1' is tail's exit; read the result JSON.
+
+# API-11 Node 20 Linux consumers; image node:20-bookworm; node v20.20.2; npm 10.8.2; Linux aarch64; uid=1000(node) gid=1000(node) groups=1000(node); 2026-11-04T13:12:20Z
+
+########## module consumer
+# consumer-setup: dir=/home/node/consumer-module type=module node=v20.20.2 npm=10.8.2 os=Linux aarch64 date=2026-11-04T13:12:20Z
+package type: "module"
+npm config legacy-peer-deps=false
+$ npm install /home/node/rp.tgz
+10 packages are looking for funding
+  run `npm fund` for details
+found 0 vulnerabilities
+exit=0
+$ npm install -D prisma@7
+27 packages are looking for funding
+  run `npm fund` for details
+found 0 vulnerabilities
+exit=0
+$ npm ls repository_prisma @prisma/client @prisma/adapter-better-sqlite3 better-sqlite3 prisma
+consumer-module@1.0.0 /home/node/consumer-module
++-- prisma@7.10.1
+| `-- better-sqlite3@12.11.1
+`-- repository_prisma@1.0.10
+  +-- @prisma/adapter-better-sqlite3@7.10.1
+  | `-- better-sqlite3@12.11.1 deduped
+  `-- @prisma/client@7.10.1
+    `-- prisma@7.10.1 deduped
+exit=0
+$ npx prisma generate
+Loaded Prisma config from prisma.config.ts.
+Prisma schema loaded from prisma/schema.prisma.
+✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 79ms
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+exit=0
+$ env DATABASE_URL=file:./app.db npx prisma db push
+Loaded Prisma config from prisma.config.ts.
+Prisma schema loaded from prisma/schema.prisma.
+Datasource "db": SQLite database "app.db" at "file:./app.db"
+SQLite database app.db created at file:./app.db
+🚀  Your database is now in sync with your Prisma schema. Done in 99ms
+┌─────────────────────────────────────────────────────────┐
+│  Update available 7.10.1 -> 8.0.0-rc.30                 │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+exit=0
+grep for adapter imports in consumer code (expect none):
+no adapter import in consumer code
+SETUP-OK
+better-sqlite3 native binding present: true
+$ node app.mjs
+{"result":"pass","checks":{"opens ./app.db in cwd":"pass","create + findUnique with relation":"pass","update":"pass","delete":"pass","runInTransaction commit":"pass","runInTransaction rollback":"pass","DateTime stored as integer and read back":"pass","non-SQLite rejected with UNSUPPORTED_DATASOURCE_PROVIDER":"pass","message says SQLite only":"pass","message leaks no URL/credentials":"pass"}}
+exit=0
+$ DATABASE_URL=file:./app.db node lazy.mjs
+{"DATABASE_URL_kind":"file","outcome":{"ok":true,"count":1}}
+exit=0
+$ DATABASE_URL=postgresql://app_user:s3cr3t-pw@db.internal.example:5432/appdb node lazy.mjs
+{"DATABASE_URL_kind":"postgresql","outcome":{"ok":false,"name":"PrismaInitializationError","code":"UNSUPPORTED_DATASOURCE_PROVIDER","message":"repository_prisma supports SQLite datasources only; use a file: URL.","isInitError":true,"leaks":false}}
+exit=0
+$ node cr01-esm.mjs dbs/cr01.db
+{"entry":"file:///home/node/consumer-module/node_modules/repository_prisma/dist/index.mjs","txResult":"txrejected:rollback-on-purpose","otherResult":{"seenUncommitted":[]},"rowsAfter":["independent-request@example.test"]}
+exit=0
+$ node load-probe.mjs dbs/load0.db 0 5000
+{"result":"pass","journalMode":"delete","durationMs":5000,"plainRequests":368,"reads":368,"transactions":{"started":254,"committed":127,"rolledBack":127,"otherErrors":{},"maxWaitToStartMs":302},"plainLatencyMs":{"p50":95,"p99":406,"max":420},"violations":{"rolledBackSeen":0,"uncommittedSeen":0,"lostPlainWrites":0,"lostCommitted":0,"keptRolledBack":0,"rowCountMatches":true}}
+exit=0
+$ node load-probe.mjs dbs/load1.db 1 5000
+{"result":"pass","journalMode":"wal","durationMs":5000,"plainRequests":663,"reads":663,"transactions":{"started":384,"committed":192,"rolledBack":192,"otherErrors":{},"maxWaitToStartMs":97},"plainLatencyMs":{"p50":55,"p99":109,"max":112},"violations":{"rolledBackSeen":0,"uncommittedSeen":0,"lostPlainWrites":0,"lostCommitted":0,"keptRolledBack":0,"rowCountMatches":true}}
+exit=0
+$ node consumer-module/path-probe.mjs (cwd ~/path-probe)
+PASS relative with spaces + query: url="file:./data dir/app one.db?connection_limit=1" main="<cwd>/data dir/app one.db"
+PASS literal %20 + query: url="file:./data dir/literal%20name.db?socket_timeout=5&connection_limit=1" main="<cwd>/data dir/literal%20name.db" decodedNameExists=false
+PASS symlink alias + query: url="file:./alias.db?connection_limit=1" main="<cwd>/physical.db"
+PASS absolute with spaces + query + WAL: url="file:<cwd>/abs space dir/abs db.db?connection_limit=1" main="<cwd>/abs space dir/abs db.db"
+files whose name contains "?": []
+tree: ["abs space dir","abs space dir/abs db.db","alias.db","data dir","data dir/app one.db","data dir/literal%20name.db","physical.db"]
+{"result":"pass"}
+exit=0
+
+########## commonjs consumer
+# consumer-setup: dir=/home/node/consumer-commonjs type=commonjs node=v20.20.2 npm=10.8.2 os=Linux aarch64 date=2026-11-04T13:13:56Z
+package type: "commonjs"
+npm config legacy-peer-deps=false
+$ npm install /home/node/rp.tgz
+10 packages are looking for funding
+  run `npm fund` for details
+found 0 vulnerabilities
+exit=0
+$ npm install -D prisma@7
+27 packages are looking for funding
+  run `npm fund` for details
+found 0 vulnerabilities
+exit=0
+$ npm ls repository_prisma @prisma/client @prisma/adapter-better-sqlite3 better-sqlite3 prisma
+consumer-commonjs@1.0.0 /home/node/consumer-commonjs
++-- prisma@7.10.1
+| `-- better-sqlite3@12.11.1
+`-- repository_prisma@1.0.10
+  +-- @prisma/adapter-better-sqlite3@7.10.1
+  | `-- better-sqlite3@12.11.1 deduped
+  `-- @prisma/client@7.10.1
+    `-- prisma@7.10.1 deduped
+exit=0
+$ npx prisma generate
+Loaded Prisma config from prisma.config.ts.
+Prisma schema loaded from prisma/schema.prisma.
+✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 83ms
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+exit=0
+$ env DATABASE_URL=file:./app.db npx prisma db push
+Loaded Prisma config from prisma.config.ts.
+Prisma schema loaded from prisma/schema.prisma.
+Datasource "db": SQLite database "app.db" at "file:./app.db"
+SQLite database app.db created at file:./app.db
+🚀  Your database is now in sync with your Prisma schema. Done in 25ms
+┌─────────────────────────────────────────────────────────┐
+│  Update available 7.10.1 -> 8.0.0-rc.30                 │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+exit=0
+grep for adapter imports in consumer code (expect none):
+no adapter import in consumer code
+SETUP-OK
+better-sqlite3 native binding present: true
+$ node app.cjs
+{"result":"pass","checks":{"opens ./app.db in cwd":"pass","create + findUnique with relation":"pass","update":"pass","delete":"pass","runInTransaction commit":"pass","runInTransaction rollback":"pass","DateTime stored as integer and read back":"pass","non-SQLite rejected with UNSUPPORTED_DATASOURCE_PROVIDER":"pass","message says SQLite only":"pass","message leaks no URL/credentials":"pass"}}
+exit=0
+$ DATABASE_URL=file:./app.db node lazy.cjs
+{"DATABASE_URL_kind":"file","outcome":{"ok":true,"count":1}}
+exit=0
+$ DATABASE_URL=postgresql://app_user:s3cr3t-pw@db.internal.example:5432/appdb node lazy.cjs
+{"DATABASE_URL_kind":"postgresql","outcome":{"ok":false,"name":"PrismaInitializationError","code":"UNSUPPORTED_DATASOURCE_PROVIDER","message":"repository_prisma supports SQLite datasources only; use a file: URL.","isInitError":true,"leaks":false}}
+exit=0
