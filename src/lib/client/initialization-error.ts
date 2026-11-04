@@ -1,5 +1,6 @@
 export type PrismaInitializationErrorCode =
   | 'DATABASE_URL_MISSING'
+  | 'UNSUPPORTED_DATASOURCE_PROVIDER'
   | 'DATASOURCE_CONFLICT'
   | 'CONNECTION_FAILED'
   | 'DATABASE_IDENTITY_MISMATCH'
@@ -27,6 +28,8 @@ export type InitializePrismaOptions = {
 
 const SAFE_ERROR_MESSAGES: Record<PrismaInitializationErrorCode, string> = {
   DATABASE_URL_MISSING: 'No Prisma datasource URL is configured.',
+  UNSUPPORTED_DATASOURCE_PROVIDER:
+    'repository_prisma supports SQLite datasources only; use a file: URL.',
   DATASOURCE_CONFLICT: 'The Prisma client is already bound to another datasource.',
   CONNECTION_FAILED: 'The Prisma client could not connect to its datasource.',
   DATABASE_IDENTITY_MISMATCH: 'The connected SQLite database identity could not be verified.',

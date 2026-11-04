@@ -160,7 +160,6 @@ describe.sequential('PrismaClientLifecycle classified failure and recovery', () 
   });
 
   it.each([
-    ['postgresql://user:password@localhost:5432/app', 'non-SQLite'],
     ['file::memory:', 'SQLite memory'],
     ['file:memory-name?mode=memory&cache=shared', 'SQLite mode=memory'],
   ])('rejects strict WAL for %s before connection or SQLite SQL', async (url) => {
@@ -175,20 +174,6 @@ describe.sequential('PrismaClientLifecycle classified failure and recovery', () 
     expect(client.$connect).not.toHaveBeenCalled();
     expect(client.$queryRawUnsafe).not.toHaveBeenCalled();
     expect(client.$disconnect).toHaveBeenCalledTimes(1);
-  });
-
-  it('initializes a non-SQLite datasource without WAL and issues no SQLite SQL', async () => {
-    const client = fakeClient();
-    const lifecycle = new PrismaClientLifecycle(() => asPrismaClient(client));
-
-    await lifecycle.initialize({
-      datasourceUrl: 'postgresql://user:password@localhost:5432/app',
-    });
-
-    expect(client.$connect).toHaveBeenCalledTimes(1);
-    expect(client.$queryRawUnsafe).not.toHaveBeenCalled();
-    expect(lifecycle.getClientForOperation()).toBe(client);
-    await lifecycle.shutdown();
   });
 });
 
@@ -248,9 +233,7 @@ describe.sequential('PrismaClientLifecycle concurrency and shutdown', () => {
     expect(firstClient.$disconnect).toHaveBeenCalledTimes(1);
     expect(firstClient.$queryRawUnsafe).toHaveBeenCalledTimes(1);
 
-    await lifecycle.initialize({
-      datasourceUrl: 'postgresql://user:password@localhost:5432/rebound',
-    });
+    await lifecycle.initialize({ datasourceUrl: 'file:rebound?mode=memory' });
     expect(lifecycle.getClientForOperation()).toBe(secondClient);
     await lifecycle.shutdown();
     await rm(directory, { recursive: true, force: true });
@@ -267,14 +250,10 @@ describe.sequential('PrismaClientLifecycle concurrency and shutdown', () => {
       asPrismaClient(clients.shift()!)
     );
 
-    await lifecycle.initialize({
-      datasourceUrl: 'postgresql://user:password@localhost:5432/first',
-    });
+    await lifecycle.initialize({ datasourceUrl: 'file:first?mode=memory' });
     await expect(lifecycle.shutdown()).rejects.toBe(disconnectFailure);
 
-    await lifecycle.initialize({
-      datasourceUrl: 'postgresql://user:password@localhost:5432/replacement',
-    });
+    await lifecycle.initialize({ datasourceUrl: 'file:replacement?mode=memory' });
     expect(lifecycle.getClientForOperation()).toBe(replacementClient);
     await lifecycle.shutdown();
   });
@@ -283,14 +262,12 @@ describe.sequential('PrismaClientLifecycle concurrency and shutdown', () => {
     const client = fakeClient();
     const factory = vi.fn(() => asPrismaClient(client));
     const lifecycle = new PrismaClientLifecycle(factory);
-    const firstTarget = 'postgresql://user:password@localhost:5432/first';
+    const firstTarget = 'file:first?mode=memory';
 
     await lifecycle.initialize({ datasourceUrl: firstTarget });
     await lifecycle.initialize({ datasourceUrl: firstTarget });
     await expectInitializationCode(
-      lifecycle.initialize({
-        datasourceUrl: 'postgresql://user:password@localhost:5432/second',
-      }),
+      lifecycle.initialize({ datasourceUrl: 'file:second?mode=memory' }),
       'DATASOURCE_CONFLICT'
     );
 
@@ -353,11 +330,167 @@ describe.sequential('PrismaClientLifecycle concurrency and shutdown', () => {
         asPrismaClient(replacement)
       );
       await replacementLifecycle.initialize({
-        datasourceUrl: `postgresql://user:password@localhost:5432/${stage}`,
+        datasourceUrl: `file:${stage}?mode=memory`,
       });
       expect(replacementLifecycle.getClientForOperation()).toBe(replacement);
       await replacementLifecycle.shutdown();
       await rm(directory, { recursive: true, force: true });
     }
   );
+});
+
+describe.sequential('PrismaClientLifecycle non-SQLite datasource rejection', () => {
+  const nonSqliteUrl = 'postgresql://user:secret@db.example.invalid:5432/app';
+  const originalDatabaseUrl = process.env.DATABASE_URL;
+  const originalTestDatabaseUrl = process.env.DATABASE_URL_TEST;
+
+  afterEach(() => {
+    if (originalDatabaseUrl === undefined) {
+      delete process.env.DATABASE_URL;
+    } else {
+      process.env.DATABASE_URL = originalDatabaseUrl;
+    }
+    if (originalTestDatabaseUrl === undefined) {
+      delete process.env.DATABASE_URL_TEST;
+    } else {
+      process.env.DATABASE_URL_TEST = originalTestDatabaseUrl;
+    }
+  });
+
+  const useEnvironmentUrl = (url: string): void => {
+    delete process.env.DATABASE_URL_TEST;
+    process.env.DATABASE_URL = url;
+  };
+
+  const expectNoDatasourceLeak = (error: Error, diagnosticCause?: unknown): void => {
+    for (const text of [error.message, String(error), String(diagnosticCause ?? '')]) {
+      expect(text).not.toContain('secret');
+      expect(text).not.toContain('db.example.invalid');
+    }
+  };
+
+  it.each([
+    { name: 'without WAL', enableWAL: undefined },
+    { name: 'with WAL', enableWAL: true },
+  ])('rejects an explicit non-SQLite URL from idle $name before building a client', async ({
+    enableWAL,
+  }) => {
+    const factory = vi.fn(() => asPrismaClient(fakeClient()));
+    const lifecycle = new PrismaClientLifecycle(factory);
+    const diagnostic = vi.fn();
+
+    const error = await expectInitializationCode(
+      lifecycle.initialize({ datasourceUrl: nonSqliteUrl, enableWAL, onDiagnostic: diagnostic }),
+      'UNSUPPORTED_DATASOURCE_PROVIDER'
+    );
+
+    expect(error.message).toBe(
+      'repository_prisma supports SQLite datasources only; use a file: URL.'
+    );
+    expect(diagnostic).toHaveBeenCalledTimes(1);
+    expect(diagnostic.mock.calls[0][0].code).toBe('UNSUPPORTED_DATASOURCE_PROVIDER');
+    expectNoDatasourceLeak(error, diagnostic.mock.calls[0][0].cause);
+    expect(factory).not.toHaveBeenCalled();
+    expect(() => lifecycle.getClientForOperation()).toThrowError(
+      expect.objectContaining({ code: 'CLIENT_NOT_READY' })
+    );
+  });
+
+  it('rejects a non-SQLite URL while a SQLite client is lazily bound and keeps that client', async () => {
+    const client = fakeClient();
+    const factory = vi.fn(() => asPrismaClient(client));
+    const lifecycle = new PrismaClientLifecycle(factory);
+    useEnvironmentUrl('file::memory:');
+    expect(lifecycle.getClientForOperation()).toBe(client);
+
+    const error = await expectInitializationCode(
+      lifecycle.initialize({ datasourceUrl: nonSqliteUrl }),
+      'UNSUPPORTED_DATASOURCE_PROVIDER'
+    );
+
+    expectNoDatasourceLeak(error);
+    expect(factory).toHaveBeenCalledTimes(1);
+    expect(client.$disconnect).not.toHaveBeenCalled();
+    expect(lifecycle.getClientForOperation()).toBe(client);
+    await lifecycle.shutdown();
+  });
+
+  it('rejects a non-SQLite URL while a SQLite client is initializing and still publishes that client', async () => {
+    const connect = deferred<void>();
+    const client = fakeClient({ $connect: vi.fn(() => connect.promise) });
+    const factory = vi.fn(() => asPrismaClient(client));
+    const lifecycle = new PrismaClientLifecycle(factory);
+
+    const initialization = lifecycle.initialize({ datasourceUrl: 'file::memory:' });
+    const error = await expectInitializationCode(
+      lifecycle.initialize({ datasourceUrl: nonSqliteUrl }),
+      'UNSUPPORTED_DATASOURCE_PROVIDER'
+    );
+    connect.resolve();
+    await initialization;
+
+    expectNoDatasourceLeak(error);
+    expect(factory).toHaveBeenCalledTimes(1);
+    expect(lifecycle.getClientForOperation()).toBe(client);
+    await lifecycle.shutdown();
+  });
+
+  it('rejects a non-SQLite URL while a SQLite client is ready and keeps that client', async () => {
+    const client = fakeClient();
+    const factory = vi.fn(() => asPrismaClient(client));
+    const lifecycle = new PrismaClientLifecycle(factory);
+    await lifecycle.initialize({ datasourceUrl: 'file::memory:' });
+
+    const error = await expectInitializationCode(
+      lifecycle.initialize({ datasourceUrl: nonSqliteUrl, enableWAL: true }),
+      'UNSUPPORTED_DATASOURCE_PROVIDER'
+    );
+
+    expectNoDatasourceLeak(error);
+    expect(factory).toHaveBeenCalledTimes(1);
+    expect(client.$disconnect).not.toHaveBeenCalled();
+    expect(lifecycle.getClientForOperation()).toBe(client);
+    await lifecycle.shutdown();
+  });
+
+  it('rejects a lazy bind from a non-SQLite DATABASE_URL before building a client', () => {
+    const factory = vi.fn(() => asPrismaClient(fakeClient()));
+    const lifecycle = new PrismaClientLifecycle(factory);
+    useEnvironmentUrl(nonSqliteUrl);
+
+    let error: unknown;
+    try {
+      lifecycle.getClientForOperation();
+    } catch (caught) {
+      error = caught;
+    }
+
+    expect(error).toMatchObject({
+      name: 'PrismaInitializationError',
+      code: 'UNSUPPORTED_DATASOURCE_PROVIDER',
+    });
+    expectNoDatasourceLeak(error as Error);
+    expect(factory).not.toHaveBeenCalled();
+    expect(() => lifecycle.getClientForOperation()).toThrowError(
+      expect.objectContaining({ code: 'CLIENT_NOT_READY' })
+    );
+  });
+
+  it('keeps CLIENT_NOT_READY precedence for a non-SQLite URL while shutdown is in progress', async () => {
+    const disconnect = deferred<void>();
+    const client = fakeClient({ $disconnect: vi.fn(() => disconnect.promise) });
+    const factory = vi.fn(() => asPrismaClient(client));
+    const lifecycle = new PrismaClientLifecycle(factory);
+    await lifecycle.initialize({ datasourceUrl: 'file::memory:' });
+
+    const shutdown = lifecycle.shutdown();
+    await expectInitializationCode(
+      lifecycle.initialize({ datasourceUrl: nonSqliteUrl }),
+      'CLIENT_NOT_READY'
+    );
+    disconnect.resolve();
+    await shutdown;
+
+    expect(factory).toHaveBeenCalledTimes(1);
+  });
 });

@@ -82,7 +82,9 @@ client and ignore inner options; the outer boundary owns configuration and atomi
 **Responsibility**: `client.ts` is the thin public facade; `PrismaClientLifecycle` is the sole raw
 root-client and lifecycle owner.
 
-- Resolve one explicit datasource target and pass it through `PrismaClient({ datasourceUrl })`.
+- Resolve one explicit datasource target and build the root client with Prisma 7's SQLite driver
+  adapter: `PrismaClient({ adapter: createSqliteDriverAdapter(target), log })`. Prisma 7 no longer
+  accepts a datasource URL in the client constructor.
 - Construct and disconnect the raw root client only inside the lifecycle owner.
 - Resolve query logging at construction through `src/lib/client/logging-policy.ts`.
   The default levels are `info`, `warn`, and `error`; `query` is appended only when
@@ -102,7 +104,19 @@ root-client and lifecycle owner.
 The related internal files remain subordinate to this owner:
 
 - `client/datasource-target.ts` selects, classifies, and normalizes the target. Physical SQLite
-  relative paths are `process.cwd()`-relative.
+  relative paths are `process.cwd()`-relative. It owns the supported-provider rule: the library
+  supports SQLite only, so any other URL is rejected here with `UNSUPPORTED_DATASOURCE_PROVIDER`,
+  before a client exists. Explicit initialization and lazy binding share this one check, so both
+  report the same code. Resolution runs before the conflict, logging-policy and WAL checks, so the
+  code applies in every lifecycle state except shutdown (`CLIENT_NOT_READY`), and a bound client is
+  left untouched.
+- `client/sqlite-driver-adapter.ts` owns how the library opens SQLite under Prisma 7. A file target
+  opens its resolved physical path; the URL query string stays only in the target's binding key,
+  because the adapter would treat it as part of the file name. A memory target opens `:memory:`.
+  `timestampFormat: 'unixepoch-ms'` keeps `DateTime` values as INTEGER unix milliseconds, the
+  representation Prisma 5 used. The adapter's default (ISO-8601 text) would make range filters
+  and ordering miss rows written by Prisma 5, so existing databases stay directly usable without a
+  migration. The adapter does not know lifecycle state.
 - `client/sqlite-readiness.ts` owns `PRAGMA database_list`, WAL activation, and the independent
   journal-mode verification. It cannot publish or disconnect a client.
 - `client/initialization-error.ts` owns safe stable codes/messages and guarded opt-in diagnostics. It
@@ -111,22 +125,28 @@ The related internal files remain subordinate to this owner:
 The package facade and Prisma CLI configuration do not import `dotenv/config` or load
 `.env` files. Applications, scripts, and CI own environment provisioning; the library
 reads already-present values only when resolving a datasource or constructing a client.
-This behavior-only hardening changes no schema, migration, or persisted-data
-representation, so existing consumer databases are directly usable without migration.
+The Prisma CLI reads its URL from `prisma.config.ts`; the schema datasource has no `url`
+(Prisma 7). Prisma 7 also no longer generates the client on install, so the package's `prepare`
+script runs `prisma generate` after `npm install`/`npm ci`.
 
 ### Package ESM/CommonJS Boundary
 
 The package exports separate ESM and CommonJS artifacts through the existing `exports.import`
-and `exports.require` conditions. Because `@prisma/client` is a CommonJS-generated external peer,
+and `exports.require` conditions. Both Prisma peers, `@prisma/client` and `@prisma/adapter-better-sqlite3`, are external (tsup
+`external`) and supplied by the consumer, which keeps the adapter in version lockstep with the
+client and leaves the native better-sqlite3 build to the consumer's platform. The adapter is a real
+ESM package, so the lifecycle imports `PrismaBetterSqlite3` by name; its native module loads only
+when a database is opened, never at package import. Because `@prisma/client` is a
+CommonJS-generated external peer,
 ESM source must consume it through the default CommonJS namespace rather than named runtime
 imports, which rely on Node's heuristic named-export detection. The lifecycle owner destructures
 `PrismaClient` for raw client construction, and the model-value owner destructures `Prisma` for
 `Models`; each keeps a separate aliased `import type` binding for TypeScript-only references.
 
 All other Prisma references in package source use explicit `import type`, so declarations retain
-the existing contracts without adding runtime peer edges. The package does not add a fallback,
-`createRequire` path, compatibility adapter, or peer-range change. Package validation includes a
-synthetic dynamic CommonJS-peer ESM probe in addition to the installed generated-peer smoke.
+the existing contracts without adding runtime peer edges. The package does not add a fallback or
+`createRequire` path. Package validation includes a synthetic dynamic CommonJS-peer ESM probe in
+addition to the installed generated-peer smoke.
 
 ### F. `src/lib/forwarding-proxy.ts` and `src/lib/prisma-proxy.ts` (Access Routing)
 
@@ -160,8 +180,8 @@ sequenceDiagram
     App->>Facade: initializePrisma(options)
     Facade->>Lifecycle: initialize(options)
     Lifecycle->>Target: resolve once
-    Target-->>Lifecycle: normalized target
-    Lifecycle->>Prisma: construct with datasourceUrl
+    Target-->>Lifecycle: normalized SQLite target (or UNSUPPORTED_DATASOURCE_PROVIDER)
+    Lifecycle->>Prisma: construct with the SQLite driver adapter
     Lifecycle->>Prisma: $connect()
     Lifecycle->>SQLite: verify main identity (physical SQLite)
     opt enableWAL
@@ -223,7 +243,7 @@ sequenceDiagram
 
 - **SQLAlchemy / TypeORM (Code-First)**: You define a class `User` in code, and the ORM generates the table from it.
 - **Prisma (Schema-First)**: You define the table in `schema.prisma`, and the ORM generates the TypeScript types/interfaces from it.
-- **Why?**: Prisma creates a "Single Source of Truth" that is independent of your programming language. This allows for better performance (the Rust engine reads the schema) and perfect type safety without runtime reflection overhead.
+- **Why?**: Prisma creates a "Single Source of Truth" that is independent of your programming language. This allows for better performance (Prisma generates its query code from the schema) and perfect type safety without runtime reflection overhead.
 
 ### Q: Do I need `@Transactional` for every method?
 
@@ -240,7 +260,7 @@ This matches the Python `repository-sqlalchemy` design: "Implicitly atomic by de
 - By default, Prisma connects lazily on first query.
 - If you want startup proof, call `initializePrisma(...)` and await it before serving traffic.
 - A non-empty `datasourceUrl` is authoritative. Otherwise the documented environment precedence is
-  resolved once and still passed explicitly to Prisma.
+  resolved once, and the library opens that SQLite target itself.
 - `enableWAL: true` supports only physical SQLite and resolves only after WAL is verified.
 - Switching a bound target requires `await shutdownPrisma()` first.
 

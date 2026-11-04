@@ -12,6 +12,12 @@ const temporaryRoot = fs.mkdtempSync(
 const consumerDirectory = path.join(temporaryRoot, 'consumer');
 const packageDirectory = path.join(consumerDirectory, 'node_modules', 'repository_prisma');
 const peerDirectory = path.join(consumerDirectory, 'node_modules', '@prisma', 'client');
+const adapterDirectory = path.join(
+  consumerDirectory,
+  'node_modules',
+  '@prisma',
+  'adapter-better-sqlite3'
+);
 const peerPath = path.join(peerDirectory, 'index.js');
 const probePath = path.join(consumerDirectory, 'esm-consumer.mjs');
 
@@ -57,7 +63,7 @@ try {
   fs.mkdirSync(peerDirectory, { recursive: true });
   fs.writeFileSync(
     path.join(peerDirectory, 'package.json'),
-    JSON.stringify({ name: '@prisma/client', version: '5.22.0', main: 'index.js' })
+    JSON.stringify({ name: '@prisma/client', version: '7.10.1', main: 'index.js' })
   );
   fs.writeFileSync(
     peerPath,
@@ -72,13 +78,19 @@ try {
       `};\n` +
       `module.exports = runtimePeer;\n`
   );
+  // The real driver adapter peer (an ESM build); its dependencies resolve from its real path.
+  fs.symlinkSync(
+    path.join(repoRoot, 'node_modules', '@prisma', 'adapter-better-sqlite3'),
+    adapterDirectory,
+    process.platform === 'win32' ? 'junction' : 'dir'
+  );
   fs.writeFileSync(
     probePath,
     `import assert from 'node:assert/strict';\n` +
       `import * as repository from 'repository_prisma';\n` +
       `assert.equal(typeof repository.initializePrisma, 'function');\n` +
       `assert.equal(repository.Models.User, 'User');\n` +
-      `await repository.initializePrisma({ datasourceUrl: 'postgresql://localhost:5432/repository-prisma-synthetic' });\n` +
+      `await repository.initializePrisma({ datasourceUrl: 'file::memory:' });\n` +
       `await repository.shutdownPrisma();\n` +
       `process.stdout.write('esm-dynamic-cjs-peer-ok\\n');\n`
   );

@@ -15,6 +15,7 @@ import {
   verifySqliteIdentity,
   verifySqliteWal,
 } from './sqlite-readiness';
+import { createSqliteDriverAdapter } from './sqlite-driver-adapter';
 import { queryLogLevels, resolveQueryLoggingPolicy } from './logging-policy';
 
 const { PrismaClient: PrismaClientRuntime } = PrismaClientPackage;
@@ -66,7 +67,7 @@ export type PrismaClientFactory = (
 
 const defaultClientFactory: PrismaClientFactory = (target, logQueries) =>
   new PrismaClientRuntime({
-    datasourceUrl: target.clientUrl,
+    adapter: createSqliteDriverAdapter(target),
     log: queryLogLevels(logQueries),
   });
 

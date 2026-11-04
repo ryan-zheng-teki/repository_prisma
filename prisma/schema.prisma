@@ -4,8 +4,6 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
-
 }
 
 model User {
@@ -19,4 +17,10 @@ model Post {
   title   String
   authorId Int
   author  User   @relation(fields: [authorId], references: [id])
+}
+
+model Event {
+  id         Int      @id @default(autoincrement())
+  label      String
+  occurredAt DateTime
 }

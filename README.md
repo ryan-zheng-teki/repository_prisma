@@ -6,6 +6,74 @@ It solves the common problem of "Prop-Drilling" transaction objects (`tx`) throu
 
 📖 **[Read the Full Design Document](./DESIGN.md)** for architecture details.
 
+## Requirements and Setup (Prisma 7)
+
+- Prisma 7 (`prisma` and `@prisma/client` 7.x) with a **SQLite** database.
+- Node.js `^20.19 || ^22.12 || >=24` and TypeScript 5.4 or newer.
+- Still on Prisma 5? Stay on `repository_prisma` 1.0.x.
+
+Install the library and the Prisma CLI:
+
+```bash
+npm install repository_prisma
+npm install -D prisma@7
+```
+
+npm 7+ and pnpm install the peers `@prisma/client` and `@prisma/adapter-better-sqlite3`
+automatically. With Yarn or `--legacy-peer-deps`, add them yourself:
+`npm install @prisma/client@7 @prisma/adapter-better-sqlite3@7`.
+
+Keep the `prisma-client-js` generator and leave the URL out of the schema:
+
+```prisma
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+```
+
+Give the Prisma CLI its URL in `prisma.config.ts`, and generate the client (Prisma 7 no longer
+does this on install):
+
+```typescript
+// prisma.config.ts
+import { defineConfig } from 'prisma/config';
+
+export default defineConfig({
+  schema: 'prisma/schema.prisma',
+  datasource: { url: process.env.DATABASE_URL },
+});
+```
+
+```bash
+npx prisma generate
+```
+
+Your code does not change, and it does not need a driver adapter: the library builds one.
+
+```typescript
+import { initializePrisma } from 'repository_prisma';
+
+await initializePrisma({ datasourceUrl: 'file:./app.db' });
+```
+
+Good to know:
+
+- `DateTime` values are stored as INTEGER unix milliseconds, as Prisma 5 stored them, so existing
+  databases keep working without a migration. If your application also builds its own Prisma 7
+  client for the same database, give it the same format:
+  `new PrismaBetterSqlite3({ url }, { timestampFormat: 'unixepoch-ms' })`. Prisma 7's default
+  (ISO-8601 text) would make date filters miss rows written in the other format.
+- URL query parameters such as `?connection_limit=1` no longer affect the connection.
+- A non-SQLite URL (for example `postgresql://...`) is rejected with
+  `UNSUPPORTED_DATASOURCE_PROVIDER`.
+- `@prisma/adapter-better-sqlite3` uses the native `better-sqlite3` module. Prebuilt binaries cover
+  the common platforms; on others, npm builds it and needs a C++ toolchain.
+
 ## The Problem: Explicit Transactions (Standard Pattern)
 
 In standard Prisma, you must pass the transaction client explicitly:
@@ -133,16 +201,22 @@ environment value in this order:
 2. `DATABASE_URL` when it is non-empty;
 3. `DATABASE_URL_TEST` when it is non-empty.
 
-The selected value is always passed explicitly to the root `PrismaClient`; Prisma does not perform
-a second, independent environment lookup. Relative physical SQLite URLs such as
-`file:./runtime/app.db` are resolved against `process.cwd()` before client construction. Query
-parameters are preserved.
+The library opens the selected SQLite database itself, through Prisma's better-sqlite3 driver
+adapter; Prisma does not perform a second, independent environment lookup. Relative physical
+SQLite URLs such as `file:./runtime/app.db` are resolved against `process.cwd()` before the
+database is opened. Query parameters are kept as part of the target's identity, so two URLs that
+differ only in their query are different targets. They do not change the opened file and have no
+effect on the connection.
 
 For a physical SQLite datasource, explicit initialization connects and verifies that SQLite's
 `main` database is the selected physical file. With `enableWAL: true`, initialization additionally
 activates WAL and performs a separate read to prove the effective journal mode is `wal`. WAL is
 strict: activation or verification failure rejects instead of warning and continuing. WAL is not
-supported for non-SQLite or SQLite in-memory targets.
+supported for SQLite in-memory targets (`WAL_UNSUPPORTED_PROVIDER`).
+
+Only SQLite datasources are supported. Explicit initialization and lazy binding reject any other
+datasource URL with `UNSUPPORTED_DATASOURCE_PROVIDER`, before a client is built; a client that is
+already bound stays bound and usable.
 
 ### Initialization Errors, Diagnostics, and Recovery
 
@@ -179,6 +253,7 @@ await initializePrisma({ datasourceUrl: 'file:./runtime/replacement.db' });
 Available codes are:
 
 - `DATABASE_URL_MISSING`
+- `UNSUPPORTED_DATASOURCE_PROVIDER`
 - `DATASOURCE_CONFLICT`
 - `CONNECTION_FAILED`
 - `DATABASE_IDENTITY_MISMATCH`
@@ -194,20 +269,22 @@ readiness attempt blocks root/repository access until a corrected explicit initi
 or `shutdownPrisma()` clears the lifecycle. Initializing a different target while one is bound
 rejects with `DATASOURCE_CONFLICT`; call and await `shutdownPrisma()` before rebinding.
 
-This behavior-only release does not change the Prisma schema, migrations, or persisted
-data, so no data migration is required.
+Moving to Prisma 7 does not change the Prisma schema models, migrations, or persisted data:
+`DateTime` values keep their INTEGER (unix milliseconds) representation, so no data migration is
+required.
 
 ## ESM and CommonJS Package Loading
 
 The package preserves both published entrypoints: ESM consumers resolve `exports.import`,
-and CommonJS consumers resolve `exports.require`. The external `@prisma/client` peer remains
-external and is supplied by the consuming application. At runtime, the package reads its
+and CommonJS consumers resolve `exports.require`. Both Prisma peers, `@prisma/client` and
+`@prisma/adapter-better-sqlite3`, stay external and are supplied by the consuming application.
+Importing the package loads no native module; better-sqlite3 is loaded only when a database is
+opened. At runtime, the package reads its
 CommonJS-generated Prisma peer through the default namespace and then selects the required
 `PrismaClient` or `Prisma` value. This avoids depending on Node's heuristic CommonJS named-export
 detection while preserving the existing public exports and Prisma behavior.
 
-Type-only Prisma references are kept compile-time-only with explicit `import type` declarations;
-no peer version, schema, migration, or database change is required for this package-loading fix.
+Type-only Prisma references are kept compile-time-only with explicit `import type` declarations.
 
 ## Advanced: Root Client Access (Use Carefully)
 
@@ -257,12 +334,13 @@ const filtered = supportsCaseInsensitiveMode()
   : filterContainsCaseInsensitive(rows, "Alice", (row) => row.name);
 ```
 
-If you want explicit provider selection, set `PRISMA_DATASOURCE_PROVIDER=sqlite|postgresql|mysql|...`
-to override auto-detection (which uses `DATABASE_URL`).
+If you want explicit provider selection for these filter helpers, set
+`PRISMA_DATASOURCE_PROVIDER=sqlite|postgresql|mysql|...` to override auto-detection (which uses
+`DATABASE_URL`). The library's own client supports SQLite only.
 
 ## Testing
 
-Install dependencies first (`npm install`). Then `npm test` automatically syncs the Prisma schema to a dedicated SQLite file (`test.db`)
+Install dependencies first (`npm install`; its `prepare` script runs `prisma generate`). Then `npm test` automatically syncs the Prisma schema to a dedicated SQLite file (`test.db`)
 and runs `prisma generate` to ensure the correct client is used for this repo.
 You can override it by setting `DATABASE_URL_TEST`. If you set a SQLite file URL, prefer an absolute path
 (`file:/...`). On macOS, Prisma's schema engine can fail on relative `file:./...` URLs, while Linux often accepts them.
@@ -270,16 +348,16 @@ The test script normalizes relative `file:` URLs to absolute paths for cross-pla
 
 ## Release (Tag-Based)
 
-We use a tag-based release flow. For this already-versioned 1.0.10 release, do not run
-`npm version patch`, because it would advance the package to 1.0.11. Create and push the
-explicit release tag instead:
+We use a tag-based release flow. The tag must match the `version` in `package.json`. The
+`Unreleased` changes in `CHANGELOG.md` are breaking, so they need a major version before they
+are released. Create and push the annotated release tag:
 
 ```bash
-git tag -a v1.0.10 -m "1.0.10"
+git tag -a vX.Y.Z -m "X.Y.Z"
 git push origin main --follow-tags
 ```
 
-If you prefer to tag manually via a Git UI, create the same annotated `v1.0.10` tag and
+If you prefer to tag manually via a Git UI, create the same annotated tag and
 push it with the repository's normal tag workflow:
 
 ```bash
@@ -296,6 +374,6 @@ initialization behavior or documentation alone does not publish a release.
 
 1.  **`src/lib/context.ts`**: Holds the `AsyncLocalStorage`.
 2.  **`src/lib/prisma-manager.ts`**: The `getPrismaClient()` function checks the storage. If a transaction is active, it returns the transaction client. If not, it returns the root forwarding boundary.
-3.  **`src/lib/client/lifecycle.ts`**: Owns the one raw root client, explicit datasource identity, readiness state, failure cleanup, and shutdown.
+3.  **`src/lib/client/lifecycle.ts`**: Owns the one raw root client, explicit datasource identity, readiness state, failure cleanup, and shutdown. It builds the client with the SQLite driver adapter from `src/lib/client/sqlite-driver-adapter.ts`.
 4.  **`src/lib/forwarding-proxy.ts`**: Resolves root or ALS methods/delegates at invocation time without retaining stale raw owners.
 5.  **`src/lib/base-repository.ts`**: Uses `getPrismaClient()` internally, so every query automatically uses the correct state.

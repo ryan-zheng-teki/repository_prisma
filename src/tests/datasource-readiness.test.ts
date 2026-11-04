@@ -4,6 +4,7 @@ import path from 'node:path';
 import type { PrismaClient } from '@prisma/client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { resolveDatasourceTarget } from '../lib/client/datasource-target';
+import { InitializationStageFailure } from '../lib/client/initialization-error';
 import {
   activateSqliteWal,
   verifySqliteIdentity,
@@ -34,7 +35,7 @@ describe('datasource target normalization', () => {
     );
   });
 
-  it('preserves physical SQLite spelling and query parameters while resolving against cwd', async () => {
+  it('resolves the physical SQLite path against cwd and keeps query parameters only in the binding key', async () => {
     const directory = await mkdtemp(path.join(os.tmpdir(), 'repository-prisma-target-'));
     temporaryDirectories.push(directory);
     process.chdir(directory);
@@ -46,7 +47,6 @@ describe('datasource target normalization', () => {
 
     expect(target).toEqual({
       kind: 'sqlite-file',
-      clientUrl: `file:${path.join(cwd, 'nested/literal%20 space.db')}?connection_limit=1`,
       bindingKey: `file:${path.join(cwd, 'nested/literal%20 space.db')}?connection_limit=1`,
       expectedPath: path.join(cwd, 'nested/literal%20 space.db'),
     });
@@ -56,24 +56,35 @@ describe('datasource target normalization', () => {
     ['file::memory:', 'file::memory:'],
     ['file:?mode=memory&cache=shared', 'file:?mode=memory&cache=shared'],
     ['file:shared?mode=MEMORY', 'file:shared?mode=MEMORY'],
-  ])('classifies %s as SQLite memory', (url, clientUrl) => {
+  ])('classifies %s as SQLite memory', (url, bindingKey) => {
     expect(resolveDatasourceTarget(url)).toEqual({
       kind: 'sqlite-memory',
-      clientUrl,
-      bindingKey: clientUrl,
+      bindingKey,
     });
   });
 
-  it('classifies non-SQLite targets without issuing or inventing physical identity', () => {
-    expect(resolveDatasourceTarget('postgresql://example.invalid/app')).toEqual({
-      kind: 'other',
-      provider: 'postgresql',
-      clientUrl: 'postgresql://example.invalid/app',
-      bindingKey: 'postgresql://example.invalid/app',
-    });
+  it.each([
+    'postgresql://user:secret@db.example.invalid:5432/app',
+    'postgres://user:secret@db.example.invalid/app',
+    'mysql://user:secret@db.example.invalid/app',
+    'sqlserver://db.example.invalid;password=secret',
+    'mongodb+srv://user:secret@db.example.invalid/app',
+  ])('rejects the non-SQLite target %s with a cause that carries no URL', (url) => {
+    let failure: unknown;
+    try {
+      resolveDatasourceTarget(url);
+    } catch (error) {
+      failure = error;
+    }
+
+    expect(failure).toBeInstanceOf(InitializationStageFailure);
+    const { code, cause } = failure as InitializationStageFailure;
+    expect(code).toBe('UNSUPPORTED_DATASOURCE_PROVIDER');
+    expect(String(cause)).not.toContain('secret');
+    expect(String(cause)).not.toContain('db.example.invalid');
   });
 
-  it('case-folds Windows drive and UNC binding paths while preserving Prisma client spelling', async () => {
+  it('case-folds Windows drive and UNC binding paths while preserving the opened path spelling', async () => {
     Object.defineProperty(process, 'platform', {
       value: 'win32',
       configurable: true,
@@ -92,7 +103,6 @@ describe('datasource target normalization', () => {
     const lowerDrive = resolveWindowsTarget('file:c:/data/app.db?x=1');
     expect(upperDrive).toMatchObject({
       kind: 'sqlite-file',
-      clientUrl: 'file:C:/Data/App.db?x=1',
       bindingKey: 'file:c:/data/app.db?x=1',
       expectedPath: 'C:\\Data\\App.db',
     });
@@ -102,7 +112,6 @@ describe('datasource target normalization', () => {
     const lowerUnc = resolveWindowsTarget('file://server/share/app.db');
     expect(upperUnc).toMatchObject({
       kind: 'sqlite-file',
-      clientUrl: 'file://Server/Share/App.db',
       bindingKey: 'file://server/share/app.db',
       expectedPath: '\\\\Server\\Share\\App.db',
     });
@@ -135,7 +144,6 @@ describe('SQLite readiness parsing and canonical identity', () => {
     await expect(
       verifySqliteIdentity(queryClient(query), {
         kind: 'sqlite-file',
-        clientUrl: `file:${alias}`,
         bindingKey: `file:${alias}`,
         expectedPath: alias,
       })
@@ -158,7 +166,6 @@ describe('SQLite readiness parsing and canonical identity', () => {
     await expect(
       verifySqliteIdentity(queryClient(query), {
         kind: 'sqlite-file',
-        clientUrl: 'file:/tmp/expected.db',
         bindingKey: 'file:/tmp/expected.db',
         expectedPath: '/tmp/expected.db',
       })

@@ -18,6 +18,7 @@
     "typecheck": "tsc -p tsconfig.json",
     "test": "node scripts/run-tests.js",
     "test:package": "npm run build && node scripts/run-package-smoke.js && node scripts/run-esm-cjs-interop.js",
+    "prepare": "prisma generate",
     "prepublishOnly": "npm run build"
   },
   "exports": {
@@ -41,15 +42,21 @@
     "uuid": "^13.0.0"
   },
   "peerDependencies": {
-    "@prisma/client": "^5.22.0"
+    "@prisma/adapter-better-sqlite3": "^7.10.1",
+    "@prisma/client": "^7.10.1"
   },
   "devDependencies": {
+    "@prisma/adapter-better-sqlite3": "^7.10.1",
+    "@prisma/client": "^7.10.1",
     "@types/node": "^25.0.10",
     "@types/uuid": "^10.0.0",
-    "prisma": "^5.22.0",
+    "prisma": "^7.10.1",
     "tsup": "^8.5.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
+  },
+  "engines": {
+    "node": "^20.19 || ^22.12 || >=24"
   }
 }

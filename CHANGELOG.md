@@ -1,5 +1,25 @@
 # Changelog
 
+## Unreleased (breaking: requires a major release)
+
+- **Breaking:** Requires Prisma 7. The peers are `@prisma/client ^7.10.1` and the new
+  `@prisma/adapter-better-sqlite3 ^7.10.1` (native better-sqlite3), which npm 7+ and pnpm install
+  automatically. Prisma 5 users stay on 1.0.x.
+- **Breaking:** Only SQLite datasources are supported. Explicit initialization and lazy binding
+  reject any other URL with the new code `UNSUPPORTED_DATASOURCE_PROVIDER`; the message contains
+  no URL or credentials.
+- **Breaking:** Declares `engines.node` `^20.19 || ^22.12 || >=24` (Prisma 7's range);
+  TypeScript 5.4 or newer is required.
+- The library builds the root client with Prisma's better-sqlite3 driver adapter. SQLite
+  consumers' code and the public API are unchanged.
+- `DateTime` values keep their INTEGER unix-millisecond representation
+  (`timestampFormat: 'unixepoch-ms'`), so databases written by Prisma 5 need no migration.
+- SQLite URL query parameters no longer affect the connection; they still identify the target.
+  The opened file never includes the query string.
+- Repository toolchain: the schema datasource has no `url` (the CLI reads `prisma.config.ts`),
+  a `prepare` script runs `prisma generate`, and CI no longer uses the removed
+  `--skip-generate` flag.
+
 ## 1.0.10
 
 - Fix ESM package loading with CommonJS-generated `@prisma/client` peers by consuming runtime

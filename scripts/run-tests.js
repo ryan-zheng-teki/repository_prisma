@@ -36,6 +36,6 @@ const run = (command, args) => {
   }
 };
 
-run(npxCmd, ['prisma', 'db', 'push', '--skip-generate']);
+run(npxCmd, ['prisma', 'db', 'push']);
 run(npxCmd, ['prisma', 'generate']);
 run(npxCmd, ['vitest']);

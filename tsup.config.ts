@@ -8,5 +8,5 @@ export default defineConfig({
   clean: true,
   target: 'es2018',
   platform: 'node',
-  external: ['@prisma/client', 'uuid'],
+  external: ['@prisma/client', '@prisma/adapter-better-sqlite3', 'uuid'],
 });

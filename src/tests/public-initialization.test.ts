@@ -2,6 +2,7 @@ import {
   access,
   mkdir,
   mkdtemp,
+  readdir,
   realpath,
   rm,
   symlink,
@@ -11,6 +12,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import PrismaClientPackage from '@prisma/client';
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
   initializePrisma,
@@ -37,6 +39,19 @@ const fileExists = async (filePath: string): Promise<boolean> => {
   } catch {
     return false;
   }
+};
+
+const sqliteSeedClient = (databasePath: string) =>
+  new PrismaClientRuntime({
+    adapter: new PrismaBetterSqlite3(
+      { url: databasePath },
+      { timestampFormat: 'unixepoch-ms' }
+    ),
+  });
+
+const filesWithQueryInName = async (directory: string): Promise<string[]> => {
+  const entries = await readdir(directory, { recursive: true });
+  return entries.filter((entry) => entry.includes('?'));
 };
 
 const mainPath = async (): Promise<string> => {
@@ -124,6 +139,76 @@ describe.sequential('public initialization and real SQLite identity', () => {
 
     expect(await mainPath()).toBe(await realpath(expectedPath));
     expect(await fileExists(path.join(nestedDirectory, 'literal name.db'))).toBe(false);
+    expect(await filesWithQueryInName(directory)).toEqual([]);
+  });
+
+  it('opens an absolute target without creating a file named after its query string', async () => {
+    const directory = await temporaryDirectory();
+    const databasePath = path.join(directory, 'query.db');
+
+    await initializePrisma({
+      datasourceUrl: `file:${databasePath}?connection_limit=1&socket_timeout=10`,
+    });
+    await rootPrismaClient.$queryRawUnsafe('CREATE TABLE query_probe (id INTEGER PRIMARY KEY);');
+
+    expect(await mainPath()).toBe(await realpath(databasePath));
+    expect(await filesWithQueryInName(directory)).toEqual([]);
+  });
+
+  it('opens a SQLite memory target through the driver adapter without a database file', async () => {
+    const directory = await temporaryDirectory();
+    process.chdir(directory);
+
+    await initializePrisma({ datasourceUrl: 'file::memory:' });
+    await rootPrismaClient.$executeRawUnsafe('CREATE TABLE memory_probe (value TEXT NOT NULL);');
+    await rootPrismaClient.$executeRawUnsafe("INSERT INTO memory_probe (value) VALUES ('kept');");
+
+    expect(
+      await rootPrismaClient.$queryRawUnsafe('SELECT value FROM memory_probe;')
+    ).toEqual([{ value: 'kept' }]);
+    const rows = await rootPrismaClient.$queryRawUnsafe<DatabaseListRow[]>(
+      'PRAGMA database_list;'
+    );
+    expect(rows.find((row) => row.name.toLowerCase() === 'main')?.file).toBe('');
+    expect(await readdir(directory)).toEqual([]);
+  });
+
+  it('rejects a non-SQLite datasource with a plain, credential-free error on explicit and lazy use', async () => {
+    const nonSqliteUrl = 'postgresql://app:secret@db.example.invalid:5432/app';
+    const diagnosticCauses: unknown[] = [];
+
+    let explicitError: unknown;
+    try {
+      await initializePrisma({
+        datasourceUrl: nonSqliteUrl,
+        onDiagnostic: ({ cause }) => diagnosticCauses.push(cause),
+      });
+    } catch (caught) {
+      explicitError = caught;
+    }
+
+    expect(explicitError).toBeInstanceOf(PrismaInitializationError);
+    expect(explicitError).toMatchObject({
+      code: 'UNSUPPORTED_DATASOURCE_PROVIDER',
+      message: 'repository_prisma supports SQLite datasources only; use a file: URL.',
+    });
+    expect('cause' in (explicitError as object)).toBe(false);
+    for (const text of [String(explicitError), String(diagnosticCauses[0])]) {
+      expect(text).not.toContain('secret');
+      expect(text).not.toContain('db.example.invalid');
+    }
+
+    await shutdownPrisma();
+    process.env.NODE_ENV = 'production';
+    process.env.DATABASE_URL = nonSqliteUrl;
+    delete process.env.DATABASE_URL_TEST;
+
+    expect(() => rootPrismaClient.user).toThrowError(
+      expect.objectContaining({
+        name: 'PrismaInitializationError',
+        code: 'UNSUPPORTED_DATASOURCE_PROVIDER',
+      })
+    );
   });
 
   it('accepts a symlink spelling when canonical physical identity is the same', async () => {
@@ -138,6 +223,7 @@ describe.sequential('public initialization and real SQLite identity', () => {
     });
 
     expect(await mainPath()).toBe(await realpath(physicalDatabase));
+    expect(await filesWithQueryInName(directory)).toEqual([]);
   });
 
   it('preserves delete mode without WAL, then upgrades and independently verifies WAL', async () => {
@@ -210,7 +296,7 @@ describe.sequential('public initialization and real SQLite identity', () => {
     const directory = await temporaryDirectory();
     const databasePath = path.join(directory, 'existing.db');
     const datasourceUrl = `file:${databasePath}`;
-    const seedClient = new PrismaClientRuntime({ datasourceUrl });
+    const seedClient = sqliteSeedClient(databasePath);
     await seedClient.$executeRawUnsafe(
       'CREATE TABLE existing_probe (id INTEGER PRIMARY KEY, value TEXT NOT NULL);'
     );
@@ -246,7 +332,7 @@ describe.sequential('context-aware public forwarding with the current Prisma sch
     temporaryDirectories.push(directory);
     const databasePath = path.join(directory, 'als.db');
     const schemaDatabaseUrl = `file:${databasePath}`;
-    const schemaClient = new PrismaClientRuntime({ datasourceUrl: schemaDatabaseUrl });
+    const schemaClient = sqliteSeedClient(databasePath);
     await schemaClient.$executeRawUnsafe(
       'CREATE TABLE "User" ("id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "email" TEXT NOT NULL);'
     );

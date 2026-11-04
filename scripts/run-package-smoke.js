@@ -44,13 +44,20 @@ const symlinkDirectory = (target, linkPath) => {
   );
 };
 
+const filesWithQueryInName = (directory) =>
+  fs
+    .readdirSync(directory, { recursive: true })
+    .map(String)
+    .filter((entry) => entry.includes('?'));
+
 try {
   const packResult = run(
     npmCommand,
     ['pack', '--json', '--pack-destination', packDirectory],
     { capture: true }
   );
-  const packRecords = JSON.parse(packResult.stdout);
+  // `npm pack` runs the `prepare` script (prisma generate), whose output precedes the JSON.
+  const packRecords = JSON.parse(packResult.stdout.slice(packResult.stdout.search(/^\[/m)));
   assert.equal(packRecords.length, 1);
   const packRecord = packRecords[0];
   const includedPaths = new Set(packRecord.files.map((file) => file.path));
@@ -85,7 +92,24 @@ try {
       false,
       `${builtPath} must not retain the old query-log default`
     );
+    for (const bundledMarker of ['better_sqlite3.node', 'Dynamic require of', 'PrismaBetterSqlite3Adapter']) {
+      assert.equal(
+        builtSource.includes(bundledMarker),
+        false,
+        `${builtPath} must not bundle the driver adapter or better-sqlite3 (${bundledMarker})`
+      );
+    }
   }
+  assert.match(
+    fs.readFileSync(path.join(repoRoot, 'dist/index.js'), 'utf8'),
+    /require\(["']@prisma\/adapter-better-sqlite3["']\)/,
+    'dist/index.js must require the driver adapter as an external peer'
+  );
+  assert.match(
+    fs.readFileSync(path.join(repoRoot, 'dist/index.mjs'), 'utf8'),
+    /from\s*["']@prisma\/adapter-better-sqlite3["']/,
+    'dist/index.mjs must import the driver adapter as an external peer'
+  );
   for (const declarationPath of ['dist/index.d.ts', 'dist/index.d.mts']) {
     const declarationSource = fs.readFileSync(path.join(repoRoot, declarationPath), 'utf8');
     assert.equal(
@@ -97,6 +121,11 @@ try {
       declarationSource.includes('LOGGING_POLICY_CONFLICT'),
       true,
       `${declarationPath} must expose the conflict code`
+    );
+    assert.equal(
+      declarationSource.includes('UNSUPPORTED_DATASOURCE_PROVIDER'),
+      true,
+      `${declarationPath} must expose the unsupported-provider code`
     );
     assert.equal(
       declarationSource.includes('type RunInTransactionOptions'),
@@ -134,10 +163,13 @@ try {
     { cwd: consumerDirectory }
   );
 
-  symlinkDirectory(
-    path.join(repoRoot, 'node_modules', '@prisma', 'client'),
-    path.join(consumerDirectory, 'node_modules', '@prisma', 'client')
-  );
+  // The peers resolve their own dependencies from their real paths in the repository.
+  for (const peer of ['client', 'adapter-better-sqlite3']) {
+    symlinkDirectory(
+      path.join(repoRoot, 'node_modules', '@prisma', peer),
+      path.join(consumerDirectory, 'node_modules', '@prisma', peer)
+    );
+  }
 
   const importCanary = 'repository-prisma-import-canary';
   const importCanaryKey = 'REPOSITORY_PRISMA_IMPORT_CANARY';
@@ -154,6 +186,12 @@ const fs = require('node:fs');
 const Module = require('node:module');
 const originalLoad = Module._load;
 let constructors = 0;
+let nativeAddons = 0;
+const originalDlopen = process.dlopen;
+process.dlopen = function(...args) {
+  nativeAddons += 1;
+  return originalDlopen.apply(this, args);
+};
 Module._load = function(request, parent, isMain) {
   const loaded = originalLoad.call(this, request, parent, isMain);
   if (request !== '@prisma/client') return loaded;
@@ -167,7 +205,10 @@ Module._load = function(request, parent, isMain) {
     },
   };
 };
-process.on('exit', () => fs.writeFileSync(process.env.CONSTRUCTOR_SPY_FILE, String(constructors)));
+process.on('exit', () => {
+  fs.writeFileSync(process.env.CONSTRUCTOR_SPY_FILE, String(constructors));
+  fs.writeFileSync(process.env.CONSTRUCTOR_SPY_FILE + '.native', String(nativeAddons));
+});
 `;
   fs.writeFileSync(path.join(consumerDirectory, 'constructor-spy.cjs'), constructorSpy);
   const importEnvironment = {
@@ -208,6 +249,7 @@ process.stdout.write('cjs-import-safety-ok\\n');
   assert.equal(cjsImportResult.stdout.includes(inheritedValue), false);
   assert.equal(cjsImportResult.stderr.includes(inheritedValue), false);
   assert.equal(fs.readFileSync(cjsImportSpyFile, 'utf8'), '0');
+  assert.equal(fs.readFileSync(`${cjsImportSpyFile}.native`, 'utf8'), '0', 'CJS import must not load a native addon');
 
   const esmImportScript = `
 import assert from 'node:assert/strict';
@@ -236,6 +278,7 @@ process.stdout.write('esm-import-safety-ok\\n');
   assert.equal(esmImportResult.stdout.includes(inheritedValue), false);
   assert.equal(esmImportResult.stderr.includes(inheritedValue), false);
   assert.equal(fs.readFileSync(esmImportSpyFile, 'utf8'), '0');
+  assert.equal(fs.readFileSync(`${esmImportSpyFile}.native`, 'utf8'), '0', 'ESM import must not load a native addon');
 
   const policyConstructorSpy = `
 const fs = require('node:fs');
@@ -293,7 +336,7 @@ export async function resolve(specifier, context, nextResolve) {
   const cjsPolicyScript = `
 const assert = require('node:assert/strict');
 const repo = require('repository_prisma');
-const datasourceUrl = 'postgresql://localhost:5432/repository-prisma-synthetic';
+const datasourceUrl = 'file:repository-prisma-synthetic?mode=memory';
 const option = process.env.LOG_QUERY_OPTION;
 const options = { datasourceUrl };
 if (option !== 'unset') options.logQueries = option === 'true';
@@ -319,7 +362,7 @@ if (option !== 'unset') options.logQueries = option === 'true';
   const esmPolicyScript = `
 import assert from 'node:assert/strict';
 import * as repo from 'repository_prisma';
-const datasourceUrl = 'postgresql://localhost:5432/repository-prisma-synthetic';
+const datasourceUrl = 'file:repository-prisma-synthetic?mode=memory';
 const option = process.env.LOG_QUERY_OPTION;
 const options = { datasourceUrl };
 if (option !== 'unset') options.logQueries = option === 'true';
@@ -427,7 +470,7 @@ process.stdout.write('esm-policy-probe-ok\\n');
           POLICY_OPTIONS_FILE: optionsFile,
           LOG_QUERY_OPTION: 'unset',
           LOG_QUERY_CASE: 'lazy-conflict',
-          DATABASE_URL: 'postgresql://localhost:5432/repository-prisma-synthetic',
+          DATABASE_URL: 'file:repository-prisma-synthetic?mode=memory',
           PRISMA_LOG_QUERIES: 'off',
           ...(format === 'esm'
             ? { POLICY_PEER_STUB: path.join(consumerDirectory, 'policy-peer-stub.mjs') }
@@ -517,6 +560,18 @@ const repo = require('repository_prisma');
     await repo.shutdownPrisma();
   }
 
+  let unsupported;
+  try {
+    await repo.initializePrisma({ datasourceUrl: ${JSON.stringify(`postgresql://app:${cjsSecret}@db.example.invalid/app`)} });
+  } catch (error) {
+    unsupported = error;
+  }
+  assert.equal(unsupported instanceof repo.PrismaInitializationError, true);
+  assert.equal(unsupported.code, 'UNSUPPORTED_DATASOURCE_PROVIDER');
+  assert.match(unsupported.message, /supports SQLite datasources only/);
+  assert.equal(String(unsupported).includes(${JSON.stringify(cjsSecret)}), false);
+  await repo.shutdownPrisma();
+
   const invalid = 'file:' + path.join(${JSON.stringify(temporaryRoot)}, 'missing-parent', ${JSON.stringify(cjsSecret)});
   let failure;
   try { await repo.initializePrisma({ datasourceUrl: invalid, enableWAL: true }); } catch (error) { failure = error; }
@@ -557,7 +612,7 @@ assert.equal(typeof initializePrisma, 'function');
 assert.equal(typeof PrismaInitializationError, 'function');
 assert.equal(typeof runInTransaction, 'function');
 assert.equal(rootPrismaClient.then, undefined);
-await initializePrisma({ datasourceUrl: ${JSON.stringify(`file:${esmDatabase}`)}, enableWAL: true });
+await initializePrisma({ datasourceUrl: ${JSON.stringify(`file:${esmDatabase}?connection_limit=1`)}, enableWAL: true });
 const transactionProbe = await runInTransaction(
   () => prisma.$queryRawUnsafe('SELECT 1 AS transaction_option_probe;'),
   { maxWait: 5_000, timeout: 10_000 }
@@ -578,6 +633,11 @@ process.stdout.write('esm-package-smoke-ok\\n');
   });
   assert.match(esmResult.stdout, /esm-package-smoke-ok/);
   assert.equal(esmResult.stderr.includes('prisma:error'), false);
+  assert.deepEqual(
+    filesWithQueryInName(temporaryRoot),
+    [],
+    'no smoke step may create a database file named after a URL query string'
+  );
 
   fs.writeFileSync(
     path.join(consumerDirectory, 'type-smoke.ts'),
@@ -601,6 +661,7 @@ const options: InitializePrismaOptions = {
 };
 const queryOptions: InitializePrismaOptions = { logQueries: true };
 const conflictCode: PrismaInitializationErrorCode = 'LOGGING_POLICY_CONFLICT';
+const unsupportedCode: PrismaInitializationErrorCode = 'UNSUPPORTED_DATASOURCE_PROVIDER';
 const transactionOptions: RunInTransactionOptions = {
   maxWait: 2_000,
   timeout: 10_000,
@@ -619,6 +680,7 @@ void optionedTransaction;
 void invalidTransactionOptions;
 void invalidWait;
 void conflictCode;
+void unsupportedCode;
 void diagnostic;
 void PrismaInitializationError;
 `
@@ -656,6 +718,9 @@ void PrismaInitializationError;
       declarations: 'pass',
       installedArtifact: 'pass',
       safeFailureOutput: 'pass',
+      externalDriverAdapter: 'pass',
+      noNativeAddonOnImport: 'pass',
+      noQueryStringFiles: 'pass',
       cleanup: temporaryRoot,
     })
   );

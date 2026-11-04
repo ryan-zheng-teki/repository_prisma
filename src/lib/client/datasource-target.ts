@@ -1,35 +1,21 @@
 import path from 'node:path';
-import {
-  DatabaseProvider,
-  getDatabaseUrl,
-  inferDatabaseProviderFromUrl,
-} from '../database';
+import { getDatabaseUrl, inferDatabaseProviderFromUrl } from '../database';
 import { InitializationStageFailure } from './initialization-error';
 
 export type SqliteFileDatasourceTarget = {
   kind: 'sqlite-file';
-  clientUrl: string;
   bindingKey: string;
   expectedPath: string;
 };
 
 export type SqliteMemoryDatasourceTarget = {
   kind: 'sqlite-memory';
-  clientUrl: string;
-  bindingKey: string;
-};
-
-export type OtherDatasourceTarget = {
-  kind: 'other';
-  provider: DatabaseProvider;
-  clientUrl: string;
   bindingKey: string;
 };
 
 export type ResolvedDatasourceTarget =
   | SqliteFileDatasourceTarget
-  | SqliteMemoryDatasourceTarget
-  | OtherDatasourceTarget;
+  | SqliteMemoryDatasourceTarget;
 
 const selectedDatasourceUrl = (explicitUrl?: string): string => {
   if (explicitUrl !== undefined && explicitUrl.trim().length > 0) {
@@ -71,9 +57,9 @@ const isMemoryTarget = (filePath: string, query: string): boolean => {
   return parameters.get('mode')?.toLowerCase() === 'memory';
 };
 
-const normalizeClientPath = (absolutePath: string): string => {
+const normalizeBindingPath = (absolutePath: string): string => {
   if (process.platform === 'win32') {
-    return absolutePath.replace(/\\/g, '/');
+    return absolutePath.replace(/\\/g, '/').toLowerCase();
   }
   return absolutePath;
 };
@@ -90,24 +76,19 @@ const normalizeInputPath = (filePath: string): string => {
 const resolveSqliteTarget = (datasourceUrl: string): ResolvedDatasourceTarget => {
   const { filePath, query } = splitSqliteUrl(datasourceUrl);
   if (isMemoryTarget(filePath, query)) {
-    const clientUrl = /^file:/i.test(datasourceUrl)
+    const bindingKey = /^file:/i.test(datasourceUrl)
       ? `file:${datasourceUrl.slice('file:'.length)}`
       : `file:${datasourceUrl}`;
     return {
       kind: 'sqlite-memory',
-      clientUrl,
-      bindingKey: clientUrl,
+      bindingKey,
     };
   }
 
   const absolutePath = path.resolve(process.cwd(), normalizeInputPath(filePath));
-  const clientPath = normalizeClientPath(absolutePath);
-  const clientUrl = `file:${clientPath}${query}`;
-  const bindingPath = process.platform === 'win32' ? clientPath.toLowerCase() : clientPath;
   return {
     kind: 'sqlite-file',
-    clientUrl,
-    bindingKey: `file:${bindingPath}${query}`,
+    bindingKey: `file:${normalizeBindingPath(absolutePath)}${query}`,
     expectedPath: absolutePath,
   };
 };
@@ -116,16 +97,13 @@ export const resolveDatasourceTarget = (
   explicitUrl?: string
 ): ResolvedDatasourceTarget => {
   const datasourceUrl = selectedDatasourceUrl(explicitUrl);
-  const provider = inferDatabaseProviderFromUrl(datasourceUrl);
 
-  if (/^file:/i.test(datasourceUrl) || provider === 'sqlite') {
-    return resolveSqliteTarget(datasourceUrl);
+  if (inferDatabaseProviderFromUrl(datasourceUrl) !== 'sqlite') {
+    throw new InitializationStageFailure(
+      'UNSUPPORTED_DATASOURCE_PROVIDER',
+      new Error('The selected datasource is not SQLite.')
+    );
   }
 
-  return {
-    kind: 'other',
-    provider,
-    clientUrl: datasourceUrl,
-    bindingKey: datasourceUrl,
-  };
+  return resolveSqliteTarget(datasourceUrl);
 };

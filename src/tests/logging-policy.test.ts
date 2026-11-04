@@ -83,7 +83,7 @@ describe('query logging policy', () => {
       return asPrismaClient(clients.shift()!);
     };
     const lifecycle = new PrismaClientLifecycle(factory);
-    const target = 'postgresql://user:password@localhost:5432/logging';
+    const target = 'file::memory:';
     delete process.env.DATABASE_URL_TEST;
     process.env.DATABASE_URL = target;
 
