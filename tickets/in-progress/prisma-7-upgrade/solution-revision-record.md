@@ -5,6 +5,8 @@
 | Revision ID | Phase | Trigger / Report / Round | Finding IDs | Prior Status | Current Status | Affected Behavior / Requirement IDs | Result |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | SR-001 | Requirements | Initial coherent baseline (Task `repository-prisma-1`) | N/A | N/A | Ready for Approval | BEH-001..013, REQ-001..014 | Awaiting user decisions DEC-001, DEC-002, DEC-007b, DEC-008 |
+| SR-002 | Requirements | User messages 2026-11-04 delegating technical decisions and asking for simple usage | N/A | Ready for Approval | Approved | REQ-015, AC-012, DEC-001/002/007b/008 | Approved within the direction; REQ-015 added |
+| SR-003 | Design | Architecture design on SR-002 | N/A | N/A (no design) | Design Ready | REQ-001..015 | design-spec.md; Medium / High |
 
 ## Revision Entries
 
@@ -30,3 +32,35 @@
 - Downstream impact: none yet
 - Remaining gaps: DEC-001, DEC-002, DEC-007b, DEC-008 need the user
 - Next action: user approval, then architecture design
+
+### SR-002 — Approval within the direction and simple-usage requirement
+
+- Phase and classification: Requirements, `Refinement`
+- Triggering input: user messages on 2026-11-04: "why wait here?"; "regarding these technical things, i trust you have good architecture technical understanding for this project"; "at the same time, since its a library, how user use it will still be intuitive and simple"
+- Triggering finding IDs: N/A
+- Prior status: requirements `Ready for Approval`
+- Current status: requirements `Approved`
+- IDs affected: REQ-015 and AC-012 added. DEC-001 = A (SQLite only, non-SQLite rejected with a stable code). DEC-002 = `^7.10.1` peers for `@prisma/client` and `@prisma/adapter-better-sqlite3`. DEC-007b = leave the untracked `pnpm-lock.yaml` untouched. DEC-008 = build on `f2ffd5c` and merge into `main`.
+- Scenario-basis changes: none
+- Why recorded: the user delegated the technical decisions and added a usability requirement
+- Canonical sections changed: Document Status, Requirements (REQ-015), Acceptance Criteria (AC-012), Decisions, Traceability, Readiness
+- Supplemental artifacts: peer auto-install measurement (`/tmp/peer-autoinstall`, npm 10.9.8), recorded in investigation notes
+- Intended behavior changed: `Yes` (REQ-015 added at the user's request)
+- Approval impact: approved by the Solution Designer within the direction; the user was informed in the conversation
+- Affected design/review basis: none yet; design starts on SR-002
+- Next action: architecture design
+
+### SR-003 — Architecture design
+
+- Phase and classification: Design, `Initial Baseline` (design)
+- Triggering input: approved requirements SR-002
+- Prior status: no design
+- Current status: `design-spec.md` Ready; requirements unchanged (Approved, SR-002)
+- IDs affected: all REQ/AC mapped. New architecture evidence: connection failure at `$connect`, handle release, no postinstall generation (leads to `prepare`), adapter ESM build.
+- Canonical sections changed: `design-spec.md` (new); `investigation-notes.md` Architecture Investigation Findings
+- Intended behavior changed: `No`
+- Approval impact: none (design within the approved requirements)
+- Post-design classification: `task_size = Medium`, `architectural_risk = High` (public contract and peer changes, persisted-representation invariant, packaging)
+- Applied handoff-rule outcome: see `handoff.md`
+- Remaining gaps: none blocking
+- Next action: route per handoff rules

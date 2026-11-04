@@ -2,15 +2,15 @@
 
 ## Document Status
 
-- Status: `Ready for Approval`
-- Current solution revision ID: `SR-001`
+- Status: `Approved`
+- Current solution revision ID: `SR-002`
 - Package identifier: `prisma-7-upgrade`
 - Request / ticket: Project Task `repository-prisma-1`: upgrade Prisma (client and CLI) from 5.22.0 to the latest stable 7.x (7.10.1)
 - Requested by: `/project_task_manager` (run `project_task_manager_843e78c72f40444ca701a6c2c0dfe98c`), on behalf of the user
 - Requirements owner: Solution Designer
 - Date: 2026-11-04
-- Approved by and reference: pending (user decisions DEC-001, DEC-002, DEC-007b, DEC-008)
-- Exact approved requirements baseline / solution revision: pending (`SR-001` proposed)
+- Approved by and reference: `Solution Designer within the direction (user informed)`. Reference: the user's messages on 2026-11-04, "why wait here?", "regarding these technical things, i trust you have good architecture technical understanding for this project" and "at the same time, since its a library, how user use it will still be intuitive and simple" (the last adds REQ-015/AC-012). The user was informed in the conversation of each decision taken (DEC-001, DEC-002, DEC-007b, DEC-008).
+- Exact approved requirements baseline / solution revision: `SR-002` (this document as committed with SR-002)
 - Behavior-defining supplements and their approved versions: none. `probes/` is evidence only.
 
 ## Problem And Desired Outcome
@@ -104,6 +104,7 @@ None. The released-but-unmerged 1.0.10 line is handled by the base choice DEC-00
 | REQ-011 | Schema and config are valid for Prisma 7: no datasource `url` in the schema, and the CLI URL comes from `prisma.config.ts`. Models are unchanged. | BEH-012 | Must | P1012 (Reproduced) | probe | — |
 | REQ-012 | README (requirements, install, Prisma 7 notes, non-SQLite stance, query-string and DateTime notes), DESIGN (adapter construction and rationale) and CHANGELOG (an unreleased entry marked breaking) match the change. The package version is not bumped; nothing is tagged or published. | all | Must | AGENTS.md; Task | — | DEC-009 |
 | REQ-013 | `package-lock.json` is the single tracked lockfile; `pnpm-lock.yaml` is not added to the repository. | BEH-011 | Must | Task done-when | git history, CI | DEC-007 |
+| REQ-015 | Using the library stays simple for SQLite consumers: no new public option, call or code is required to use it on Prisma 7. Driver adapters are invisible in normal use (the library builds the adapter). Installation is the usual package install, with peers auto-installed by npm 7+ and pnpm defaults. README gives one short setup section covering install, the schema generator block and `prisma.config.ts`, with copy-paste snippets. Errors for unsupported setups say what to do in plain words. | BEH-002, BEH-010 | Must | User, 2026-11-04: "how user use it will still be intuitive and simple" | Measured: npm 10.9.8 auto-installed both declared peers (`/tmp/peer-autoinstall`) | User |
 | REQ-014 | The package declares its Node runtime minimum matching Prisma 7 (`^20.19 \|\| ^22.12 \|\| >=24`) and documents TypeScript >= 5.4. | BEH-013 | Should | Consumers get an early, clear signal | npm metadata | DEC-010 |
 
 ## Acceptance Criteria
@@ -120,6 +121,7 @@ None. The released-but-unmerged 1.0.10 line is handled by the base choice DEC-00
 | AC-008 | REQ-008 | SCN-005 | `initializePrisma({ datasourceUrl: 'postgresql://...' })` and lazy binding to a non-SQLite URL | Outcome per DEC-001 (recommended: rejects with a new stable code, no URL in the message) | — | New tests |
 | AC-009 | REQ-009 | SCN-003 | Packed tarball installed in an ESM and a CJS consumer with Prisma 7 peers | Both import; `dist` contains no bundled adapter or better-sqlite3 code; no `.env` loaded; no native addon loaded on import | — | `npm run test:package` incl. interop probe |
 | AC-010 | REQ-010, REQ-011 | SCN-004 | Clean checkout | All commands in REQ-010 pass; CI workflow commands match | — | Logged evidence |
+| AC-012 | REQ-015 | SCN-001, SCN-003 | A fresh consumer project follows only the README setup section | `npm install repository_prisma` (plus `prisma` as a dev dependency) installs `@prisma/client` and the adapter; the existing `initializePrisma({ datasourceUrl })` + repository code runs unchanged; no adapter import in consumer code | A non-SQLite URL gets an error whose message states that only SQLite is supported | Package smoke installs without `--legacy-peer-deps`; README review |
 | AC-011 | REQ-012, REQ-014 | all | Docs review | README/DESIGN/CHANGELOG and `engines` match the behavior; version unchanged; no tag | — | Docs review |
 
 ## Relevant Scenarios And Journeys
@@ -177,14 +179,14 @@ None. The released-but-unmerged 1.0.10 line is handled by the base choice DEC-00
 
 | Decision ID | Question | Why It Matters | Options / Evidence | Reasoning And Recommendation | Decision Owner | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| DEC-001 | What happens with non-SQLite datasource URLs on Prisma 7? | Prisma 7 cannot build a client from a URL; the library would need a provider-specific adapter for each database | A) SQLite only: non-SQLite targets reject at bind/initialize with a new stable code (e.g. `UNSUPPORTED_DATASOURCE_PROVIDER`), documented. B) New public option to pass an app-built driver adapter. C) The library loads pg/mariadb/mssql adapters as optional peers. | The library's features (WAL, identity, case-insensitive helpers) are SQLite-centred. The only known consumer is SQLite. Non-SQLite was never tested against a real database. B and C add new, untested public surface. A states the truth plainly and keeps the change small; B can be added later without breaking anything (FU-004). **Recommend A.** | User (removes a documented capability) | Needs user |
-| DEC-002 | Peer ranges | Declares what the library supports; a release decision | Tested: 7.10.1 only. Adapters are released in lockstep with the client. 8.x has a different CLI. | **Recommend** `@prisma/client: ^7.10.1` and a new peer `@prisma/adapter-better-sqlite3: ^7.10.1` (peer, not a dependency, so the consumer controls the version lockstep and the native build); dev `prisma: 7.10.1` range `^7.10.1`. A wider floor (`^7.0.0`) is untested. Caret ranges exclude 8.x. The next release becomes a major (2.0.0). | User (Task: "propose") | Needs user |
+| DEC-001 | What happens with non-SQLite datasource URLs on Prisma 7? | Prisma 7 cannot build a client from a URL; the library would need a provider-specific adapter for each database | A) SQLite only: non-SQLite targets reject at bind/initialize with a new stable code (e.g. `UNSUPPORTED_DATASOURCE_PROVIDER`), documented. B) New public option to pass an app-built driver adapter. C) The library loads pg/mariadb/mssql adapters as optional peers. | The library's features (WAL, identity, case-insensitive helpers) are SQLite-centred. The only known consumer is SQLite. Non-SQLite was never tested against a real database. B and C add new, untested public surface. A states the truth plainly and keeps the change small; B can be added later without breaking anything (FU-004). **Recommend A.** | Solution Designer (user delegated technical decisions, 2026-11-04) | Decided: A |
+| DEC-002 | Peer ranges | Declares what the library supports; a release decision | Tested: 7.10.1 only. Adapters are released in lockstep with the client. 8.x has a different CLI. | **Recommend** `@prisma/client: ^7.10.1` and a new peer `@prisma/adapter-better-sqlite3: ^7.10.1` (peer, not a dependency, so the consumer controls the version lockstep and the native build); dev `prisma: 7.10.1` range `^7.10.1`. A wider floor (`^7.0.0`) is untested. Caret ranges exclude 8.x. The next release becomes a major (2.0.0). | Solution Designer (user delegated technical decisions, 2026-11-04) | Decided as recommended |
 | DEC-003 | Which SQLite adapter | Native vs libsql | better-sqlite3: documented by Prisma for SQLite and Measured working. libsql: aimed at Turso/remote. | **better-sqlite3.** | Solution Designer | Decided |
 | DEC-005 | DateTime storage format | Data continuity | Measured: `iso8601` default breaks range queries over Prisma-5 rows | **`unixepoch-ms`** for library-built clients; README warns consumers who build their own clients | Solution Designer | Decided |
 | DEC-006 | SQLite URL query strings | Adapter would open `name?query` | Reproduced | Open the resolved path without the query. Engine-only parameters are ignored and documented. The binding key is unchanged. | Solution Designer | Decided |
 | DEC-007 | Which lockfiles the repo keeps | Task done-when | `pnpm-lock.yaml` never tracked; CI uses `npm ci` with the npm cache | **`package-lock.json` only.** | Solution Designer | Decided |
-| DEC-007b | Delete the stale untracked `pnpm-lock.yaml` (Prisma 5.22) in the shared checkout `/Users/normy/autobyteus_org/repository_prisma`? | A pnpm install there would reinstall 5.22. It is your local file, untracked, so deletion cannot be undone from git. | Keep / delete during delivery cleanup | **Recommend deleting it** during delivery cleanup | User | Needs user |
-| DEC-008 | Base for this upgrade | `main` is 1.0.9; the published `1.0.10` (ESM interop fix, tag `v1.0.10`) lives only on the unmerged branch `codex/repository-prisma-esm-cjs-interop` (`f2ffd5c`), whose ancestor is `main` | A) Build on `f2ffd5c` and merge into `main`; `main` then fast-forwards over the released 1.0.10 commits. B) Build on `main`; the upgrade would drop the published 1.0.10 fix. C) Separate prerequisite Task to merge 1.0.10 first. | B would regress a published release. A and C give the same result, and A needs no extra Task. **Recommend A** (the worktree is already on `f2ffd5c`). | User (changes `main`'s history to include another ticket's work) | Needs user |
+| DEC-007b | Delete the stale untracked `pnpm-lock.yaml` (Prisma 5.22) in the shared checkout `/Users/normy/autobyteus_org/repository_prisma`? | A pnpm install there would reinstall 5.22. It is your local file, untracked, so deletion cannot be undone from git. | Keep / delete during delivery cleanup | Leave it untouched: it is outside git, the repo does not use it, and deleting a user's file is not needed for this ticket. Mention it in the final result. | Solution Designer | Decided: leave |
+| DEC-008 | Base for this upgrade | `main` is 1.0.9; the published `1.0.10` (ESM interop fix, tag `v1.0.10`) lives only on the unmerged branch `codex/repository-prisma-esm-cjs-interop` (`f2ffd5c`), whose ancestor is `main` | A) Build on `f2ffd5c` and merge into `main`; `main` then fast-forwards over the released 1.0.10 commits. B) Build on `main`; the upgrade would drop the published 1.0.10 fix. C) Separate prerequisite Task to merge 1.0.10 first. | B would regress a published release. A and C give the same result, and A needs no extra Task. **Recommend A** (the worktree is already on `f2ffd5c`). | Solution Designer (user delegated technical decisions, 2026-11-04) | Decided: A |
 | DEC-009 | Version and CHANGELOG | No release in this Task | — | Do not bump `version`. Add a `## Unreleased (breaking: requires a major release)` CHANGELOG section. | Solution Designer | Decided |
 | DEC-010 | Declare `engines.node`? | Early signal for consumers | Prisma 7 engines | Declare `^20.19 \|\| ^22.12 \|\| >=24` | Solution Designer | Decided |
 
@@ -206,6 +208,7 @@ None. The released-but-unmerged 1.0.10 line is handled by the base choice DEC-00
 | REQ-012 | all | all | AC-011 | all | — |
 | REQ-013 | UC-003 | BEH-011 | AC-001 | SCN-004 | git |
 | REQ-014 | UC-002 | BEH-013 | AC-011 | SCN-003 | npm |
+| REQ-015 | UC-001, UC-002 | BEH-002, BEH-010 | AC-012 | SCN-001, SCN-003 | peer auto-install probe |
 
 ## Architecture Phase Input
 
@@ -228,11 +231,11 @@ None. The released-but-unmerged 1.0.10 line is handled by the base choice DEC-00
 - Applicable UI/UX approval and final visual-reference basis are recorded: `N/A`
 - Material assumptions and decisions are visible, each decision with reasoning and recommendation: `Yes`
 - Content ready for approval: `Yes`
-- Remaining content blocker: user decisions DEC-001, DEC-002, DEC-007b, DEC-008
+- Remaining content blocker: None
 
 ### Approved Basis Ready For Design
 
-- Approval recorded: `No`
-- Exact requirements and supplement approval basis recorded: `No`
-- Approved requirements package ready for architecture design: `No`
-- Remaining blocker: user approval
+- Approval recorded: `Yes` (Solution Designer within the direction; user informed)
+- Exact requirements and supplement approval basis recorded: `Yes` (SR-002)
+- Approved requirements package ready for architecture design: `Yes`
+- Remaining blocker: None

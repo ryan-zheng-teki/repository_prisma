@@ -11,7 +11,7 @@
 - Finalization target remote / branch: `origin` / `main`, as the Task requires ("finalized on the base branch"). Merging fast-forwards `main` over the released 1.0.10 commits (DEC-008).
 - Bootstrap result: Completed. `git worktree add -b codex/prisma-7-upgrade ... origin/codex/repository-prisma-esm-cjs-interop`; ticket folder `tickets/in-progress/prisma-7-upgrade`.
 - Bootstrap note: `git fetch origin` fails in this environment (`git@github.com: Permission denied (publickey)`). `git ls-remote origin` succeeds through the configured `github.com-ryan` host alias and confirmed remote `main` = `8ab582f` and remote ticket branch = `f2ffd5c`, both identical to the local remote-tracking refs. Delivery should re-check fetch/push access before finalization.
-- Current solution revision ID: `SR-001`
+- Current solution revision ID: `SR-002`
 - Authorities read (requirements reading gate; file and date): `references/requirements-engineering.md`, `references/finding-the-cause.md`, `references/ticket-scope.md` (2026-11-04)
 - Investigation status: Requirements investigation complete. Architecture investigation not started (follows approval).
 
@@ -110,6 +110,7 @@
 | `datetime-continuity-*` | Prisma-5 data read/written by 7 | 5.22 stores INTEGER ms. With adapter default `iso8601`, new rows are TEXT and a range filter misses older rows. `unixepoch-ms` preserves results. | Measured | REQ-005, DEC-005 | `probes/README.md` |
 | Full suite on scratch patch | Whole library | 83/83 pass; typecheck passes | Reproduced | Feasibility of REQ-003..010 | `probes/feasibility-patch.diff` |
 | `test:package` on scratch patch | Packaging | Bundled adapter breaks ESM; externalized adapter passes smoke | Reproduced | REQ-009 | `probes/README.md` |
+| Fake library with peers `@prisma/client` and `@prisma/adapter-better-sqlite3` `^7.10.1`, packed and installed into an empty consumer with npm 10.9.8 (`/tmp/peer-autoinstall`) | Consumer install simplicity | npm installed both peers automatically | Measured | REQ-015 | this row |
 | Read `better-sqlite3/lib/database.js:48` | Import-time cost | Native addon is loaded lazily in the `Database` constructor | Read | REQ-009 (no native load at import) | — |
 
 - Temporary diagnostics: None in the task worktree. All probes ran in `/tmp` scratch copies.
@@ -157,7 +158,19 @@
 
 ## Architecture Investigation Findings
 
-Not started; follows requirements approval.
+Recorded 2026-11-04 after SR-002 approval. Design reading gate read: `references/architecture-design.md`, `references/design-principles.md`, project `DESIGN.md`.
+
+| Method / Source | Observation | Established | Design Use |
+| --- | --- | --- | --- |
+| `/tmp/prisma7-scripts/p3.mjs` | Client construction with a missing directory succeeds; `$connect()` throws "Cannot open database because the directory does not exist". `$disconnect()` closes the handle (WAL checkpointed, `-wal`/`-shm` gone); the same client reconnects. | Reproduced | CONNECTION_FAILED path and shutdown/rebind unchanged |
+| `/tmp/prisma5-scripts/raw.cjs` vs `/tmp/prisma7dt-scripts/raw.mjs` | Raw `SELECT id, count(*)` returns `{ id: 1, n: 1n }` on both 5.22 and 7.10.1 | Measured | No raw-type change for readiness or docs |
+| `/tmp/prisma7-probe`: `rm -rf node_modules/.prisma && npm run build` | DTS build fails without a generated client. `prisma generate` succeeds with no `DATABASE_URL`. | Reproduced | `prepare: prisma generate` |
+| `npm view @prisma/client@{5.22.0,7.10.1} scripts` | 5.22 had a postinstall that auto-generated; 7.10.1 has none | Read | same; the release workflow (`npm ci`, `npm run build`) relied on it |
+| `@prisma/adapter-better-sqlite3/package.json` | `exports.import` -> real ESM `dist/index.mjs` | Read | Named ESM import is safe |
+| `.github/workflows/ci.yml` | `env DATABASE_URL`, `npx prisma db push --skip-generate`, then typecheck before test | Read | Remove the step and the env; `prepare` generates |
+| `grep -rn clientUrl src` | Only non-test reader is `lifecycle.ts:69` | Read | `clientUrl` removable |
+| `lifecycle.ts:73-81, 114-121, 210-229` | Resolution failures keep their own stage code on both entry forms | Read | Reject non-SQLite in `resolveDatasourceTarget` |
+
 
 ## Requirement Implications
 
