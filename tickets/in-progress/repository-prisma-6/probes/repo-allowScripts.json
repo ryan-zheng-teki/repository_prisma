@@ -1,0 +1,7 @@
+{
+  "better-sqlite3@12.11.1": true,
+  "esbuild": false,
+  "prisma": false,
+  "@prisma/engines": false,
+  "fsevents": false
+}
