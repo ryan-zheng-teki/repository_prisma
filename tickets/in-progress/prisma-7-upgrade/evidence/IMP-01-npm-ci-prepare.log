@@ -1,0 +1,55 @@
+# Check: IMP-01
+# Command: env -u DATABASE_URL -u DATABASE_URL_TEST sh -c 'rm -rf node_modules && npm ci' ; npm ls prisma @prisma/client @prisma/adapter-better-sqlite3 ; ls node_modules/.prisma/client ; git ls-files pnpm-lock.yaml
+# Commit: a092a60 (worktree /Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade)
+# Environment: macOS 26.5.2, Node v22.23.1, npm 10.9.8
+# Date: 2026-11-04T12:30Z
+
+npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
+
+> repository_prisma@1.0.10 prepare
+> prisma generate
+
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+
+✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 51ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+
+
+added 268 packages in 5s
+exit=0
+
+$ npm ls prisma @prisma/client @prisma/adapter-better-sqlite3
+repository_prisma@1.0.10 /Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade
++-- @prisma/adapter-better-sqlite3@7.10.1
++-- @prisma/client@7.10.1
+| `-- prisma@7.10.1 deduped
+`-- prisma@7.10.1
+
+
+$ ls node_modules/.prisma/client
+client.d.ts
+client.js
+default.d.ts
+default.js
+edge.d.ts
+edge.js
+index-browser.js
+index.d.ts
+index.js
+package.json
+query_compiler_fast_bg.js
+query_compiler_fast_bg.wasm
+query_compiler_fast_bg.wasm-base64.js
+schema.prisma
+wasm-edge-light-loader.mjs
+wasm-worker-loader.mjs
+
+$ git ls-files pnpm-lock.yaml (empty = not tracked)
+tracked-pnpm-lock-count=0
+
+$ node -p peers/engines
+{"peerDependencies":{"@prisma/adapter-better-sqlite3":"^7.10.1","@prisma/client":"^7.10.1"},"engines":{"node":"^20.19 || ^22.12 || >=24"},"prepare":"prisma generate","version":"1.0.10"}

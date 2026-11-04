@@ -1,0 +1,18 @@
+# Check: IMP-06
+# Command: git diff --check 614bac4..HEAD (this implementation commit); then git diff --check f2ffd5c..HEAD (whole branch) for reference
+# Commit: a092a60 (worktree /Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade)
+# Environment: macOS 26.5.2, git 2.50.1
+# Date: 2026-11-04T12:32Z
+
+$ git diff --check 614bac4..HEAD
+implementation-commit exit=0
+
+$ git diff --check f2ffd5c..HEAD (reference; hits are only blank diff-context lines inside the Solution Designer probe file probes/feasibility-patch.diff, which a unified diff writes as a single space)
+tickets/in-progress/prisma-7-upgrade/probes/feasibility-patch.diff:10: trailing whitespace.
+tickets/in-progress/prisma-7-upgrade/probes/feasibility-patch.diff:20: trailing whitespace.
+tickets/in-progress/prisma-7-upgrade/probes/feasibility-patch.diff:24: trailing whitespace.
+tickets/in-progress/prisma-7-upgrade/probes/feasibility-patch.diff:28: trailing whitespace.
+tickets/in-progress/prisma-7-upgrade/probes/feasibility-patch.diff:30: trailing whitespace.
+tickets/in-progress/prisma-7-upgrade/probes/feasibility-patch.diff:36: trailing whitespace.
+tickets/in-progress/prisma-7-upgrade/probes/feasibility-patch.diff:61: trailing whitespace.
+whole-branch exit=2

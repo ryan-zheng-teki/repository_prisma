@@ -1,0 +1,84 @@
+# Check: IMP-08
+# Command: NO_COLOR=1 npx vitest run --reporter=verbose src/tests/client-lifecycle.test.ts src/tests/datasource-readiness.test.ts src/tests/public-initialization.test.ts src/tests/datetime-continuity.test.ts src/tests/logging-policy.test.ts (after IMP-03 generated the client)
+# Commit: a092a60 (worktree /Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade)
+# Environment: macOS 26.5.2, Node v22.23.1, npm 10.9.8
+# Date: 2026-11-04T12:32Z
+
+
+ RUN  v4.0.18 /Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade
+
+ ✓ src/tests/datasource-readiness.test.ts > datasource target normalization > resolves the physical SQLite path against cwd and keeps query parameters only in the binding key 6ms
+ ✓ src/tests/datasource-readiness.test.ts > datasource target normalization > classifies file::memory: as SQLite memory 1ms
+ ✓ src/tests/datasource-readiness.test.ts > datasource target normalization > classifies file:?mode=memory&cache=shared as SQLite memory 0ms
+ ✓ src/tests/datasource-readiness.test.ts > datasource target normalization > classifies file:shared?mode=MEMORY as SQLite memory 1ms
+ ✓ src/tests/datasource-readiness.test.ts > datasource target normalization > rejects the non-SQLite target postgresql://user:secret@db.example.invalid:5432/app with a cause that carries no URL 1ms
+ ✓ src/tests/datasource-readiness.test.ts > datasource target normalization > rejects the non-SQLite target postgres://user:secret@db.example.invalid/app with a cause that carries no URL 0ms
+ ✓ src/tests/datasource-readiness.test.ts > datasource target normalization > rejects the non-SQLite target mysql://user:secret@db.example.invalid/app with a cause that carries no URL 0ms
+ ✓ src/tests/datasource-readiness.test.ts > datasource target normalization > rejects the non-SQLite target sqlserver://db.example.invalid;password=secret with a cause that carries no URL 0ms
+ ✓ src/tests/datasource-readiness.test.ts > datasource target normalization > rejects the non-SQLite target mongodb+srv://user:secret@db.example.invalid/app with a cause that carries no URL 0ms
+ ✓ src/tests/datasource-readiness.test.ts > datasource target normalization > case-folds Windows drive and UNC binding paths while preserving the opened path spelling 7ms
+ ✓ src/tests/datasource-readiness.test.ts > SQLite readiness parsing and canonical identity > accepts a symlink alias when expected and reported paths resolve to the same file 5ms
+ ✓ src/tests/datasource-readiness.test.ts > SQLite readiness parsing and canonical identity > rejects a non-array database_list response 0ms
+ ✓ src/tests/datasource-readiness.test.ts > SQLite readiness parsing and canonical identity > rejects a missing main database_list response 0ms
+ ✓ src/tests/datasource-readiness.test.ts > SQLite readiness parsing and canonical identity > rejects a multiple main rows database_list response 0ms
+ ✓ src/tests/datasource-readiness.test.ts > SQLite readiness parsing and canonical identity > rejects a missing main file database_list response 0ms
+ ✓ src/tests/datasource-readiness.test.ts > SQLite readiness parsing and canonical identity > uses separate activation and case-insensitive verification queries 0ms
+ ✓ src/tests/datasource-readiness.test.ts > SQLite readiness parsing and canonical identity > rejects a non-array journal-mode verification response 0ms
+ ✓ src/tests/datasource-readiness.test.ts > SQLite readiness parsing and canonical identity > rejects a zero rows journal-mode verification response 0ms
+ ✓ src/tests/datasource-readiness.test.ts > SQLite readiness parsing and canonical identity > rejects a multiple rows journal-mode verification response 0ms
+ ✓ src/tests/datasource-readiness.test.ts > SQLite readiness parsing and canonical identity > rejects a multiple fields journal-mode verification response 0ms
+ ✓ src/tests/datasource-readiness.test.ts > SQLite readiness parsing and canonical identity > rejects a non-string journal-mode verification response 0ms
+ ✓ src/tests/datasource-readiness.test.ts > SQLite readiness parsing and canonical identity > rejects a non-WAL journal-mode verification response 0ms
+ ✓ src/tests/logging-policy.test.ts > query logging policy > rejects non-truthy flag undefined 1ms
+ ✓ src/tests/logging-policy.test.ts > query logging policy > rejects non-truthy flag "" 0ms
+ ✓ src/tests/logging-policy.test.ts > query logging policy > rejects non-truthy flag "false" 0ms
+ ✓ src/tests/logging-policy.test.ts > query logging policy > rejects non-truthy flag "0" 0ms
+ ✓ src/tests/logging-policy.test.ts > query logging policy > rejects non-truthy flag "off" 0ms
+ ✓ src/tests/logging-policy.test.ts > query logging policy > rejects non-truthy flag "maybe" 0ms
+ ✓ src/tests/logging-policy.test.ts > query logging policy > rejects non-truthy flag " trueish " 0ms
+ ✓ src/tests/logging-policy.test.ts > query logging policy > accepts truthy flag "1" 0ms
+ ✓ src/tests/logging-policy.test.ts > query logging policy > accepts truthy flag "true" 0ms
+ ✓ src/tests/logging-policy.test.ts > query logging policy > accepts truthy flag "TRUE" 0ms
+ ✓ src/tests/logging-policy.test.ts > query logging policy > accepts truthy flag " yes " 0ms
+ ✓ src/tests/logging-policy.test.ts > query logging policy > accepts truthy flag "On" 0ms
+ ✓ src/tests/logging-policy.test.ts > query logging policy > gives a defined typed option precedence over the environment 0ms
+ ✓ src/tests/logging-policy.test.ts > query logging policy > captures lazy policy, rejects a differing typed policy, and permits a new policy after shutdown 2ms
+ ✓ src/tests/datetime-continuity.test.ts > DateTime continuity with rows written by Prisma 5 > stores new DateTime values as INTEGER unix ms and filters and orders them with existing rows 104ms
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle classified failure and recovery > keeps connection failure safe, reports the original cause only to diagnostics, and recovers on retry 7ms
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle classified failure and recovery > classifies 'identity mismatch', disconnects once, and blocks silent reuse 2ms
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle classified failure and recovery > classifies 'WAL activation failure', disconnects once, and blocks silent reuse 2ms
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle classified failure and recovery > classifies 'WAL verification failure', disconnects once, and blocks silent reuse 2ms
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle classified failure and recovery > rejects strict WAL for file::memory: before connection or SQLite SQL 0ms
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle classified failure and recovery > rejects strict WAL for file:memory-name?mode=memory&cache=shared before connection or SQLite SQL 0ms
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle concurrency and shutdown > shares identical requests, rejects different/stronger requests, and never publishes after shutdown 2ms
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle concurrency and shutdown > clears the lifecycle even when direct shutdown disconnect rejects 1ms
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle concurrency and shutdown > keeps a healthy ready client authoritative when a different target is rejected 1ms
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle concurrency and shutdown > coordinates shutdown while the identity stage is in flight without publishing the candidate 53ms
+ ✓ src/tests/public-initialization.test.ts > public initialization and real SQLite identity > opens DATABASE_URL_TEST under test and leaves DATABASE_URL untouched 50ms
+ ✓ src/tests/public-initialization.test.ts > public initialization and real SQLite identity > lets a non-empty explicit datasource win and treats whitespace as omitted 5ms
+ ✓ src/tests/public-initialization.test.ts > public initialization and real SQLite identity > normalizes cwd-relative paths with spaces, literal percent spelling, and query parameters 3ms
+ ✓ src/tests/public-initialization.test.ts > public initialization and real SQLite identity > opens an absolute target without creating a file named after its query string 5ms
+ ✓ src/tests/public-initialization.test.ts > public initialization and real SQLite identity > opens a SQLite memory target through the driver adapter without a database file 2ms
+ ✓ src/tests/public-initialization.test.ts > public initialization and real SQLite identity > rejects a non-SQLite datasource with a plain, credential-free error on explicit and lazy use 1ms
+ ✓ src/tests/public-initialization.test.ts > public initialization and real SQLite identity > accepts a symlink spelling when canonical physical identity is the same 5ms
+ ✓ src/tests/public-initialization.test.ts > public initialization and real SQLite identity > preserves delete mode without WAL, then upgrades and independently verifies WAL 4ms
+ ✓ src/tests/public-initialization.test.ts > public initialization and real SQLite identity > blocks access after a safe missing-target failure and permits corrected explicit retry 4ms
+ ✓ src/tests/public-initialization.test.ts > public initialization and real SQLite identity > rejects a lazy-bound target switch without opening the second file, then rebinds captured methods after shutdown 4ms
+ ✓ src/tests/public-initialization.test.ts > public initialization and real SQLite identity > reads representative existing data directly without schema migration 4ms
+ ✓ src/tests/public-initialization.test.ts > context-aware public forwarding with the current Prisma schema > uses a captured context method inside ALS and the root owner after ALS exits 41ms
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle concurrency and shutdown > coordinates shutdown while the activation stage is in flight without publishing the candidate 54ms
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle concurrency and shutdown > coordinates shutdown while the verification stage is in flight without publishing the candidate 53ms
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle non-SQLite datasource rejection > rejects an explicit non-SQLite URL from idle 'without WAL' before building a client 1ms
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle non-SQLite datasource rejection > rejects an explicit non-SQLite URL from idle 'with WAL' before building a client 0ms
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle non-SQLite datasource rejection > rejects a non-SQLite URL while a SQLite client is lazily bound and keeps that client 0ms
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle non-SQLite datasource rejection > rejects a non-SQLite URL while a SQLite client is initializing and still publishes that client 0ms
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle non-SQLite datasource rejection > rejects a non-SQLite URL while a SQLite client is ready and keeps that client 0ms
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle non-SQLite datasource rejection > rejects a lazy bind from a non-SQLite DATABASE_URL before building a client 0ms
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle non-SQLite datasource rejection > keeps CLIENT_NOT_READY precedence for a non-SQLite URL while shutdown is in progress 0ms
+
+ Test Files  5 passed (5)
+      Tests  68 passed (68)
+   Start at  13:32:42
+   Duration  535ms (transform 771ms, setup 0ms, import 1.05s, tests 444ms, environment 0ms)
+
+exit=0

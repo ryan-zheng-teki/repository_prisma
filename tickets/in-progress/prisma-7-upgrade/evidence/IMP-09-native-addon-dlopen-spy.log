@@ -1,0 +1,20 @@
+# Check: IMP-09
+# Command: node --require spy.cjs probe.mjs <adapter index.mjs> [open]  (spy counts process.dlopen calls; scripts are reproduced below)
+# Commit: a092a60 (worktree /Users/normy/autobyteus_org/worktrees/codex/prisma-7-upgrade)
+# Environment: macOS 26.5.2, Node v22.23.1, npm 10.9.8
+# Date: 2026-11-04T12:32Z
+
+--- spy.cjs
+let n = 0; const o = process.dlopen; process.dlopen = function (...a) { n += 1; return o.apply(this, a); };
+process.on('exit', () => console.log('dlopen count', n));
+--- probe.mjs
+const { PrismaBetterSqlite3 } = await import(process.argv[2]);
+const factory = new PrismaBetterSqlite3({ url: ':memory:' }, { timestampFormat: 'unixepoch-ms' });
+if (process.argv[3] === 'open') { const adapter = await factory.connect(); await adapter.dispose(); }
+console.log(process.argv[3] === 'open' ? 'adapter constructed and connected' : 'adapter constructed only');
+--- construct only
+adapter constructed only
+dlopen count 0
+--- construct and connect
+adapter constructed and connected
+dlopen count 1

@@ -1,0 +1,41 @@
+# Check: IMP-07 (mutation checks: the AC-004 and AC-005 tests fail when their guarded rule is removed)
+# Command: (a) sed timestampFormat option -> {} ; npx vitest run src/tests/datetime-continuity.test.ts ; git checkout -- src/lib/client/sqlite-driver-adapter.ts
+#          (b) sed target.expectedPath -> target.bindingKey (query string reaches the adapter) ; npx vitest run src/tests/public-initialization.test.ts ; git checkout -- src/lib/client/sqlite-driver-adapter.ts
+# Commit: a092a60 (mutations applied to the working tree only, then restored)
+# Environment: macOS 26.5.2, Node v22.23.1
+# Date: 2026-11-04T12:32Z
+
+## (a) mutation: default ISO-8601 timestamp format
+19:    {}
+     × stores new DateTime values as INTEGER unix ms and filters and orders them with existing rows 89ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+- Expected
++ Received
+      "storage": "integer",
+-     "storage": "integer",
++     "storage": "text",
+     44|       'SELECT "label", typeof("occurredAt") AS "storage", "occurredAt"…
+     46|     expect(stored.map(({ label, storage }) => ({ label, storage }))).t…
+     47|       { label: 'prisma-5', storage: 'integer' },
+     48|       { label: 'prisma-7', storage: 'integer' },
+      Tests  1 failed (1)
+
+## (b) mutation: URL query string passed to the adapter
+18:    { url: target.kind === 'sqlite-file' ? target.bindingKey : ':memory:' },
+     ✓ opens DATABASE_URL_TEST under test and leaves DATABASE_URL untouched 51ms
+     ✓ lets a non-empty explicit datasource win and treats whitespace as omitted 5ms
+     × normalizes cwd-relative paths with spaces, literal percent spelling, and query parameters 6ms
+     × opens an absolute target without creating a file named after its query string 3ms
+     ✓ opens a SQLite memory target through the driver adapter without a database file 4ms
+     ✓ rejects a non-SQLite datasource with a plain, credential-free error on explicit and lazy use 1ms
+     × accepts a symlink spelling when canonical physical identity is the same 4ms
+     ✓ preserves delete mode without WAL, then upgrades and independently verifies WAL 4ms
+     ✓ blocks access after a safe missing-target failure and permits corrected explicit retry 6ms
+     ✓ rejects a lazy-bound target switch without opening the second file, then rebinds captured methods after shutdown 24ms
+     ✓ reads representative existing data directly without schema migration 4ms
+     ✓ uses a captured context method inside ALS and the root owner after ALS exits 46ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  3 failed | 9 passed (12)
+
+## restored
+working tree restored: src/lib/client/sqlite-driver-adapter.ts unchanged from a092a60
