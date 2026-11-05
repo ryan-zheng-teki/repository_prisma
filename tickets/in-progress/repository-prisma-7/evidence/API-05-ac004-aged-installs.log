@@ -1,0 +1,58 @@
+# Case API-05
+# Code commit bcf2be0 (HEAD a23493f differs only in tickets/). Packed build: repository_prisma-2.0.0.tgz sha256 7ea8273ac82ae365237fc45a98e58244c2308e8219d9dc639f6645ceea5126e4 (npm pack of the worktree at bcf2be0). Scripts: evidence/API-scripts/. Recorded by api_e2e_engineer, 2026-11-05.
+# run-ac004-aged.sh on macOS: README installs in the post-release-age state (consumer pnpm-workspace.yaml minimumReleaseAge: 60, because 2.0.0 is ~15 h old); pnpm 11.28.9 and 12.16.1 pinned + unpinned control; npm 12.2.1 pinned.
+
+## now 2026-11-05T06:15:07Z; 2.0.0 published 2026-11-04T15:10:08.431Z; node v22.23.1
+
+==== pnpm 11.28.9, pinned install line, minimumReleaseAge: 60
+$ pnpm add repository_prisma@2 @prisma/client@7
++ @prisma/client 7.10.1
++ repository_prisma 2.0.0
+$ pnpm approve-builds better-sqlite3
+.../node_modules/better-sqlite3 install: Done
+--- pnpm-workspace.yaml (expect no minimumReleaseAgeExclude entry):
+allowBuilds:
+  better-sqlite3: true
+minimumReleaseAge: 60
+generate exit=0
+installed repository_prisma: 2.0.0
+RESULT ok count 0
+RESULT ok (cjs) count 0
+
+==== pnpm 11.28.9, unpinned install line, minimumReleaseAge: 60
+$ pnpm add repository_prisma @prisma/client@7
++ @prisma/client 7.10.1
++ repository_prisma 2.0.0
+installed repository_prisma: 2.0.0  (control: the unpinned line also gets 2.0.0 once the gate is passed)
+
+==== pnpm 12.16.1, pinned install line, minimumReleaseAge: 60
+$ pnpm add repository_prisma@2 @prisma/client@7
++ @prisma/client 7.10.1
++ repository_prisma 2.0.0
+$ pnpm approve-builds better-sqlite3
+.../node_modules/better-sqlite3 install: Done
+--- pnpm-workspace.yaml (expect no minimumReleaseAgeExclude entry):
+allowBuilds:
+  better-sqlite3: true
+minimumReleaseAge: 60
+generate exit=0
+installed repository_prisma: 2.0.0
+RESULT ok count 0
+RESULT ok (cjs) count 0
+
+==== pnpm 12.16.1, unpinned install line, minimumReleaseAge: 60
+$ pnpm add repository_prisma @prisma/client@7
++ @prisma/client 7.10.1
++ repository_prisma 2.0.0
+installed repository_prisma: 2.0.0  (control: the unpinned line also gets 2.0.0 once the gate is passed)
+
+==== npm 12.2.1, README npm line
+npm 12.2.1, min-release-age config: null
+$ npm install repository_prisma@2
+added 45 packages in 4s
+  added better-sqlite3@12.11.1
+rebuilt dependencies successfully
+generate exit=0
+installed repository_prisma: 2.0.0
+RESULT ok count 0
+RESULT ok (cjs) count 0

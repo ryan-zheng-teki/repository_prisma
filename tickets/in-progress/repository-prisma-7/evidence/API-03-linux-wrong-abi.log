@@ -1,0 +1,43 @@
+# Case API-03
+# Code commit bcf2be0 (HEAD a23493f differs only in tickets/). Packed build: repository_prisma-2.0.0.tgz sha256 7ea8273ac82ae365237fc45a98e58244c2308e8219d9dc639f6645ceea5126e4 (npm pack of the worktree at bcf2be0). Scripts: evidence/API-scripts/. Recorded by api_e2e_engineer, 2026-11-05.
+# docker run --platform linux/amd64 --user node node:22-bookworm sh linux-b-node22.sh on the same volume: module built under Node 24 (ABI 137) run under Node 22 (ABI 127), then npm rebuild better-sqlite3.
+
+## node v22.23.4 (ABI 127), npm 10.9.9, Linux x86_64, user node, 2026-11-05T06:11:53Z
+
+==== 3. module built for Node 24 (ABI 137), running Node v22.23.4
+RESULT failed SQLITE_DRIVER_UNAVAILABLE
+  message: The SQLite driver (better-sqlite3) could not load its native module. Allow its build or rebuild it for this Node.js version; see "Allow the native SQLite build" in the repository_prisma README.
+  diagnostic: SQLITE_DRIVER_UNAVAILABLE | The module '/work/consumer/node_modules/better-sqlite3/build/Release/better_sqlite3.node' | cause.code = ERR_DLOPEN_FAILED
+RESULT failed (cjs) SQLITE_DRIVER_UNAVAILABLE
+  message: The SQLite driver (better-sqlite3) could not load its native module. Allow its build or rebuild it for this Node.js version; see "Allow the native SQLite build" in the repository_prisma README.
+  diagnostic: SQLITE_DRIVER_UNAVAILABLE | The module '/work/consumer/node_modules/better-sqlite3/build/Release/better_sqlite3.node' | cause.code = ERR_DLOPEN_FAILED
+prisma:error 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+The module '/work/consumer/node_modules/better-sqlite3/build/Release/better_sqlite3.node'
+was compiled against a different Node.js version using
+NODE_MODULE_VERSION 137. This version of Node.js requires
+NODE_MODULE_VERSION 127. Please try re-compiling or re-installing
+the module (for instance, using `npm rebuild` or `npm install`).
+RESULT failed (lazy) PrismaClientKnownRequestError ERR_DLOPEN_FAILED | 
+prisma:error 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+The module '/work/consumer/node_modules/better-sqlite3/build/Release/better_sqlite3.node'
+was compiled against a different Node.js version using
+NODE_MODULE_VERSION 137. This version of Node.js requires
+NODE_MODULE_VERSION 127. Please try re-compiling or re-installing
+the module (for instance, using `npm rebuild` or `npm install`).
+RESULT failed (lazy cjs) PrismaClientKnownRequestError ERR_DLOPEN_FAILED | 
+
+==== 4. README fix: npm rebuild better-sqlite3 (under Node v22.23.4, npm 10.9.9)
+$ npm rebuild better-sqlite3
+npm notice To update run: npm install -g npm@12.2.2
+npm notice
+exit=0
+RESULT ok count 0
+RESULT ok (cjs) count 0
+RESULT ok (lazy) 0
+RESULT ok (lazy cjs) 0

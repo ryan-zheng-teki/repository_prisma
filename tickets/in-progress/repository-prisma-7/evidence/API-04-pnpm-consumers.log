@@ -1,0 +1,311 @@
+# Case API-04
+# Code commit bcf2be0 (HEAD a23493f differs only in tickets/). Packed build: repository_prisma-2.0.0.tgz sha256 7ea8273ac82ae365237fc45a98e58244c2308e8219d9dc639f6645ceea5126e4 (npm pack of the worktree at bcf2be0). Scripts: evidence/API-scripts/. Recorded by api_e2e_engineer, 2026-11-05.
+# pnpm consumers of the packed build (README pnpm steps; tarball path instead of repository_prisma@2). Part 1: macOS pnpm 11.28.9, Node 22 -> Node 25 ABI, npm rebuild with Node 25's npm 11.6.2, then pnpm rebuild. Part 2: macOS pnpm 12.16.1, npm rebuild with npm 12.2.1 under Node 25 (npm 12 does not support Node 25: confounded, superseded by Part 3). Part 3: Linux x64 pnpm 12.16.1 project built under node:22, run under node:24 (Node 24.22.2 supported by npm 12): npm 12.2.1 rebuild, bundled npm 11.19.1 rebuild, pnpm rebuild, each on its own copy (4c's first attempt failed only because the harness did not mount the local tarball, which pnpm re-reads; rerun in 'Part 3 rerun').
+
+########## Part 1: macOS pnpm 11
+## pnpm 11.28.9, node v22.23.1 (ABI 127); Node 25: v25.2.1 (ABI 141); Darwin arm64; 2026-11-05T06:11:20Z
+$ pnpm add <packed bcf2be0 tarball> @prisma/client@7   (README: pnpm add repository_prisma@2 @prisma/client@7)
++ @prisma/client 7.10.1
++ repository_prisma 2.0.0
+[ERR_PNPM_IGNORED_BUILDS] Ignored build scripts: better-sqlite3@12.11.1
+pnpm add -D prisma@7 exit=1 (ERR_PNPM_IGNORED_BUILDS expected)
+prisma generate exit=0
+better-sqlite3 hoisted at node_modules/better-sqlite3: no
+
+==== 1. native module missing (pnpm ignored better-sqlite3's build), Node 22
+native module present: 0 ()
+RESULT failed SQLITE_DRIVER_UNAVAILABLE
+  message: The SQLite driver (better-sqlite3) could not load its native module. Allow its build or rebuild it for this Node.js version; see "Allow the native SQLite build" in the repository_prisma README.
+  diagnostic: SQLITE_DRIVER_UNAVAILABLE | Could not locate the bindings file. Tried: | cause.code = -
+RESULT failed (cjs) SQLITE_DRIVER_UNAVAILABLE
+  message: The SQLite driver (better-sqlite3) could not load its native module. Allow its build or rebuild it for this Node.js version; see "Allow the native SQLite build" in the repository_prisma README.
+  diagnostic: SQLITE_DRIVER_UNAVAILABLE | Could not locate the bindings file. Tried: | cause.code = -
+prisma:error Could not locate the bindings file. Tried:
+ → /private/tmp/rp7e/pnpm-c11/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/better_sqlite3.node
+ → /private/tmp/rp7e/pnpm-c11/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Debug/better_sqlite3.node
+ → /private/tmp/rp7e/pnpm-c11/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node
+ → /private/tmp/rp7e/pnpm-c11/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/out/Debug/better_sqlite3.node
+ → /private/tmp/rp7e/pnpm-c11/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/Debug/better_sqlite3.node
+ → /private/tmp/rp7e/pnpm-c11/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/out/Release/better_sqlite3.node
+ → /private/tmp/rp7e/pnpm-c11/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/Release/better_sqlite3.node
+ → /private/tmp/rp7e/pnpm-c11/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/default/better_sqlite3.node
+ → /private/tmp/rp7e/pnpm-c11/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/compiled/22.23.1/darwin/arm64/better_sqlite3.node
+ → /private/tmp/rp7e/pnpm-c11/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/addon-build/release/install-root/better_sqlite3.node
+ → /private/tmp/rp7e/pnpm-c11/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/addon-build/debug/install-root/better_sqlite3.node
+ → /private/tmp/rp7e/pnpm-c11/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/addon-build/default/install-root/better_sqlite3.node
+ → /private/tmp/rp7e/pnpm-c11/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/lib/binding/node-v127-darwin-arm64/better_sqlite3.node
+RESULT failed (lazy) Error - | Could not locate the bindings file. Tried:
+
+==== 2. README fix (pnpm 11+): pnpm approve-builds better-sqlite3
+$ pnpm approve-builds better-sqlite3
+.../node_modules/better-sqlite3 install$ prebuild-install || node-gyp rebuild --release
+.../node_modules/better-sqlite3 install: Done
+exit=0
+native module present: 1 (Jun 15 19:15)
+RESULT ok count 0
+RESULT ok (cjs) count 0
+RESULT ok (lazy) 0
+
+==== 3. module built for Node 22 (ABI 127), running Node 25 (ABI 141)
+RESULT failed SQLITE_DRIVER_UNAVAILABLE
+  message: The SQLite driver (better-sqlite3) could not load its native module. Allow its build or rebuild it for this Node.js version; see "Allow the native SQLite build" in the repository_prisma README.
+  diagnostic: SQLITE_DRIVER_UNAVAILABLE | The module '/private/tmp/rp7e/pnpm-c11/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node' | cause.code = ERR_DLOPEN_FAILED
+RESULT failed (cjs) SQLITE_DRIVER_UNAVAILABLE
+  message: The SQLite driver (better-sqlite3) could not load its native module. Allow its build or rebuild it for this Node.js version; see "Allow the native SQLite build" in the repository_prisma README.
+  diagnostic: SQLITE_DRIVER_UNAVAILABLE | The module '/private/tmp/rp7e/pnpm-c11/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node' | cause.code = ERR_DLOPEN_FAILED
+prisma:error 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+The module '/private/tmp/rp7e/pnpm-c11/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node'
+was compiled against a different Node.js version using
+NODE_MODULE_VERSION 127. This version of Node.js requires
+NODE_MODULE_VERSION 141. Please try re-compiling or re-installing
+the module (for instance, using `npm rebuild` or `npm install`).
+RESULT failed (lazy) PrismaClientKnownRequestError ERR_DLOPEN_FAILED | 
+
+==== 4. README fix as written: npm rebuild better-sqlite3 (under Node 25, npm 11.6.2)
+$ npm rebuild better-sqlite3
+rebuilt dependencies successfully
+exit=0
+native module present: 1 (Jun 15 19:16)
+RESULT ok count 0
+RESULT ok (cjs) count 0
+RESULT ok (lazy) 0
+
+==== 5. control: pnpm rebuild better-sqlite3 (under Node 25)
+$ pnpm rebuild better-sqlite3
+.../node_modules/better-sqlite3 install$ prebuild-install || node-gyp rebuild --release
+.../node_modules/better-sqlite3 install: Done
+exit=0
+native module present: 1 (Jun 15 19:16)
+RESULT ok count 0
+RESULT ok (cjs) count 0
+RESULT ok (lazy) 0
+
+########## Part 2: macOS pnpm 12 (npm 12 on Node 25, confounded)
+## pnpm 12.16.1, node v22.23.1 (ABI 127); Node 25: v25.2.1 (ABI 141); Darwin arm64; 2026-11-05T06:11:45Z
+$ pnpm add <packed bcf2be0 tarball> @prisma/client@7   (README: pnpm add repository_prisma@2 @prisma/client@7)
++ @prisma/client 7.10.1
++ repository_prisma 2.0.0
+Error: ERR_PNPM_IGNORED_BUILDS
+  ╰─▶ Ignored build scripts: better-sqlite3@12.11.1
+pnpm add -D prisma@7 exit=1 (ERR_PNPM_IGNORED_BUILDS expected)
+prisma generate exit=0
+better-sqlite3 hoisted at node_modules/better-sqlite3: no
+
+==== 1. native module missing (pnpm ignored better-sqlite3's build), Node 22
+native module present: 0 ()
+RESULT failed SQLITE_DRIVER_UNAVAILABLE
+  message: The SQLite driver (better-sqlite3) could not load its native module. Allow its build or rebuild it for this Node.js version; see "Allow the native SQLite build" in the repository_prisma README.
+  diagnostic: SQLITE_DRIVER_UNAVAILABLE | Could not locate the bindings file. Tried: | cause.code = -
+RESULT failed (cjs) SQLITE_DRIVER_UNAVAILABLE
+  message: The SQLite driver (better-sqlite3) could not load its native module. Allow its build or rebuild it for this Node.js version; see "Allow the native SQLite build" in the repository_prisma README.
+  diagnostic: SQLITE_DRIVER_UNAVAILABLE | Could not locate the bindings file. Tried: | cause.code = -
+prisma:error Could not locate the bindings file. Tried:
+ → /private/tmp/rp7e/pnpm-c12/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/better_sqlite3.node
+ → /private/tmp/rp7e/pnpm-c12/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Debug/better_sqlite3.node
+ → /private/tmp/rp7e/pnpm-c12/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node
+ → /private/tmp/rp7e/pnpm-c12/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/out/Debug/better_sqlite3.node
+ → /private/tmp/rp7e/pnpm-c12/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/Debug/better_sqlite3.node
+ → /private/tmp/rp7e/pnpm-c12/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/out/Release/better_sqlite3.node
+ → /private/tmp/rp7e/pnpm-c12/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/Release/better_sqlite3.node
+ → /private/tmp/rp7e/pnpm-c12/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/default/better_sqlite3.node
+ → /private/tmp/rp7e/pnpm-c12/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/compiled/22.23.1/darwin/arm64/better_sqlite3.node
+ → /private/tmp/rp7e/pnpm-c12/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/addon-build/release/install-root/better_sqlite3.node
+ → /private/tmp/rp7e/pnpm-c12/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/addon-build/debug/install-root/better_sqlite3.node
+ → /private/tmp/rp7e/pnpm-c12/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/addon-build/default/install-root/better_sqlite3.node
+ → /private/tmp/rp7e/pnpm-c12/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/lib/binding/node-v127-darwin-arm64/better_sqlite3.node
+RESULT failed (lazy) Error - | Could not locate the bindings file. Tried:
+
+==== 2. README fix (pnpm 11+): pnpm approve-builds better-sqlite3
+$ pnpm approve-builds better-sqlite3
+✓ Lockfile passes supply-chain policies (verified 1s ago)
+Already up to date
+.../node_modules/better-sqlite3 install$ prebuild-install || node-gyp rebuild --release
+.../node_modules/better-sqlite3 install: Done
+exit=0
+native module present: 1 (Jun 15 19:15)
+RESULT ok count 0
+RESULT ok (cjs) count 0
+RESULT ok (lazy) 0
+
+==== 3. module built for Node 22 (ABI 127), running Node 25 (ABI 141)
+RESULT failed SQLITE_DRIVER_UNAVAILABLE
+  message: The SQLite driver (better-sqlite3) could not load its native module. Allow its build or rebuild it for this Node.js version; see "Allow the native SQLite build" in the repository_prisma README.
+  diagnostic: SQLITE_DRIVER_UNAVAILABLE | The module '/private/tmp/rp7e/pnpm-c12/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node' | cause.code = ERR_DLOPEN_FAILED
+RESULT failed (cjs) SQLITE_DRIVER_UNAVAILABLE
+  message: The SQLite driver (better-sqlite3) could not load its native module. Allow its build or rebuild it for this Node.js version; see "Allow the native SQLite build" in the repository_prisma README.
+  diagnostic: SQLITE_DRIVER_UNAVAILABLE | The module '/private/tmp/rp7e/pnpm-c12/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node' | cause.code = ERR_DLOPEN_FAILED
+prisma:error 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+The module '/private/tmp/rp7e/pnpm-c12/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node'
+was compiled against a different Node.js version using
+NODE_MODULE_VERSION 127. This version of Node.js requires
+NODE_MODULE_VERSION 141. Please try re-compiling or re-installing
+the module (for instance, using `npm rebuild` or `npm install`).
+RESULT failed (lazy) PrismaClientKnownRequestError ERR_DLOPEN_FAILED | 
+
+npm warn cli npm v12.2.1 does not support Node.js v25.2.1. This version of npm supports the following node versions: `^22.22.2 || ^24.15.0 || >=26.0.0`. You can find the latest version at https://nodejs.org/.
+==== 4. README fix as written: npm rebuild better-sqlite3 (under Node 25, with npm 12.2.1, npm latest)
+$ npm rebuild better-sqlite3
+npm warn cli npm v12.2.1 does not support Node.js v25.2.1. This version of npm supports the following node versions: `^22.22.2 || ^24.15.0 || >=26.0.0`. You can find the latest version at https://nodejs.org/.
+npm warn rebuild 9 packages had install scripts blocked because they are not covered by allowScripts. Run `npm install-scripts ls` to review.
+rebuilt dependencies successfully
+exit=0
+native module present: 1 (Jun 15 19:15)
+RESULT failed SQLITE_DRIVER_UNAVAILABLE
+  message: The SQLite driver (better-sqlite3) could not load its native module. Allow its build or rebuild it for this Node.js version; see "Allow the native SQLite build" in the repository_prisma README.
+  diagnostic: SQLITE_DRIVER_UNAVAILABLE | The module '/private/tmp/rp7e/pnpm-c12/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node' | cause.code = ERR_DLOPEN_FAILED
+RESULT failed (cjs) SQLITE_DRIVER_UNAVAILABLE
+  message: The SQLite driver (better-sqlite3) could not load its native module. Allow its build or rebuild it for this Node.js version; see "Allow the native SQLite build" in the repository_prisma README.
+  diagnostic: SQLITE_DRIVER_UNAVAILABLE | The module '/private/tmp/rp7e/pnpm-c12/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node' | cause.code = ERR_DLOPEN_FAILED
+prisma:error 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+The module '/private/tmp/rp7e/pnpm-c12/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node'
+was compiled against a different Node.js version using
+NODE_MODULE_VERSION 127. This version of Node.js requires
+NODE_MODULE_VERSION 141. Please try re-compiling or re-installing
+the module (for instance, using `npm rebuild` or `npm install`).
+RESULT failed (lazy) PrismaClientKnownRequestError ERR_DLOPEN_FAILED | 
+
+==== 5. control: pnpm rebuild better-sqlite3 (under Node 25)
+$ pnpm rebuild better-sqlite3
+.../node_modules/better-sqlite3 install$ prebuild-install || node-gyp rebuild --release
+.../node_modules/better-sqlite3 install: Done
+Done in 276ms using pnpm v12.16.1
+exit=0
+native module present: 1 (Jun 15 19:16)
+RESULT ok count 0
+RESULT ok (cjs) count 0
+RESULT ok (lazy) 0
+
+########## Part 3a: Linux pnpm 12 project built under Node 22
+## node v22.23.4 (ABI 127), pnpm 12.16.1, Linux x86_64, user node, 2026-11-05T06:12:51Z
+pnpm add exit=1 (ERR_PNPM_IGNORED_BUILDS expected)
+pnpm add -D prisma@7 exit=1
+$ pnpm approve-builds better-sqlite3
+.../node_modules/better-sqlite3 install$ prebuild-install || node-gyp rebuild --release
+.../node_modules/better-sqlite3 install: Done
+exit=0
+prisma generate exit=0
+better-sqlite3 hoisted: no
+RESULT ok count 0
+RESULT ok (cjs) count 0
+
+########## Part 3b: same project under Node 24, three rebuild commands
+## node v24.22.2 (ABI 137), bundled npm 11.19.1, Linux x86_64, user node, 2026-11-05T06:13:14Z
+
+==== 3. module built under Node 22 (ABI 127), running Node v24.22.2
+RESULT failed SQLITE_DRIVER_UNAVAILABLE
+  message: The SQLite driver (better-sqlite3) could not load its native module. Allow its build or rebuild it for this Node.js version; see "Allow the native SQLite build" in the repository_prisma README.
+  diagnostic: SQLITE_DRIVER_UNAVAILABLE | The module '/work/pc/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node' | cause.code = ERR_DLOPEN_FAILED
+RESULT failed (cjs) SQLITE_DRIVER_UNAVAILABLE
+  message: The SQLite driver (better-sqlite3) could not load its native module. Allow its build or rebuild it for this Node.js version; see "Allow the native SQLite build" in the repository_prisma README.
+  diagnostic: SQLITE_DRIVER_UNAVAILABLE | The module '/work/pc/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node' | cause.code = ERR_DLOPEN_FAILED
+prisma:error 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+The module '/work/pc/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node'
+was compiled against a different Node.js version using
+NODE_MODULE_VERSION 127. This version of Node.js requires
+NODE_MODULE_VERSION 137. Please try re-compiling or re-installing
+the module (for instance, using `npm rebuild` or `npm install`).
+RESULT failed (lazy) PrismaClientKnownRequestError ERR_DLOPEN_FAILED | 
+
+==== 4a. README fix as written, npm 12 (npm latest): npm rebuild better-sqlite3
+$ npm rebuild better-sqlite3   (npm 12.2.1)
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice
+exit=0
+RESULT failed SQLITE_DRIVER_UNAVAILABLE
+  message: The SQLite driver (better-sqlite3) could not load its native module. Allow its build or rebuild it for this Node.js version; see "Allow the native SQLite build" in the repository_prisma README.
+  diagnostic: SQLITE_DRIVER_UNAVAILABLE | The module '/work/pc/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node' | cause.code = ERR_DLOPEN_FAILED
+RESULT failed (cjs) SQLITE_DRIVER_UNAVAILABLE
+  message: The SQLite driver (better-sqlite3) could not load its native module. Allow its build or rebuild it for this Node.js version; see "Allow the native SQLite build" in the repository_prisma README.
+  diagnostic: SQLITE_DRIVER_UNAVAILABLE | The module '/work/pc/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node' | cause.code = ERR_DLOPEN_FAILED
+prisma:error 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+The module '/work/pc/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node'
+was compiled against a different Node.js version using
+NODE_MODULE_VERSION 127. This version of Node.js requires
+NODE_MODULE_VERSION 137. Please try re-compiling or re-installing
+the module (for instance, using `npm rebuild` or `npm install`).
+RESULT failed (lazy) PrismaClientKnownRequestError ERR_DLOPEN_FAILED | 
+
+==== 4b. README fix as written, Node 24's bundled npm: npm rebuild better-sqlite3
+$ npm rebuild better-sqlite3   (npm 11.19.1)
+npm warn rebuild 9 packages have install scripts not yet covered by allowScripts. Run `npm install-scripts ls` to review.
+rebuilt dependencies successfully
+exit=0
+RESULT ok count 0
+RESULT ok (cjs) count 0
+RESULT ok (lazy) 0
+
+==== 4c. pnpm's own command: pnpm rebuild better-sqlite3
+$ pnpm rebuild better-sqlite3   (pnpm 12.16.1)
+  ╰─▶ Failed to read local tarball /pack/repository_prisma-2.0.0.tgz: No such
+      file or directory (os error 2)
+
+exit=0
+RESULT failed SQLITE_DRIVER_UNAVAILABLE
+  message: The SQLite driver (better-sqlite3) could not load its native module. Allow its build or rebuild it for this Node.js version; see "Allow the native SQLite build" in the repository_prisma README.
+  diagnostic: SQLITE_DRIVER_UNAVAILABLE | The module '/work/pc-pnpm/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node' | cause.code = ERR_DLOPEN_FAILED
+RESULT failed (cjs) SQLITE_DRIVER_UNAVAILABLE
+  message: The SQLite driver (better-sqlite3) could not load its native module. Allow its build or rebuild it for this Node.js version; see "Allow the native SQLite build" in the repository_prisma README.
+  diagnostic: SQLITE_DRIVER_UNAVAILABLE | The module '/work/pc-pnpm/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node' | cause.code = ERR_DLOPEN_FAILED
+prisma:error 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+The module '/work/pc-pnpm/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node'
+was compiled against a different Node.js version using
+NODE_MODULE_VERSION 127. This version of Node.js requires
+NODE_MODULE_VERSION 137. Please try re-compiling or re-installing
+the module (for instance, using `npm rebuild` or `npm install`).
+RESULT failed (lazy) PrismaClientKnownRequestError ERR_DLOPEN_FAILED | 
+
+########## Part 3 rerun: fresh copies, npm 12 full output and pnpm rebuild with the tarball mounted
+## node v24.22.2 (ABI 137), Linux x86_64, user node, 2026-11-05T06:13:53Z
+
+==== 4a (rerun, full output). npm rebuild better-sqlite3 with npm 12
+$ npm rebuild better-sqlite3   (npm 12.2.1)
+npm warn rebuild 9 packages had install scripts blocked because they are not covered by allowScripts. Run `npm install-scripts ls` to review.
+rebuilt dependencies successfully
+exit=0
+build/Release/better_sqlite3.node built for ABI: does not load: ERR_DLOPEN_FAILED
+RESULT failed SQLITE_DRIVER_UNAVAILABLE
+  message: The SQLite driver (better-sqlite3) could not load its native module. Allow its build or rebuild it for this Node.js version; see "Allow the native SQLite build" in the repository_prisma README.
+  diagnostic: SQLITE_DRIVER_UNAVAILABLE | The module '/work/pc-npm12b/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node' | cause.code = ERR_DLOPEN_FAILED
+RESULT failed (cjs) SQLITE_DRIVER_UNAVAILABLE
+  message: The SQLite driver (better-sqlite3) could not load its native module. Allow its build or rebuild it for this Node.js version; see "Allow the native SQLite build" in the repository_prisma README.
+  diagnostic: SQLITE_DRIVER_UNAVAILABLE | The module '/work/pc-npm12b/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node' | cause.code = ERR_DLOPEN_FAILED
+prisma:error 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+The module '/work/pc-npm12b/node_modules/.pnpm/better-sqlite3@12.11.1/node_modules/better-sqlite3/build/Release/better_sqlite3.node'
+was compiled against a different Node.js version using
+NODE_MODULE_VERSION 127. This version of Node.js requires
+NODE_MODULE_VERSION 137. Please try re-compiling or re-installing
+the module (for instance, using `npm rebuild` or `npm install`).
+RESULT failed (lazy) PrismaClientKnownRequestError ERR_DLOPEN_FAILED | 
+
+==== 4c (rerun). pnpm rebuild better-sqlite3
+$ pnpm rebuild better-sqlite3   (pnpm 12.16.1)
+.../node_modules/better-sqlite3 install: (node:130) [DEP0176] DeprecationWarning: fs.R_OK is deprecated, use fs.constants.R_OK instead
+.../node_modules/better-sqlite3 install: (Use `node --trace-deprecation ...` to show where the warning was created)
+.../node_modules/better-sqlite3 install: Done
+Done in 7.8s using pnpm v12.16.1
+exit=0
+RESULT ok count 0
+RESULT ok (cjs) count 0
+RESULT ok (lazy) 0

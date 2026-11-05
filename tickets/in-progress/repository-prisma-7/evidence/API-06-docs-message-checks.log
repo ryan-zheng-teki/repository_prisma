@@ -1,0 +1,78 @@
+# Case API-06
+# Code commit bcf2be0 (HEAD a23493f differs only in tickets/). Packed build: repository_prisma-2.0.0.tgz sha256 7ea8273ac82ae365237fc45a98e58244c2308e8219d9dc639f6645ceea5126e4 (npm pack of the worktree at bcf2be0). Scripts: evidence/API-scripts/. Recorded by api_e2e_engineer, 2026-11-05.
+# Docs and message review checks.
+
+# API-06 docs and message review checks at bcf2be0; 2026-11-05T06:15:41Z
+$ grep -n "Allow the native SQLite build" README.md src/lib/client/initialization-error.ts DESIGN.md
+README.md:38:### Allow the native SQLite build
+README.md:398:  [Allow the native SQLite build](#allow-the-native-sqlite-build). Only `initializePrisma`
+src/lib/client/initialization-error.ts:40:    'rebuild it for this Node.js version; see "Allow the native SQLite build" in the ' +
+DESIGN.md:147:  cites the README heading "Allow the native SQLite build"; renaming that heading needs a message
+
+$ git diff feeedf6..bcf2be0 -- DESIGN.md CHANGELOG.md TESTING.md
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 62dd754..9bd8bdf 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -2,6 +2,16 @@
+ 
+ ## Unreleased
+ 
++- New initialization code `SQLITE_DRIVER_UNAVAILABLE`: `initializePrisma` reports it when
++  `better-sqlite3` cannot load its native module (not built, for example when npm 12+ or pnpm
++  blocked its install script, or built for another Node.js version). Its message points to the
++  README's "Allow the native SQLite build" step and contains no path; `onDiagnostic` gets the
++  driver's error. Other connection failures stay `CONNECTION_FAILED`. With lazy binding, the first
++  query still throws the driver's own error.
++- README: the install lines pin the major (`repository_prisma@2`), so pnpm 11+ installs it even
++  while the newest release is younger than pnpm's minimum release age, instead of silently
++  installing the previous major. The release guide reminds maintainers to update the pin on a
++  major release.
+ - Support for Prisma 7's `prisma-client` generator (ESM and `moduleFormat = "cjs"` clients):
+   register the generated client module once with the new `registerPrismaClient()` and declare
+   its types in the new `PrismaClientRegistry` interface; every runtime feature and public type
+diff --git a/DESIGN.md b/DESIGN.md
+index d250458..827b93c 100644
+--- a/DESIGN.md
++++ b/DESIGN.md
+@@ -136,6 +136,16 @@ The related internal files remain subordinate to this owner:
+   and ordering miss rows written by Prisma 5, so existing databases stay directly usable without a
+   migration. The adapter does not know lifecycle state. It wraps the adapter in the
+   connection gate.
++- The same file owns the driver's failure shapes: `isSqliteDriverLoadFailure` recognizes that
++  better-sqlite3 could not load its native module, from the `bindings` message "Could not locate
++  the bindings file" (no module built) or Node's `ERR_DLOPEN_FAILED` (built for another Node.js
++  version), on the error or in its `cause` chain (bounded and cycle-safe; it never throws). The
++  lifecycle asks it in the `$connect()` catch: such a failure is `SQLITE_DRIVER_UNAVAILABLE`, any
++  other stays `CONNECTION_FAILED`. If a driver version changes these shapes, the result falls back
++  to `CONNECTION_FAILED`. The lazy path is unchanged: Prisma rewraps coded errors thrown from the
++  adapter, so lazy callers get the driver's own error. The `SQLITE_DRIVER_UNAVAILABLE` message
++  cites the README heading "Allow the native SQLite build"; renaming that heading needs a message
++  update.
+ - `client/sqlite-connection-gate.ts` keeps transactions isolated on the adapter's single
+   connection. The better-sqlite3 adapter runs every operation of a client on one connection,
+   and only its transactions take the adapter's own lock. Without the gate, a plain query from
+diff --git a/TESTING.md b/TESTING.md
+index a67e790..847ec47 100644
+--- a/TESTING.md
++++ b/TESTING.md
+@@ -24,7 +24,7 @@ section is the short maintainer version; this file is the guideline.
+ | Layer | What it proves | Command |
+ | --- | --- | --- |
+ | Typecheck | Two programs, because a `PrismaClientRegistry` declaration applies to a whole program. `tsconfig.json`: `src/` and `examples/` compile against the prisma-client-js client, and `src/tests/type-equality.typecheck.ts` proves its public types are identical to 2.0.0. `tsconfig.prisma-client-generator.json`: `examples/prisma-client-generator/` and `src/tests/prisma-client-generator/` compile against the `prisma-client` generator's client (`generated/prisma-client/`) with the declaration, and their `@ts-expect-error` lines prove the registered types are enforced. `scripts/check-typecheck-programs.js` then fails unless every file in those two folders is in the registered program and none is in the default one (DESIGN.md DC-002) | `npm run typecheck` (both `tsc` runs, then the program-content check) |
+-| Unit and integration (vitest) | Library behavior: lifecycle, datasource resolution, readiness, logging policy, transactions (including concurrent requests on one SQLite file), repositories, DateTime storage. `public-initialization`, `datetime-continuity`, `transaction-isolation` and `integration` use real SQLite files. `client-lifecycle`, `client-registration`, `logging-policy`, `sqlite-connection-gate`, `forwarding-proxy` and `transaction-context` use fake clients, client modules or adapters (in part), so they do not prove the real driver. `missing-client` stubs the `@prisma/client` load to stand for an app without prisma-client-js output. `prisma-client-generator/registered-client` registers the real generated `prisma-client` client against real SQLite files, with the `@prisma/client` load stubbed to fail, so every case runs on the registered client (including concurrent requests); `prisma-client-generator/registration-recovery` starts with nothing registered and registers after a failed start. Vitest transforms that folder without the root `tsconfig.json` (which excludes it), so tests there apply decorators as function calls. | `npm test` (runs `prisma db push` to `test.db`, `prisma generate`, then vitest) |
++| Unit and integration (vitest) | Library behavior: lifecycle, datasource resolution, readiness, logging policy, transactions (including concurrent requests on one SQLite file), repositories, DateTime storage. `public-initialization`, `datetime-continuity`, `transaction-isolation` and `integration` use real SQLite files. `client-lifecycle`, `client-registration`, `logging-policy`, `sqlite-connection-gate`, `sqlite-driver-unavailable`, `forwarding-proxy` and `transaction-context` use fake clients, client modules or adapters (in part), so they do not prove the real driver. `missing-client` stubs the `@prisma/client` load to stand for an app without prisma-client-js output. `prisma-client-generator/registered-client` registers the real generated `prisma-client` client against real SQLite files, with the `@prisma/client` load stubbed to fail, so every case runs on the registered client (including concurrent requests); `prisma-client-generator/registration-recovery` starts with nothing registered and registers after a failed start. Vitest transforms that folder without the root `tsconfig.json` (which excludes it), so tests there apply decorators as function calls. | `npm test` (runs `prisma db push` to `test.db`, `prisma generate`, then vitest) |
+ | Build | tsup emits `dist` (CJS, ESM, declarations) with the Prisma packages external | `npm run build` |
+ | Package smoke | Runs the build, then the packed tarball as a consumer gets it: the packed file list and `dist` text, import safety (no `.env`, no `@prisma/client` load, no native addon on import), the logging policy, the CJS and ESM runtime (WAL, transactions, identity, safe failures, read-only WAL), the consumer declarations (`tsc`: a prisma-client-js consumer, a registered prisma-client consumer whose `@ts-expect-error` lines must all be errors, and one without the declaration that must fail with the declaration in the message, each under `NodeNext`, `Node16` and `Bundler` resolution and as a CommonJS consumer), a consumer on the `prisma-client` generator without prisma-client-js output (ESM and `moduleFormat = "cjs"` clients through the ESM and CJS builds: missing client, registration, WAL, CRUD, transactions, `Models`, conflict) and ESM/CJS interop | `npm run test:package` (`scripts/run-package-smoke.js` runs the steps in `scripts/package-smoke/`, then `scripts/run-esm-cjs-interop.js`) |
+ 
+
+$ message path check (characters / or \ in the safe message)
+SQLITE_DRIVER_UNAVAILABLE:
+    'The SQLite driver (better-sqlite3) could not load its native module. Allow its build or ' +
+    'rebuild it for this Node.js version; see "Allow the native SQLite build" in the ' +
+    'repository_prisma README.',
+contains / or \\: false
+
+$ node -p version; git tag --contains bcf2be0 | wc -l
+2.0.0
+       0

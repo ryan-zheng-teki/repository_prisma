@@ -45,6 +45,14 @@ There are no gated suites: no layer needs a service, key or account.
     manager under test, without `--legacy-peer-deps`;
   - follow only the README setup;
   - run `initializePrisma` plus a query, in ESM and CJS.
+- Real native-driver failures cannot be produced in the repository's own
+  `node_modules`. Test them in a throwaway consumer of the packed build:
+  - "not built": let npm 12+ or pnpm block `better-sqlite3`'s install script;
+  - "wrong ABI": build under one Node.js and run under another, for example
+    `node:22-bookworm` and `node:24-bookworm` containers on one Docker volume.
+  Check the README remedy with each package manager the README names: npm 12
+  runs only approved install scripts, so `npm rebuild better-sqlite3` does
+  nothing in a pnpm project.
 - Toolchain or CI changes (Node, npm, workflows, install policy) need the CI
   steps in a clean Linux x64 checkout as a non-root user (see Environments).
 - `release.yml` cannot be run outside a real release. Its steps can be checked
