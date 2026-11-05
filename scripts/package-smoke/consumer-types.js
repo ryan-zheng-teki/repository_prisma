@@ -80,10 +80,10 @@ void PrismaInitializationError;
     ],
     { cwd: consumerDirectory }
   );
-  checkRegisteredConsumerTypes(context, prismaClientConsumer);
+  return { registeredConsumerTypes: checkRegisteredConsumerTypes(context, prismaClientConsumer) };
 };
 
-const registeredTypes = `import * as generated from './esm/generated/prisma/client.js';
+const registeredTypes = (clientPath) => `import * as generated from '${clientPath}';
 import {
   BaseRepository,
   Models,
@@ -143,11 +143,22 @@ export const rejected = async (): Promise<void> => {
 export class PostRepository extends BaseRepository<'Post'> {}
 `;
 
-const missingDeclaration = `import * as generated from './esm/generated/prisma/client.js';
+const missingDeclaration = (clientPath) => `import * as generated from '${clientPath}';
 import { registerPrismaClient } from 'repository_prisma';
 
 registerPrismaClient(generated);
 `;
+
+// Consumer settings the registered types must hold under (QR-002): each resolution mode for an
+// ESM consumer of the ESM client, and a CommonJS consumer of the `moduleFormat = "cjs"` client.
+const esmClient = './esm/generated/prisma/client.js';
+const registeredConsumers = [
+  { name: 'nodenext', directory: '.', module: 'NodeNext', moduleResolution: 'NodeNext', clientPath: esmClient },
+  { name: 'node16', directory: '.', module: 'Node16', moduleResolution: 'Node16', clientPath: esmClient },
+  { name: 'bundler', directory: '.', module: 'ESNext', moduleResolution: 'Bundler', clientPath: esmClient },
+  // In `cjs/` ("type": "commonjs"), next to the `moduleFormat = "cjs"` client.
+  { name: 'cjs-node16', directory: 'cjs', module: 'Node16', moduleResolution: 'Node16', clientPath: './generated/prisma/client.js' },
+];
 
 /**
  * Type-checks consumers on the prisma-client generator (AC-006, AC-013): with the declaration the
@@ -157,43 +168,54 @@ registerPrismaClient(generated);
 const checkRegisteredConsumerTypes = (context, appDirectory) => {
   const { repoRoot, nodeCommand } = context;
   const tsc = path.join(repoRoot, 'node_modules', 'typescript', 'bin', 'tsc');
-  const typecheck = (name, source) => {
-    fs.writeFileSync(path.join(appDirectory, `${name}.ts`), source);
-    fs.writeFileSync(
-      path.join(appDirectory, `tsconfig.${name}.json`),
-      JSON.stringify({
-        compilerOptions: {
-          target: 'ES2022',
-          module: 'NodeNext',
-          moduleResolution: 'NodeNext',
-          strict: true,
-          noEmit: true,
-          skipLibCheck: true,
-        },
-        include: [`${name}.ts`],
-      })
+
+  for (const consumer of registeredConsumers) {
+    const directory = path.join(appDirectory, consumer.directory);
+    const typecheck = (name, source) => {
+      const file = `${name}.${consumer.name}`;
+      fs.writeFileSync(path.join(directory, `${file}.ts`), source);
+      fs.writeFileSync(
+        path.join(directory, `tsconfig.${file}.json`),
+        JSON.stringify({
+          compilerOptions: {
+            target: 'ES2022',
+            module: consumer.module,
+            moduleResolution: consumer.moduleResolution,
+            strict: true,
+            noEmit: true,
+            skipLibCheck: true,
+          },
+          include: [`${file}.ts`],
+        })
+      );
+      return spawnSync(nodeCommand, [tsc, '--project', `tsconfig.${file}.json`, '--listFiles'], {
+        cwd: directory,
+        encoding: 'utf8',
+      });
+    };
+
+    const registered = typecheck('registered-types', registeredTypes(consumer.clientPath));
+    assert.equal(
+      registered.status,
+      0,
+      `registered consumer types (${consumer.name}) failed:\n${registered.stdout}${registered.stderr}`
     );
-    return spawnSync(nodeCommand, [tsc, '--project', `tsconfig.${name}.json`, '--listFiles'], {
-      cwd: appDirectory,
-      encoding: 'utf8',
-    });
-  };
+    // The program really contains the consumer file and the generated client (DESIGN.md DC-002).
+    assert.match(registered.stdout, new RegExp(`registered-types\\.${consumer.name}\\.ts`));
+    // tsc lists files with forward slashes on every platform.
+    assert.equal(registered.stdout.includes(consumer.clientPath.replace(/^\.\//, '').replace(/\.js$/, '.ts')), true);
 
-  const registered = typecheck('registered-types', registeredTypes);
-  assert.equal(registered.status, 0, `registered consumer types failed:\n${registered.stdout}${registered.stderr}`);
-  // The program really contains the consumer file and the generated client (DESIGN.md DC-002).
-  assert.match(registered.stdout, /registered-types\.ts/);
-  assert.match(registered.stdout, /esm[\\/]generated[\\/]prisma[\\/]client\.ts/);
-
-  const missing = typecheck('missing-declaration', missingDeclaration);
-  const output = `${missing.stdout}${missing.stderr}`;
-  assert.notEqual(missing.status, 0, 'registerPrismaClient without the declaration must not compile');
-  assert.match(output, /missing-declaration\.ts\(4,\d+\): error TS2345/);
-  assert.equal(
-    output.includes("declare module 'repository_prisma' { interface PrismaClientRegistry { client: typeof generated } }"),
-    true,
-    `the error must name the declaration to add:\n${output}`
-  );
+    const missing = typecheck('missing-declaration', missingDeclaration(consumer.clientPath));
+    const output = `${missing.stdout}${missing.stderr}`;
+    assert.notEqual(missing.status, 0, `registerPrismaClient without the declaration must not compile (${consumer.name})`);
+    assert.match(output, new RegExp(`missing-declaration\\.${consumer.name}\\.ts\\(4,\\d+\\): error TS2345`));
+    assert.equal(
+      output.includes("declare module 'repository_prisma' { interface PrismaClientRegistry { client: typeof generated } }"),
+      true,
+      `the error must name the declaration to add (${consumer.name}):\n${output}`
+    );
+  }
+  return registeredConsumers.map((consumer) => consumer.name);
 };
 
 module.exports = { checkConsumerTypes };

@@ -22,7 +22,7 @@ try {
   const { readonlyWal } = checkCjsRuntime(context);
   checkEsmRuntime(context);
   const { appDirectory: prismaClientConsumer } = checkPrismaClientGenerator(context);
-  checkConsumerTypes(context, { prismaClientConsumer });
+  const { registeredConsumerTypes } = checkConsumerTypes(context, { prismaClientConsumer });
 
   console.log(
     JSON.stringify({
@@ -39,6 +39,7 @@ try {
       noQueryStringFiles: 'pass',
       readonlyWal,
       prismaClientGenerator: 'pass',
+      registeredConsumerTypes,
       cleanup: temporaryRoot,
     })
   );
