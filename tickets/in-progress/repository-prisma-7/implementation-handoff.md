@@ -103,7 +103,7 @@ Decisions within the design, for the reviewer:
 - Dead code in the touched files and modules removed: `Yes` (none found)
 - Dead code found elsewhere, added to `follow-ups.md`: None
 - Shared structures remain tight: `Yes`
-- Changed source implementation files stayed within proactive size-pressure guardrails: `Yes`. `lifecycle.ts` 487 lines, `sqlite-driver-adapter.ts` 70, `initialization-error.ts` 98.
+- Changed source implementation files stayed within proactive size-pressure guardrails: `Yes`. `lifecycle.ts` 487 lines, `sqlite-driver-adapter.ts` 70, `initialization-error.ts` 99.
 
 ## Persisted Data Transition Check
 
