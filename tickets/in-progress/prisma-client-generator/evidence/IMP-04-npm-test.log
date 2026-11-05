@@ -1,0 +1,169 @@
+# IMP-04 vitest suite
+# Command: npm test
+# Commit: c97eab8 (working tree clean for src/, scripts/, examples/, configs)
+# Environment: macOS (Darwin 25.5.0), Node v22.23.1, npm 10.9.8, non-root user normy
+# Date: 2026-11-05T04:55:02Z
+
+> repository_prisma@2.0.0 test
+> node scripts/run-tests.js
+Loaded Prisma config from prisma.config.ts.
+Prisma schema loaded from prisma/schema.prisma.
+Datasource "db": SQLite database "test.db" at "file:///Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/test.db"
+The database is already in sync with the Prisma schema.
+Loaded Prisma config from prisma.config.ts.
+Prisma schema loaded from prisma/schema.prisma.
+✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 51ms
+✔ Generated Prisma Client (7.10.1) to ./generated/prisma-client in 24ms
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+ RUN  v4.1.12 /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3
+ Test Files  15 passed (15)
+      Tests  144 passed (144)
+   Start at  05:55:05
+   Duration  3.43s (transform 941ms, setup 0ms, import 1.78s, tests 4.66s, environment 1ms)
+exit=0
+
+## Test list (npx vitest run --reporter=verbose, durations removed)
+ ✓ src/tests/datasource-readiness.test.ts > datasource target normalization > resolves the physical SQLite path against cwd and keeps query parameters only in the binding key
+ ✓ src/tests/datasource-readiness.test.ts > datasource target normalization > classifies file::memory: as SQLite memory
+ ✓ src/tests/datasource-readiness.test.ts > datasource target normalization > classifies file:?mode=memory&cache=shared as SQLite memory
+ ✓ src/tests/datasource-readiness.test.ts > datasource target normalization > classifies file:shared?mode=MEMORY as SQLite memory
+ ✓ src/tests/datasource-readiness.test.ts > datasource target normalization > rejects the non-SQLite target postgresql://user:secret@db.example.invalid:5432/app with a cause that carries no URL
+ ✓ src/tests/datasource-readiness.test.ts > datasource target normalization > rejects the non-SQLite target postgres://user:secret@db.example.invalid/app with a cause that carries no URL
+ ✓ src/tests/datasource-readiness.test.ts > datasource target normalization > rejects the non-SQLite target mysql://user:secret@db.example.invalid/app with a cause that carries no URL
+ ✓ src/tests/datasource-readiness.test.ts > datasource target normalization > rejects the non-SQLite target sqlserver://db.example.invalid;password=secret with a cause that carries no URL
+ ✓ src/tests/datasource-readiness.test.ts > datasource target normalization > rejects the non-SQLite target mongodb+srv://user:secret@db.example.invalid/app with a cause that carries no URL
+ ✓ src/tests/datasource-readiness.test.ts > datasource target normalization > case-folds Windows drive and UNC binding paths while preserving the opened path spelling
+ ✓ src/tests/datasource-readiness.test.ts > SQLite readiness parsing and canonical identity > accepts a symlink alias when expected and reported paths resolve to the same file
+ ✓ src/tests/datasource-readiness.test.ts > SQLite readiness parsing and canonical identity > rejects a non-array database_list response
+ ✓ src/tests/datasource-readiness.test.ts > SQLite readiness parsing and canonical identity > rejects a missing main database_list response
+ ✓ src/tests/datasource-readiness.test.ts > SQLite readiness parsing and canonical identity > rejects a multiple main rows database_list response
+ ✓ src/tests/datasource-readiness.test.ts > SQLite readiness parsing and canonical identity > rejects a missing main file database_list response
+ ✓ src/tests/datasource-readiness.test.ts > SQLite readiness parsing and canonical identity > uses separate activation and case-insensitive verification queries
+ ✓ src/tests/datasource-readiness.test.ts > SQLite readiness parsing and canonical identity > rejects a non-array journal-mode verification response
+ ✓ src/tests/datasource-readiness.test.ts > SQLite readiness parsing and canonical identity > rejects a zero rows journal-mode verification response
+ ✓ src/tests/datasource-readiness.test.ts > SQLite readiness parsing and canonical identity > rejects a multiple rows journal-mode verification response
+ ✓ src/tests/datasource-readiness.test.ts > SQLite readiness parsing and canonical identity > rejects a multiple fields journal-mode verification response
+ ✓ src/tests/datasource-readiness.test.ts > SQLite readiness parsing and canonical identity > rejects a non-string journal-mode verification response
+ ✓ src/tests/datasource-readiness.test.ts > SQLite readiness parsing and canonical identity > rejects a non-WAL journal-mode verification response
+ ✓ src/tests/client-registration.test.ts > PrismaClientSource > starts on the default package and loads it only when asked
+ ✓ src/tests/client-registration.test.ts > PrismaClientSource > classifies a default package that cannot load as PRISMA_CLIENT_UNAVAILABLE with the raw cause
+ ✓ src/tests/client-registration.test.ts > PrismaClientSource > returns the registered module without loading the default package
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle without a usable client (AC-009) > rejects explicit initialization with PRISMA_CLIENT_UNAVAILABLE and gives onDiagnostic the cause
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle without a usable client (AC-009) > throws PRISMA_CLIENT_UNAVAILABLE on the first lazy use, then CLIENT_NOT_READY until shutdown
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle without a usable client (AC-009) > reports the missing client through getClientModule as a stage failure
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle without a usable client (AC-009) > builds the client from a module registered after the failure
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle registration rule (AC-010) > rejects 'undefined' with a TypeError and changes nothing
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle registration rule (AC-010) > rejects 'a class instead of the module' with a TypeError and changes nothing
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle registration rule (AC-010) > rejects 'a module without PrismaClient' with a TypeError and changes nothing
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle registration rule (AC-010) > rejects 'a module without Prisma' with a TypeError and changes nothing
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle registration rule (AC-010) > rejects 'a module without Prisma.ModelName' with a TypeError and changes nothing
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle registration rule (AC-010) > accepts a module in idle and treats the same module again as a no-op while bound
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle registration rule (AC-010) > rejects a different module while lazily bound and keeps the bound client
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle registration rule (AC-010) > rejects a different module while initializing and still publishes the bound client
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle registration rule (AC-010) > rejects a different module while ready and while shutting down, then accepts it after shutdown
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle registration rule (AC-010) > accepts a different module after a failed initialization
+ ✓ src/tests/sqlite-connection-gate.test.ts > SQLite connection gate > forwards adapter information, connection info, savepoints and dispose unchanged
+ ✓ src/tests/sqlite-connection-gate.test.ts > SQLite connection gate > leaves optional methods absent when the inner adapter has none
+ ✓ src/tests/sqlite-connection-gate.test.ts > SQLite connection gate > runs plain operations one at a time in call order
+ ✓ src/tests/sqlite-connection-gate.test.ts > SQLite connection gate > holds plain operations while a transaction is open and runs its own statements directly
+ ✓ src/tests/sqlite-connection-gate.test.ts > SQLite connection gate > queues transactions in order and releases the lock on rollback
+ ✓ src/tests/sqlite-connection-gate.test.ts > SQLite connection gate > releases the lock when commit throws and reports the failure
+ ✓ src/tests/sqlite-connection-gate.test.ts > SQLite connection gate > releases the lock when rollback throws and reports the failure
+ ✓ src/tests/sqlite-connection-gate.test.ts > SQLite connection gate > releases the lock only once when a transaction ends twice
+ ✓ src/tests/sqlite-connection-gate.test.ts > SQLite connection gate > releases the lock when starting a transaction fails
+ ✓ src/tests/sqlite-connection-gate.test.ts > SQLite connection gate > releases the lock when a plain operation fails
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle classified failure and recovery > keeps connection failure safe, reports the original cause only to diagnostics, and recovers on retry
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle classified failure and recovery > classifies 'identity mismatch', disconnects once, and blocks silent reuse
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle classified failure and recovery > classifies 'WAL activation failure', disconnects once, and blocks silent reuse
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle classified failure and recovery > classifies 'WAL verification failure', disconnects once, and blocks silent reuse
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle classified failure and recovery > rejects strict WAL for file::memory: before connection or SQLite SQL
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle classified failure and recovery > rejects strict WAL for file:memory-name?mode=memory&cache=shared before connection or SQLite SQL
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle concurrency and shutdown > shares identical requests, rejects different/stronger requests, and never publishes after shutdown
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle concurrency and shutdown > clears the lifecycle even when direct shutdown disconnect rejects
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle concurrency and shutdown > keeps a healthy ready client authoritative when a different target is rejected
+ ✓ src/tests/public-initialization.test.ts > public initialization and real SQLite identity > opens DATABASE_URL_TEST under test and leaves DATABASE_URL untouched
+ ✓ src/tests/datetime-continuity.test.ts > DateTime continuity with rows written by Prisma 5 > stores new DateTime values as INTEGER unix ms and filters and orders them with existing rows
+ × src/tests/integration.test.ts > Implicit Transactions (Integration) > should commit transaction correctly (Decorator)
+ × src/tests/integration.test.ts > Implicit Transactions (Integration) > should rollback transaction on error (Decorator)
+ × src/tests/integration.test.ts > Implicit Transactions (Integration) > should commit transaction correctly (HOF)
+ × src/tests/integration.test.ts > Implicit Transactions (Integration) > should rollback transaction on error (HOF)
+ × src/tests/integration.test.ts > Implicit Transactions (Integration) > should commit multi-repository work with HOF transaction options
+ × src/tests/integration.test.ts > Implicit Transactions (Integration) > should rollback multi-repository work with HOF transaction options
+ × src/tests/integration.test.ts > Implicit Transactions (Integration) > should rollback nested HOF work at the outer optioned boundary
+ × src/tests/integration.test.ts > Implicit Transactions (Integration) > should persist single operation WITHOUT transaction decorator (Implicit Atomic)
+ × src/tests/integration.test.ts > Implicit Transactions (Integration) > should perform full CRUD operations correctly
+ × src/tests/integration.test.ts > Implicit Transactions (Integration) > should handle nested transactions by flattening them
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle concurrency and shutdown > coordinates shutdown while the activation stage is in flight without publishing the candidate
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle concurrency and shutdown > coordinates shutdown while the identity stage is in flight without publishing the candidate
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle concurrency and shutdown > coordinates shutdown while the verification stage is in flight without publishing the candidate
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle non-SQLite datasource rejection > rejects an explicit non-SQLite URL from idle 'without WAL' before building a client
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle non-SQLite datasource rejection > rejects an explicit non-SQLite URL from idle 'with WAL' before building a client
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle non-SQLite datasource rejection > rejects a non-SQLite URL while a SQLite client is lazily bound and keeps that client
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle non-SQLite datasource rejection > rejects a non-SQLite URL while a SQLite client is initializing and still publishes that client
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle non-SQLite datasource rejection > rejects a non-SQLite URL while a SQLite client is ready and keeps that client
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle non-SQLite datasource rejection > rejects a lazy bind from a non-SQLite DATABASE_URL before building a client
+ ✓ src/tests/client-lifecycle.test.ts > PrismaClientLifecycle non-SQLite datasource rejection > keeps CLIENT_NOT_READY precedence for a non-SQLite URL while shutdown is in progress
+ ✓ src/tests/public-initialization.test.ts > public initialization and real SQLite identity > lets a non-empty explicit datasource win and treats whitespace as omitted
+ ✓ src/tests/public-initialization.test.ts > public initialization and real SQLite identity > rejects a lazy-bound target switch without opening the second file, then rebinds captured methods after shutdown
+ ✓ src/tests/public-initialization.test.ts > public initialization and real SQLite identity > normalizes cwd-relative paths with spaces, literal percent spelling, and query parameters
+ ✓ src/tests/public-initialization.test.ts > public initialization and real SQLite identity > reads representative existing data directly without schema migration
+ ✓ src/tests/public-initialization.test.ts > public initialization and real SQLite identity > opens an absolute target without creating a file named after its query string
+ ✓ src/tests/public-initialization.test.ts > context-aware public forwarding with the current Prisma schema > uses a captured context method inside ALS and the root owner after ALS exits
+ ✓ src/tests/public-initialization.test.ts > public initialization and real SQLite identity > opens a SQLite memory target through the driver adapter without a database file
+ ✓ src/tests/public-initialization.test.ts > public initialization and real SQLite identity > rejects a non-SQLite datasource with a plain, credential-free error on explicit and lazy use
+ ✓ src/tests/public-initialization.test.ts > public initialization and real SQLite identity > accepts a symlink spelling when canonical physical identity is the same
+ ✓ src/tests/public-initialization.test.ts > public initialization and real SQLite identity > preserves delete mode without WAL, then upgrades and independently verifies WAL
+ ✓ src/tests/public-initialization.test.ts > public initialization and real SQLite identity > blocks access after a safe missing-target failure and permits corrected explicit retry
+ ✓ src/tests/prisma-client-generator/registered-client.test.ts > registered prisma-client generator client > initializes with WAL on the target file and runs repository and prisma queries (AC-002)
+ ✓ src/tests/prisma-client-generator/registered-client.test.ts > registered prisma-client generator client > binds the registered client lazily from DATABASE_URL (AC-003)
+ ✓ src/tests/prisma-client-generator/registered-client.test.ts > registered prisma-client generator client > commits and rolls back runInTransaction and @Transactional work (AC-004)
+ ✓ src/tests/prisma-client-generator/registered-client.test.ts > registered prisma-client generator client > reads Models from the registered module and builds repositories from its model names (AC-005)
+ ✓ src/tests/prisma-client-generator/registered-client.test.ts > registered prisma-client generator client > keeps the bound client on a conflicting registration and uses the new one after shutdown (AC-010)
+ ✓ src/tests/prisma-client-generator/registered-client.test.ts > registered prisma-client generator client > rejects a malformed registration with a TypeError and keeps the registered client
+ ✓ src/tests/transaction-isolation.test.ts > transaction isolation between concurrent requests on one SQLite file > keeps a request without a transaction out of another request's open transaction
+ ✓ src/tests/transaction-context.test.ts > runInTransaction control flow > preserves the one-argument Prisma call when options are omitted
+ ✓ src/tests/transaction-context.test.ts > runInTransaction control flow > forwards the exact options object and routes repository work through its transaction client
+ ✓ src/tests/transaction-context.test.ts > runInTransaction control flow > forwards an explicitly supplied empty options object
+ ✓ src/tests/transaction-context.test.ts > runInTransaction control flow > reuses one transaction client and keeps outer options authoritative when nested
+ ✓ src/tests/logging-policy.test.ts > query logging policy > rejects non-truthy flag undefined
+ ✓ src/tests/logging-policy.test.ts > query logging policy > rejects non-truthy flag ""
+ ✓ src/tests/logging-policy.test.ts > query logging policy > rejects non-truthy flag "false"
+ ✓ src/tests/logging-policy.test.ts > query logging policy > rejects non-truthy flag "0"
+ ✓ src/tests/logging-policy.test.ts > query logging policy > rejects non-truthy flag "off"
+ ✓ src/tests/logging-policy.test.ts > query logging policy > rejects non-truthy flag "maybe"
+ ✓ src/tests/logging-policy.test.ts > query logging policy > rejects non-truthy flag " trueish "
+ ✓ src/tests/logging-policy.test.ts > query logging policy > accepts truthy flag "1"
+ ✓ src/tests/logging-policy.test.ts > query logging policy > accepts truthy flag "true"
+ ✓ src/tests/logging-policy.test.ts > query logging policy > accepts truthy flag "TRUE"
+ ✓ src/tests/logging-policy.test.ts > query logging policy > accepts truthy flag " yes "
+ ✓ src/tests/logging-policy.test.ts > query logging policy > accepts truthy flag "On"
+ ✓ src/tests/logging-policy.test.ts > query logging policy > gives a defined typed option precedence over the environment
+ ✓ src/tests/logging-policy.test.ts > query logging policy > captures lazy policy, rejects a differing typed policy, and permits a new policy after shutdown
+ ✓ src/tests/missing-client.test.ts > public API without a registered client and without prisma-client-js output > imports the package and rejects initializePrisma with the cause on onDiagnostic
+ ✓ src/tests/missing-client.test.ts > public API without a registered client and without prisma-client-js output > throws PRISMA_CLIENT_UNAVAILABLE on the first lazy use and CLIENT_NOT_READY after it
+ ✓ src/tests/missing-client.test.ts > public API without a registered client and without prisma-client-js output > throws PRISMA_CLIENT_UNAVAILABLE from Models
+ ✓ src/tests/models-view.test.ts > Models view with the default prisma-client-js package > reads the model names of the client module in use
+ ✓ src/tests/models-view.test.ts > Models view with the default prisma-client-js package > supports Object.keys, Object.values, Object.entries, `in` and spread like the plain object
+ ✓ src/tests/models-view.test.ts > Models view with the default prisma-client-js package > rejects writes and leaves the model names unchanged
+ ✓ src/tests/forwarding-proxy.test.ts > createForwardingPrismaProxy > resolves captured nested handles and methods against the current owner with correct this
+ ✓ src/tests/forwarding-proxy.test.ts > createForwardingPrismaProxy > routes lifecycle hooks without invoking raw methods
+ ✓ src/tests/forwarding-proxy.test.ts > createForwardingPrismaProxy > leaves already-invoked returned values caller-owned instead of claiming revocation
+ ✓ src/tests/database-filter.test.ts > database metadata and filter regressions > uses the documented environment precedence and ignores empty values
+ ✓ src/tests/database-filter.test.ts > database metadata and filter regressions > infers file:/tmp/app.db as sqlite
+ ✓ src/tests/database-filter.test.ts > database metadata and filter regressions > infers postgres://localhost/app as postgresql
+ ✓ src/tests/database-filter.test.ts > database metadata and filter regressions > infers postgresql://localhost/app as postgresql
+ ✓ src/tests/database-filter.test.ts > database metadata and filter regressions > infers mysql://localhost/app as mysql
+ ✓ src/tests/database-filter.test.ts > database metadata and filter regressions > infers mongodb+srv://localhost/app as mongodb
+ ✓ src/tests/database-filter.test.ts > database metadata and filter regressions > infers sqlserver://localhost/app as sqlserver
+ ✓ src/tests/database-filter.test.ts > database metadata and filter regressions > infers cockroachdb://localhost/app as cockroachdb
+ ✓ src/tests/database-filter.test.ts > database metadata and filter regressions > infers unknown://localhost/app as unknown
+ ✓ src/tests/database-filter.test.ts > database metadata and filter regressions > preserves SQLite-safe contains filters and optional in-memory case folding
+ ✓ src/tests/database-filter.test.ts > database metadata and filter regressions > retains provider-supported insensitive filter mode
+ ✓ src/tests/prisma-client-generator/registered-client.test.ts > concurrent requests on the registered client > keeps a request without a transaction out of another request's open transaction
+ ✓ src/tests/prisma-client-generator/registered-client.test.ts > concurrent requests on the registered client > commits two concurrent transactions
+ ✓ src/tests/transaction-isolation.test.ts > transaction isolation between concurrent requests on one SQLite file > commits two concurrent transactions
+ ✓ src/tests/transaction-isolation.test.ts > transaction isolation between concurrent requests on one SQLite file > runs a nested write concurrently with an interactive transaction
+ ✓ src/tests/transaction-isolation.test.ts > transaction isolation between concurrent requests on one SQLite file > runs a batch transaction concurrently with an interactive transaction
+ ✓ src/tests/transaction-isolation.test.ts > transaction isolation between concurrent requests on one SQLite file > keeps concurrent plain requests isolated and loses no writes while transactions commit and roll back
+ ✓ src/tests/transaction-isolation.test.ts > transaction isolation between concurrent requests on one SQLite file > fails a transaction that uses rootPrismaClient inside its own callback with Prisma's timeout (SCN-007)
+ ✓ src/tests/transaction-isolation.test.ts > transaction isolation between concurrent requests on one SQLite file > fails a transaction queued past its maxWait and keeps the connection usable

@@ -1,0 +1,12 @@
+# IMP-03 typecheck: default program, registered program, program-content check
+# Command: npm run typecheck
+# Commit: c97eab8 (working tree clean for src/, scripts/, examples/, configs)
+# Environment: macOS (Darwin 25.5.0), Node v22.23.1, npm 10.9.8, non-root user normy
+# Date: 2026-11-05T04:54:59Z
+
+
+> repository_prisma@2.0.0 typecheck
+> tsc -p tsconfig.json && tsc -p tsconfig.prisma-client-generator.json && node scripts/check-typecheck-programs.js
+
+{"result":"pass","registeredProgramFiles":{"examples/prisma-client-generator":2,"src/tests/prisma-client-generator":1}}
+exit=0
