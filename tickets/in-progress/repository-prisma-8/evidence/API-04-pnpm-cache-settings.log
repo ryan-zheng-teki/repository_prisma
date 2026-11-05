@@ -1,0 +1,20 @@
+# Case API-04
+# Code commit e44ea62 (HEAD 1b5171f differs only in tickets/). Scripts: evidence/API-scripts/. Recorded by api_e2e_engineer, 2026-11-05.
+# Command: bash api04-pnpm-cache.sh <pnpm 11.28.11 bin> <pnpm 12.16.1 bin> (macOS)
+
+
+################ pnpm 11.28.11, node v22.23.1, Darwin arm64, 2026-11-05T07:56:00Z
+default cache-dir: undefined
+npm_config_cache_dir=<tmp>: pnpm config get cache-dir -> undefined; pnpm add exit=0; files written to <tmp>: 0
+pnpm_config_cache_dir=<tmp>: pnpm config get cache-dir -> <tmp>; pnpm add exit=0; files written to <tmp>: 2
+--cache-dir=<tmp>: pnpm config get cache-dir -> ; pnpm add exit=0; files written to <tmp>: 2
+$ pnpm cache view repository_prisma --cache-dir=<tmp>   (versions listed)
+  raw: [ERROR] Unknown option: 'cache-dir' Did you mean 'store-dir'? Use "--config.unknown=value" to force an unknown option. For help, run: pnpm help cache 
+
+################ pnpm 12.16.1, node v22.23.1, Darwin arm64, 2026-11-05T07:56:08Z
+default cache-dir: undefined
+npm_config_cache_dir=<tmp>: pnpm config get cache-dir -> undefined; pnpm add exit=0; files written to <tmp>: 0
+pnpm_config_cache_dir=<tmp>: pnpm config get cache-dir -> <tmp>; pnpm add exit=0; files written to <tmp>: 2
+--cache-dir=<tmp>: pnpm config get cache-dir -> <tmp>; pnpm add exit=0; files written to <tmp>: 2
+$ pnpm cache view repository_prisma --cache-dir=<tmp>   (versions listed)
+  versions: ["0","1","2"]

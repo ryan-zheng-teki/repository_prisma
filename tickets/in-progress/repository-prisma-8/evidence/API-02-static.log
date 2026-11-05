@@ -1,0 +1,115 @@
+# Case API-02
+# Code commit e44ea62 (HEAD 1b5171f differs only in tickets/). Scripts: evidence/API-scripts/. Recorded by api_e2e_engineer, 2026-11-05.
+# Command: bash api02-static.sh (worktree root, macOS)
+
+# API-02 static checks; 2026-11-05T07:50:34Z
+Note: switching to 'a0853c24544627f65ddf259abe73b1d18a591444'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+Note: switching to '249970729cb0ef3589644e2896645e5dc5ba9c38'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+$ git diff 4a2f312..e44ea62 -- .github
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index f3afb66..5c2a393 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -10,7 +10,7 @@ jobs:
+     runs-on: ubuntu-latest
+     steps:
+       - uses: actions/checkout@v5
+-      - uses: actions/setup-node@v5
++      - uses: actions/setup-node@v6
+         with:
+           node-version: 24
+           cache: npm
+diff --git a/.github/workflows/release.yml b/.github/workflows/release.yml
+index 5b9affa..c895f16 100644
+--- a/.github/workflows/release.yml
++++ b/.github/workflows/release.yml
+@@ -13,7 +13,7 @@ jobs:
+       id-token: write
+     steps:
+       - uses: actions/checkout@v5
+-      - uses: actions/setup-node@v5
++      - uses: actions/setup-node@v6
+         with:
+           node-version: 24
+           registry-url: "https://registry.npmjs.org"
+
+$ actionlint .github/workflows/ci.yml .github/workflows/release.yml
+verbose: Found total 0 errors in 101 ms for .github/workflows/ci.yml
+verbose: Found total 0 errors in 112 ms for .github/workflows/release.yml
+verbose: Found 0 errors in 2 files
+exit=0
+
+== setup-node v5 at commit a0853c24544627f65ddf259abe73b1d18a591444
+43:  using: 'node24'
+5:  always-auth:
+8:  node-version:
+17:  registry-url:
+24:  cache:
+26:  package-manager-cache:
+40:  node-version:
+
+== setup-node v6 at commit 249970729cb0ef3589644e2896645e5dc5ba9c38
+40:  using: 'node24'
+5:  node-version:
+14:  registry-url:
+21:  cache:
+23:  package-manager-cache:
+37:  node-version:
+
+$ diff setup-node-v5/src/authutil.ts setup-node-v6/src/authutil.ts
+7c7
+< export function configAuthentication(registryUrl: string, alwaysAuth: string) {
+---
+> export function configAuthentication(registryUrl: string) {
+16c16
+<   writeRegistryToFile(registryUrl, npmrc, alwaysAuth);
+---
+>   writeRegistryToFile(registryUrl, npmrc);
+19,23c19
+< function writeRegistryToFile(
+<   registryUrl: string,
+<   fileLocation: string,
+<   alwaysAuth: string
+< ) {
+---
+> function writeRegistryToFile(registryUrl: string, fileLocation: string) {
+50,51c46
+<   const alwaysAuthString = `always-auth=${alwaysAuth}`;
+<   newContents += `${authString}${os.EOL}${registryString}${os.EOL}${alwaysAuthString}`;
+---
+>   newContents += `${authString}${os.EOL}${registryString}`;
+
+package.json packageManager/devEngines (automatic-caching precondition):
+{"packageManager":null,"devEngines":null}

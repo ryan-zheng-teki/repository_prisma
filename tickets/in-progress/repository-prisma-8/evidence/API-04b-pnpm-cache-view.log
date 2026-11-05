@@ -1,0 +1,114 @@
+# Case API-04b
+# Code commit e44ea62 (HEAD 1b5171f differs only in tickets/). Scripts: evidence/API-scripts/. Recorded by api_e2e_engineer, 2026-11-05.
+# Command: bash api04b-cache-view.sh <pnpm 11.28.11 bin> <pnpm 12.16.1 bin> (macOS; default pnpm cache, then pnpm_config_cache_dir=<tmp>)
+
+
+################ pnpm 11.28.11
+pnpm add (default cache) exit=0
+$ pnpm cache view repository_prisma   (default cache)
+{
+  "https://registry.npmjs.org/": {
+    "cachedVersions": [
+      "1.0.10",
+      "2.0.0"
+    ],
+    "nonCachedVersions": [
+      "1.0.0",
+      "1.0.2",
+      "1.0.3",
+      "1.0.4",
+      "1.0.6",
+      "1.0.7",
+      "1.0.8",
+      "1.0.9"
+    ],
+    "cachedAt": "Thu Nov 05 2026 07:15:08 GMT+0100 (Central European Standard Time)",
+    "distTags": {
+      "latest": "2.0.0"
+    }
+  }
+}
+
+exit=0
+pnpm add (pnpm_config_cache_dir=<tmp>) exit=0
+$ pnpm_config_cache_dir=<tmp> pnpm cache view repository_prisma
+{
+  "https://registry.npmjs.org/": {
+    "cachedVersions": [
+      "1.0.10",
+      "2.0.0",
+      "2.1.0"
+    ],
+    "nonCachedVersions": [
+      "1.0.0",
+      "1.0.2",
+      "1.0.3",
+      "1.0.4",
+      "1.0.6",
+      "1.0.7",
+      "1.0.8",
+      "1.0.9"
+    ],
+    "cachedAt": "Thu Nov 05 2026 08:56:26 GMT+0100 (Central European Standard Time)",
+    "distTags": {
+      "latest": "2.1.0"
+    }
+  }
+}
+
+exit=0
+
+################ pnpm 12.16.1
+pnpm add (default cache) exit=0
+$ pnpm cache view repository_prisma   (default cache)
+{
+  "https://registry.npmjs.org/": {
+    "cachedVersions": [
+      "1.0.10",
+      "2.0.0"
+    ],
+    "nonCachedVersions": [
+      "1.0.0",
+      "1.0.2",
+      "1.0.3",
+      "1.0.4",
+      "1.0.6",
+      "1.0.7",
+      "1.0.8",
+      "1.0.9"
+    ],
+    "cachedAt": "2026-11-05T06:15:08.766Z",
+    "distTags": {
+      "latest": "2.0.0"
+    }
+  }
+}
+
+exit=0
+pnpm add (pnpm_config_cache_dir=<tmp>) exit=0
+$ pnpm_config_cache_dir=<tmp> pnpm cache view repository_prisma
+{
+  "https://registry.npmjs.org/": {
+    "cachedVersions": [
+      "1.0.10",
+      "2.0.0",
+      "2.1.0"
+    ],
+    "nonCachedVersions": [
+      "1.0.0",
+      "1.0.2",
+      "1.0.3",
+      "1.0.4",
+      "1.0.6",
+      "1.0.7",
+      "1.0.8",
+      "1.0.9"
+    ],
+    "cachedAt": "2026-11-05T07:56:33.238Z",
+    "distTags": {
+      "latest": "2.1.0"
+    }
+  }
+}
+
+exit=0

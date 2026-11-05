@@ -1,0 +1,38 @@
+# Case API-05
+# Code commit e44ea62 (HEAD 1b5171f differs only in tickets/). Scripts: evidence/API-scripts/. Recorded by api_e2e_engineer, 2026-11-05.
+# Docs review support (worktree, macOS)
+
+# API-05 docs review checks at e44ea62; 2026-11-05T07:56:49Z
+$ sed -n 68,86p TESTING.md
+  for example a container.
+- Linux x64 as on CI: `git archive` the commit into
+  `docker run --platform linux/amd64 -e CI=true --user node node:24-bookworm`.
+  Use the non-root `node` user for CI parity.
+- Package-manager versions change install behavior:
+  - npm 12+ and pnpm 10+ block dependencies' install scripts by default;
+  - npm 12 prints `npm pack --json` as an object, while npm 10/11 print an
+    array;
+  - pnpm 11+ does not resolve versions younger than its minimum release age
+    (about a day). To test a just-published release, add a test-only
+    `minimumReleaseAgeExclude` entry in the consumer's `pnpm-workspace.yaml`.
+  - pnpm also caches registry metadata and resolves from it, so a cache from
+    before the release does not list the new version, even with that entry.
+    To test a just-published version, also use an empty cache
+    (`pnpm_config_cache_dir=<tmp dir>` or `--cache-dir <tmp dir>`; pnpm 11 and
+    12 ignore `npm_config_cache_dir`), or check that `pnpm cache view <pkg>`
+    lists the version.
+
+## Rules
+
+$ sed -n 1,9p CHANGELOG.md
+# Changelog
+
+## Unreleased
+
+- Repository: CI and the release workflow use `actions/setup-node@v6`, so npm no longer warns
+  about the unknown `always-auth` config during releases.
+
+## 2.1.0
+
+
+version: 2.1.0; tags containing e44ea62: 0

@@ -1,0 +1,99 @@
+# Case API-03
+# Code commit e44ea62 (HEAD 1b5171f differs only in tickets/). Scripts: evidence/API-scripts/. Recorded by api_e2e_engineer, 2026-11-05.
+# Command: docker run --rm --platform linux/amd64 -e CI=true --user node node:24-bookworm bash api03-release.sh (setup-node v6 2499707 and v5 a0853c2 executed from their tag commits; final of three runs, see the report's deviations)
+
+# node v24.22.2, bundled npm 11.19.1, Linux x86_64, user node, CI=true, 2026-11-05T07:54:11Z
+
+################ setup-node v6 (249970729cb0ef3589644e2896645e5dc5ba9c38)
+  [action] ::group::Environment details
+  [action] node: v24.22.2
+  [action] npm: 11.19.1
+  [action] yarn: 1.22.22
+  [action] ::endgroup::
+  [action] ::debug::Setting auth in /home/node/runner-temp-v6/.npmrc
+  [action] ::warning::The runner was not able to contact the cache service. Caching will be skipped
+  [action] ##[add-matcher]/actions/setup-node-v6/.github/tsc.json
+  [action] ##[add-matcher]/actions/setup-node-v6/.github/eslint-stylish.json
+  [action] ##[add-matcher]/actions/setup-node-v6/.github/eslint-compact.json
+action exit=0
+--- GITHUB_ENV written by the action:
+  NPM_CONFIG_USERCONFIG<<ghadelimiter_64eda873-f5fd-4d23-a039-2d1bed78803a
+  /home/node/runner-temp-v6/.npmrc
+  ghadelimiter_64eda873-f5fd-4d23-a039-2d1bed78803a
+  NODE_AUTH_TOKEN<<ghadelimiter_6e9a8752-1097-4047-8065-b7dc8cefbd55
+  XXXXX-XXXXX-XXXXX-XXXXX
+  ghadelimiter_6e9a8752-1097-4047-8065-b7dc8cefbd55
+--- NPM_CONFIG_USERCONFIG=/home/node/runner-temp-v6/.npmrc ; NODE_AUTH_TOKEN=XXXXX-XXXXX-XXXXX-XXXXX
+--- .npmrc written by setup-node v6:
+  //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}
+  registry=https://registry.npmjs.org/
+$ npm --version
+  exit=0  always-auth warnings: 0
+$ npm i -g npm@^11.5.1
+  exit=0  always-auth warnings: 0
+$ npm --version
+  exit=0  always-auth warnings: 0
+  npm now: 11.21.2
+$ npm ci
+  exit=0  always-auth warnings: 0
+$ npm run build
+  exit=0  always-auth warnings: 0
+$ npm version 2.1.1 --no-git-tag-version
+  exit=0  always-auth warnings: 0
+$ npm publish --dry-run --provenance=false --access public
+  npm notice version: 2.1.1
+  npm notice total files: 10
+  npm notice Publishing to https://registry.npmjs.org/ with tag latest and public access (dry-run)
+  + repository_prisma@2.1.1
+  exit=0  always-auth warnings: 0
+
+################ setup-node v5 (a0853c24544627f65ddf259abe73b1d18a591444)
+  [action] ::group::Environment details
+  [action] (node:334) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+  [action] (Use `node --trace-deprecation ...` to show where the warning was created)
+  [action] node: v24.22.2
+  [action] npm: 11.19.1
+  [action] yarn: 1.22.22
+  [action] ::endgroup::
+  [action] ::debug::Setting auth in /home/node/runner-temp-v5/.npmrc
+  [action] ##[add-matcher]/actions/setup-node-v5/.github/tsc.json
+  [action] ##[add-matcher]/actions/setup-node-v5/.github/eslint-stylish.json
+  [action] ##[add-matcher]/actions/setup-node-v5/.github/eslint-compact.json
+action exit=0
+--- GITHUB_ENV written by the action:
+  NPM_CONFIG_USERCONFIG<<ghadelimiter_3811f4f0-d7c7-4e95-94db-55bfa201fd38
+  /home/node/runner-temp-v5/.npmrc
+  ghadelimiter_3811f4f0-d7c7-4e95-94db-55bfa201fd38
+  NODE_AUTH_TOKEN<<ghadelimiter_c986fdd3-4085-4833-87c4-652844cbdeba
+  XXXXX-XXXXX-XXXXX-XXXXX
+  ghadelimiter_c986fdd3-4085-4833-87c4-652844cbdeba
+--- NPM_CONFIG_USERCONFIG=/home/node/runner-temp-v5/.npmrc ; NODE_AUTH_TOKEN=XXXXX-XXXXX-XXXXX-XXXXX
+--- .npmrc written by setup-node v5:
+  //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}
+  registry=https://registry.npmjs.org/
+  always-auth=false
+$ npm --version
+  exit=0  always-auth warnings: 0
+$ npm i -g npm@^11.5.1
+  npm warn Unknown user config "always-auth". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+  exit=0  always-auth warnings: 1
+$ npm --version
+  exit=0  always-auth warnings: 0
+  npm now: 11.21.2
+$ npm ci
+  npm warn Unknown user config "always-auth". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+  exit=0  always-auth warnings: 1
+$ npm run build
+  npm warn Unknown user config "always-auth". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+  exit=0  always-auth warnings: 1
+$ npm version 2.1.1 --no-git-tag-version
+  npm warn Unknown user config "always-auth". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+  exit=0  always-auth warnings: 1
+$ npm publish --dry-run --provenance=false --access public
+  npm warn Unknown user config "always-auth". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+  npm warn Unknown user config "always-auth". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+  npm notice version: 2.1.1
+  npm notice total files: 10
+  npm notice Publishing to https://registry.npmjs.org/ with tag latest and public access (dry-run)
+  + repository_prisma@2.1.1
+  exit=0  always-auth warnings: 2
