@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.1.0
 
 - New initialization code `SQLITE_DRIVER_UNAVAILABLE`: `initializePrisma` reports it when
   `better-sqlite3` cannot load its native module (not built, for example when npm 12+ or pnpm
