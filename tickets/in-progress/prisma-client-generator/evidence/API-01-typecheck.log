@@ -1,0 +1,11 @@
+# API-01 npm run typecheck (both programs + program-content check)
+# Code: c97eab8 + API-04 test + API-05 smoke change (committed with this round's API/E2E commit)
+# Env: macOS Darwin 25.5.0, Node v22.23.1, npm 10.9.8, tsc 5.9.3, user normy
+# Date: 2026-11-05T05:06:53Z
+
+
+> repository_prisma@2.0.0 typecheck
+> tsc -p tsconfig.json && tsc -p tsconfig.prisma-client-generator.json && node scripts/check-typecheck-programs.js
+
+{"result":"pass","registeredProgramFiles":{"examples/prisma-client-generator":2,"src/tests/prisma-client-generator":2}}
+exit=0

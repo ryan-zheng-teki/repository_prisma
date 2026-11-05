@@ -1,0 +1,69 @@
+# API-09 docs, version, peers and tag review (AC-011, AC-012, DEC-007)
+# Code: c97eab8 (docs/manifest unchanged by this round except the TESTING.md rows this round updates)
+# Env: macOS, git 2.50.1; Date: 2026-11-05T05:10:35Z
+
+$ git show c97eab8:package.json | node -e "...version, peerDependencies"
+{"version":"2.0.0","peerDependencies":{"@prisma/adapter-better-sqlite3":"^7.10.1","@prisma/client":"^7.10.1"}}
+$ git show 0a4e824:package.json | (same)
+{"version":"2.0.0","peerDependencies":{"@prisma/adapter-better-sqlite3":"^7.10.1","@prisma/client":"^7.10.1"}}
+$ git diff 0a4e824 c97eab8 -- package.json (changed lines)
+-    "typecheck": "tsc -p tsconfig.json",
++    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.prisma-client-generator.json && node scripts/check-typecheck-programs.js",
+$ git tag --contains c97eab8 (expect empty)
+tags-containing-count=0
+
+$ grep README sections
+100:### Using the prisma-client generator
+111:     provider = "prisma-client"
+133:   registerPrismaClient(generated);
+136:     interface PrismaClientRegistry {
+142:3. Import it first in your entry file, before any module that uses the library:
+152:4. Name models with your own generated `Prisma.ModelName` or the type parameter, which work in any
+159:   export class UserRepository extends BaseRepository.forModel(Prisma.ModelName.User) {}
+160:   export class PostRepository extends BaseRepository<'Post'> {}
+164:   module that runs before `db.ts` throws `PRISMA_CLIENT_UNAVAILABLE`.
+168:- Without the `declare module` block, the `registerPrismaClient(generated)` line does not compile.
+173:    Property '"repository_prisma: declare the generated client module: declare module 'repository_prisma' { interface PrismaClientRegistry { client: typeof generated } }"' is missing ...
+177:- Keep `skipLibCheck: true` in `tsconfig.json` (the `tsc --init` default). Without prisma-client-js
+180:  `initializePrisma` rejects and the first query throws `PRISMA_CLIENT_UNAVAILABLE`.
+182:  `PRISMA_CLIENT_CONFLICT`; call and await `shutdownPrisma()` first. Registering the same module
+184:- [`examples/prisma-client-generator/`](./examples/prisma-client-generator/) shows the setup with
+388:- `PRISMA_CLIENT_UNAVAILABLE`: no Prisma client module is available: nothing was registered with
+392:- `PRISMA_CLIENT_CONFLICT`: `registerPrismaClient()` received a different client module while a
+
+$ ls examples/prisma-client-generator
+db.ts
+demo.ts
+(compiled by the registered program: API-01-typecheck.log "examples/prisma-client-generator":2)
+
+$ grep DESIGN.md
+117:- `client/client-source.ts` (`PrismaClientSource`) owns where the Prisma client module comes
+180:first needed, with `createRequire(import.meta.url)('@prisma/client')`. That is a CommonJS require
+185:Bundlers do not trace a `createRequire` call, so an application that bundles the library and
+187:unaffected). This replaces the earlier rule that the package adds no `createRequire` path.
+198:- `prisma-types.ts` owns the type registry `PrismaClientRegistry` and every type derived from
+202:  module once (`interface PrismaClientRegistry { client: typeof generated }`); without a
+214:- A `PrismaClientRegistry` augmentation applies to its whole TypeScript program, so the repository
+338:### DC-002: A type check that compiled none of the files it was meant to check (prisma-client generator, ARCH-REV-003 AR-003)
+
+$ sed -n 1,20p CHANGELOG.md
+# Changelog
+
+## Unreleased
+
+- Support for Prisma 7's `prisma-client` generator (ESM and `moduleFormat = "cjs"` clients):
+  register the generated client module once with the new `registerPrismaClient()` and declare
+  its types in the new `PrismaClientRegistry` interface; every runtime feature and public type
+  then follows that client. `registerPrismaClient` accepts only the declared module: without the
+  declaration the call fails to compile, and the error names the declaration to add. The README
+  has a copy-paste `db.ts`, and `examples/prisma-client-generator/` shows the setup.
+  Non-breaking: prisma-client-js applications change nothing, and their public types are
+  identical.
+- Importing the package no longer loads `@prisma/client`; the prisma-client-js client is loaded
+  the first time a client or `Models` is needed. `Models` is now a read-only view that reads the
+  client's model names on access.
+- New initialization codes: `PRISMA_CLIENT_UNAVAILABLE` (no registered client and no
+  prisma-client-js output) and `PRISMA_CLIENT_CONFLICT` (a different client registered while one
+  is bound). `registerPrismaClient()` throws a `TypeError` for an argument that is not a
+  generated client module.
+- Build: the bundles target es2020 (was es2018).

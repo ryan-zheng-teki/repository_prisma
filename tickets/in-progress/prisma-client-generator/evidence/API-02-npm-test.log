@@ -1,0 +1,47 @@
+# API-02 npm test (prisma db push to test.db, prisma generate, vitest)
+# Code: c97eab8 + API-04 test + API-05 smoke change
+# Env: macOS Darwin 25.5.0, Node v22.23.1, npm 10.9.8, user normy
+# Date: 2026-11-05T05:07:02Z
+
+
+> repository_prisma@2.0.0 test
+> node scripts/run-tests.js
+
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+Datasource "db": SQLite database "test.db" at "file:///Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/test.db"
+
+The database is already in sync with the Prisma schema.
+
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+┌─────────────────────────────────────────────────────────┐
+│  Update available 7.10.1 -> 8.0.0-rc.30                 │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+
+✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 46ms
+
+✔ Generated Prisma Client (7.10.1) to ./generated/prisma-client in 22ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+
+
+ RUN  v4.1.12 /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3
+
+
+ Test Files  16 passed (16)
+      Tests  147 passed (147)
+   Start at  06:07:05
+   Duration  3.36s (transform 967ms, setup 0ms, import 1.66s, tests 4.66s, environment 1ms)
+
+exit=0

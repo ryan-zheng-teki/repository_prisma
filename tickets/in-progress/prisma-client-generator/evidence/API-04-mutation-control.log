@@ -1,0 +1,22 @@
+# API-04 negative control: the new test fails when the lifecycle refuses registration in the failed state
+# Mutation (temporary, restored with cp from a backup; `git diff -- src/lib` empty afterwards):
+#   src/lib/client/lifecycle.ts registerClientModule: moved `case 'failed':` from the accept branch
+#   (`this.source.register(module)`) to the PRISMA_CLIENT_CONFLICT branch.
+# Command: DATABASE_URL=file:$PWD/test.db npx vitest run src/tests/prisma-client-generator/registration-recovery.test.ts
+# Code: c97eab8 + new test file + the mutation; Env: macOS Darwin 25.5.0, Node v22.23.1, user normy
+# Date: 2026-11-05
+
+Output (filtered with grep -E "✓|×|FAIL|PRISMA_CLIENT_CONFLICT|Tests "):
+     × registers after initializePrisma failed for a missing client, without shutdownPrisma (AC-009, REQ-006) 45ms
+     × accepts a different client after initializePrisma failed to connect, without shutdownPrisma (AC-010, REQ-006) 5ms
+     × accepts a different client after the first lazy use failed, and binds it on initializePrisma (AC-010, REQ-006) 5ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/tests/prisma-client-generator/registration-recovery.test.ts > recovering from a failed start with the registered client > registers after initializePrisma failed for a missing client, without shutdownPrisma (AC-009, REQ-006)
+    129|         throw new PrismaInitializationError('PRISMA_CLIENT_CONFLICT');
+ FAIL  src/tests/prisma-client-generator/registration-recovery.test.ts > recovering from a failed start with the registered client > accepts a different client after initializePrisma failed to connect, without shutdownPrisma (AC-010, REQ-006)
+    129|         throw new PrismaInitializationError('PRISMA_CLIENT_CONFLICT');
+ FAIL  src/tests/prisma-client-generator/registration-recovery.test.ts > recovering from a failed start with the registered client > accepts a different client after the first lazy use failed, and binds it on initializePrisma (AC-010, REQ-006)
+    129|         throw new PrismaInitializationError('PRISMA_CLIENT_CONFLICT');
+      Tests  3 failed (3)
+
+After restoring lifecycle.ts: API-04-registration-recovery.log shows 3 passed.

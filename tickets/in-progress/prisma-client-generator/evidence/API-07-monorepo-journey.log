@@ -1,0 +1,592 @@
+# API-06 / API-07 / API-08 npm-workspaces monorepo journey on the prisma-client generator
+# Command: evidence/API-07-probe/run.sh /tmp/rp3-api/pack/repository_prisma-2.0.0.tgz /tmp/rp3-api
+# Package: npm run build + npm pack of the worktree at c97eab8 (library source unchanged in this round; only tests and smoke scripts changed)
+# Env: macOS Darwin 25.5.0, Node v22.23.1, npm 10.9.8, user normy; TypeScript 5.9.3 (workspace) and 5.4.5 (API-06); esbuild 0.25 (workspace)
+# Date: 2026-11-05T05:10:25Z
+# Sections: '=== API-07 ...' (install, @acme/db, apps/api, apps/worker), '=== API-08 load order', '=== API-06 TypeScript 5.4'. Steps marked EXPECT-FAIL are controls that must fail.
+
+================ API-07 install (npm workspaces, no --legacy-peer-deps)
+
+$ npm install --no-audit --no-fund
+npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
+
+added 185 packages in 12s
+exit=0
+--- repository_prisma copies (expect one, hoisted):
+./node_modules/repository_prisma/package.json
+--- @prisma/client prisma-client-js output present? (expect no .prisma/client):
+ls: node_modules/.prisma/client: No such file or directory
+
+================ API-07 generate, push, build @acme/db (nodenext, declarations)
+
+$ npx prisma generate
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+
+✔ Generated Prisma Client (7.10.1) to ./src/generated/prisma in 21ms
+
+exit=0
+
+$ npx prisma db push
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+Datasource "db": SQLite database "app.db" at "file:/tmp/rp3-api/mono/app.db"
+
+SQLite database app.db created at file:/tmp/rp3-api/mono/app.db
+
+🚀  Your database is now in sync with your Prisma schema. Done in 11ms
+┌─────────────────────────────────────────────────────────┐
+│  Update available 7.10.1 -> 8.0.0-rc.30                 │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+
+exit=0
+
+$ npx tsc -p tsconfig.json
+exit=0
+--- declaration emitted by @acme/db (dist/index.d.ts):
+import * as generated from './generated/prisma/client.js';
+declare module 'repository_prisma' {
+    interface PrismaClientRegistry {
+        client: typeof generated;
+    }
+}
+export { Prisma } from './generated/prisma/client.js';
+
+--- AC-013 control: README db.ts without the declare module block. EXPECT-FAIL with TS2345 naming the declaration
+
+$ npx tsc -p tsconfig.controls.json
+controls/missing-declaration.ts(5,22): error TS2345: Argument of type 'typeof import("/private/tmp/rp3-api/mono/packages/db/src/generated/prisma/client", { with: { "resolution-mode": "import" } })' is not assignable to parameter of type 'MissingTypeDeclaration'.
+  Property '"repository_prisma: declare the generated client module: declare module 'repository_prisma' { interface PrismaClientRegistry { client: typeof generated } }"' is missing in type 'typeof import("/private/tmp/rp3-api/mono/packages/db/src/generated/prisma/client", { with: { "resolution-mode": "import" } })' but required in type 'MissingTypeDeclaration'.
+exit=2
+
+================ API-07 apps/api (ESM, nodenext, compiled): types from @acme/db's declaration
+
+$ npx tsc -p tsconfig.json --listFiles
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es5.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2015.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2016.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2017.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2018.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2019.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2020.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2021.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2022.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.dom.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.dom.iterable.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.dom.asynciterable.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.webworker.importscripts.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.scripthost.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2015.core.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2015.collection.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2015.generator.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2015.iterable.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2015.promise.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2015.proxy.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2015.reflect.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2015.symbol.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2015.symbol.wellknown.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2016.array.include.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2016.intl.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2017.arraybuffer.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2017.date.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2017.object.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2017.sharedmemory.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2017.string.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2017.intl.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2017.typedarrays.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2018.asyncgenerator.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2018.asynciterable.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2018.intl.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2018.promise.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2018.regexp.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2019.array.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2019.object.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2019.string.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2019.symbol.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2019.intl.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2020.bigint.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2020.date.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2020.promise.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2020.sharedmemory.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2020.string.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2020.symbol.wellknown.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2020.intl.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2020.number.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2021.promise.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2021.string.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2021.weakref.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2021.intl.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2022.array.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2022.error.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2022.intl.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2022.object.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2022.string.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2022.regexp.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.decorators.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.decorators.legacy.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2022.full.d.ts
+/private/tmp/rp3-api/mono/node_modules/@prisma/client-runtime-utils/dist/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@prisma/client/runtime/client.d.ts
+/private/tmp/rp3-api/mono/packages/db/dist/generated/prisma/models/User.d.ts
+/private/tmp/rp3-api/mono/packages/db/dist/generated/prisma/models/Post.d.ts
+/private/tmp/rp3-api/mono/packages/db/dist/generated/prisma/commonInputTypes.d.ts
+/private/tmp/rp3-api/mono/packages/db/dist/generated/prisma/models.d.ts
+/private/tmp/rp3-api/mono/packages/db/dist/generated/prisma/internal/prismaNamespace.d.ts
+/private/tmp/rp3-api/mono/packages/db/dist/generated/prisma/internal/class.d.ts
+/private/tmp/rp3-api/mono/packages/db/dist/generated/prisma/enums.d.ts
+/private/tmp/rp3-api/mono/packages/db/dist/generated/prisma/client.d.ts
+/private/tmp/rp3-api/mono/packages/db/dist/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@prisma/client/default.d.ts
+/private/tmp/rp3-api/mono/node_modules/repository_prisma/dist/index.d.ts
+/private/tmp/rp3-api/mono/apps/api/src/main.ts
+/private/tmp/rp3-api/mono/apps/api/src/models-repositories.ts
+/private/tmp/rp3-api/mono/apps/api/src/negatives.ts
+/private/tmp/rp3-api/mono/apps/api/src/readme-repositories.ts
+/private/tmp/rp3-api/mono/apps/api/src/readme-order.ts
+/private/tmp/rp3-api/mono/apps/api/src/wrong-order.ts
+/private/tmp/rp3-api/mono/node_modules/@types/d3-array/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/d3-color/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/d3-delaunay/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/d3-format/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/geojson/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/d3-geo/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/d3-interpolate/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/d3-path/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/d3-time/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/d3-scale/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/d3-shape/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/d3-time-format/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/common/common.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/common/array.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/common/collection.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/common/date.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/common/function.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/common/lang.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/common/math.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/common/number.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/common/object.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/common/seq.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/common/string.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/common/util.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/compatibility/disposable.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/compatibility/indexable.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/compatibility/iterators.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/compatibility/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/globals.typedarray.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/buffer.buffer.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/globals.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/web-globals/abortcontroller.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/web-globals/domexception.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/web-globals/events.d.ts
+/private/tmp/rp3-api/mono/node_modules/buffer/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/header.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/readable.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/file.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/fetch.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/formdata.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/connector.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/client.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/errors.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/dispatcher.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/global-dispatcher.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/global-origin.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/pool-stats.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/pool.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/handlers.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/balanced-pool.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/agent.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/mock-interceptor.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/mock-agent.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/mock-client.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/mock-pool.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/mock-errors.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/proxy-agent.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/env-http-proxy-agent.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/retry-handler.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/retry-agent.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/api.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/interceptors.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/util.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/cookies.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/patch.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/websocket.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/eventsource.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/filereader.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/diagnostics-channel.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/content-type.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/cache.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/web-globals/fetch.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/web-globals/navigator.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/web-globals/storage.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/web-globals/streams.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/assert.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/assert/strict.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/async_hooks.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/buffer.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/child_process.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/cluster.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/console.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/constants.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/crypto.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/dgram.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/diagnostics_channel.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/dns.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/dns/promises.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/domain.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/events.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/fs.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/fs/promises.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/http.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/http2.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/https.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/inspector.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/inspector.generated.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/module.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/net.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/os.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/path.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/perf_hooks.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/process.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/punycode.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/querystring.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/readline.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/readline/promises.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/repl.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/sea.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/sqlite.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/stream.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/stream/promises.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/stream/consumers.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/stream/web.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/string_decoder.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/test.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/timers.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/timers/promises.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/tls.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/trace_events.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/tty.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/url.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/util.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/v8.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/vm.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/wasi.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/worker_threads.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/zlib.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/react/global.d.ts
+/private/tmp/rp3-api/mono/node_modules/csstype/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/react/index.d.ts
+exit=0
+
+--- control: same @ts-expect-error lines without importing @acme/db. EXPECT-FAIL with TS2578 (unused) on each
+
+$ npx tsc -p tsconfig.no-db-import.json
+src/no-db-import.ts(9,3): error TS2578: Unused '@ts-expect-error' directive.
+src/no-db-import.ts(11,3): error TS2578: Unused '@ts-expect-error' directive.
+src/no-db-import.ts(13,3): error TS2578: Unused '@ts-expect-error' directive.
+exit=2
+
+--- run the app (WAL, repositories, transaction with isolation level, rollback, @Transactional rollback, Models)
+
+$ node dist/main.js
+api-main {"journal":"wal","rows":[{"id":1,"email":"ada@mono.test","posts":[{"id":1,"title":"Hello","authorId":1}]}],"models":"User"}
+exit=0
+
+================ API-08 load order
+--- Models.User read in a module evaluated before @acme/db. EXPECT-FAIL with PRISMA_CLIENT_UNAVAILABLE
+
+$ node dist/wrong-order.js
+file:///private/tmp/rp3-api/mono/node_modules/repository_prisma/dist/index.mjs:973
+      throw new PrismaInitializationError(error.code);
+            ^
+
+PrismaInitializationError: No generated Prisma client is available. Run `prisma generate`, or pass the client your prisma-client generator created to registerPrismaClient().
+    at currentModelNames (file:///private/tmp/rp3-api/mono/node_modules/repository_prisma/dist/index.mjs:973:13)
+    at Object.get (file:///private/tmp/rp3-api/mono/node_modules/repository_prisma/dist/index.mjs:980:43)
+    at file:///private/tmp/rp3-api/mono/apps/api/dist/models-repositories.js:3:68
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {
+  code: 'PRISMA_CLIENT_UNAVAILABLE'
+}
+
+Node.js v22.23.1
+exit=1
+
+--- README naming (Prisma.ModelName / BaseRepository<'X'>) in the same import order
+
+$ node dist/readme-order.js
+readme-order 1
+exit=0
+
+================ API-07 apps/worker (moduleResolution bundler, @acme/db source condition, esbuild bundle)
+
+$ npx tsc -p tsconfig.json --listFiles
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es5.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2015.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2016.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2017.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2018.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2019.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2020.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2021.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2022.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.dom.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.dom.iterable.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.dom.asynciterable.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.webworker.importscripts.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.scripthost.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2015.core.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2015.collection.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2015.generator.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2015.iterable.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2015.promise.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2015.proxy.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2015.reflect.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2015.symbol.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2015.symbol.wellknown.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2016.array.include.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2016.intl.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2017.arraybuffer.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2017.date.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2017.object.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2017.sharedmemory.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2017.string.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2017.intl.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2017.typedarrays.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2018.asyncgenerator.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2018.asynciterable.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2018.intl.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2018.promise.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2018.regexp.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2019.array.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2019.object.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2019.string.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2019.symbol.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2019.intl.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2020.bigint.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2020.date.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2020.promise.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2020.sharedmemory.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2020.string.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2020.symbol.wellknown.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2020.intl.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2020.number.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2021.promise.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2021.string.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2021.weakref.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2021.intl.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2022.array.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2022.error.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2022.intl.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2022.object.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2022.string.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2022.regexp.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.decorators.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.decorators.legacy.d.ts
+/private/tmp/rp3-api/mono/node_modules/typescript/lib/lib.es2022.full.d.ts
+/private/tmp/rp3-api/mono/node_modules/@prisma/client-runtime-utils/dist/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@prisma/client/runtime/client.d.ts
+/private/tmp/rp3-api/mono/packages/db/src/generated/prisma/enums.ts
+/private/tmp/rp3-api/mono/packages/db/src/generated/prisma/models/User.ts
+/private/tmp/rp3-api/mono/packages/db/src/generated/prisma/models/Post.ts
+/private/tmp/rp3-api/mono/packages/db/src/generated/prisma/commonInputTypes.ts
+/private/tmp/rp3-api/mono/packages/db/src/generated/prisma/models.ts
+/private/tmp/rp3-api/mono/packages/db/src/generated/prisma/internal/prismaNamespace.ts
+/private/tmp/rp3-api/mono/packages/db/src/generated/prisma/internal/class.ts
+/private/tmp/rp3-api/mono/packages/db/src/generated/prisma/client.ts
+/private/tmp/rp3-api/mono/node_modules/@prisma/client/default.d.ts
+/private/tmp/rp3-api/mono/node_modules/repository_prisma/dist/index.d.ts
+/private/tmp/rp3-api/mono/packages/db/src/index.ts
+/private/tmp/rp3-api/mono/apps/worker/src/main.ts
+/private/tmp/rp3-api/mono/node_modules/@types/d3-array/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/d3-color/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/d3-delaunay/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/d3-format/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/geojson/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/d3-geo/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/d3-interpolate/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/d3-path/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/d3-time/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/d3-scale/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/d3-shape/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/d3-time-format/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/common/common.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/common/array.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/common/collection.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/common/date.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/common/function.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/common/lang.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/common/math.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/common/number.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/common/object.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/common/seq.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/common/string.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/common/util.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/lodash/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/compatibility/disposable.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/compatibility/indexable.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/compatibility/iterators.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/compatibility/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/globals.typedarray.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/buffer.buffer.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/globals.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/web-globals/abortcontroller.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/web-globals/domexception.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/web-globals/events.d.ts
+/private/tmp/rp3-api/mono/node_modules/buffer/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/header.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/readable.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/file.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/fetch.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/formdata.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/connector.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/client.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/errors.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/dispatcher.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/global-dispatcher.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/global-origin.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/pool-stats.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/pool.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/handlers.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/balanced-pool.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/agent.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/mock-interceptor.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/mock-agent.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/mock-client.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/mock-pool.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/mock-errors.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/proxy-agent.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/env-http-proxy-agent.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/retry-handler.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/retry-agent.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/api.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/interceptors.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/util.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/cookies.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/patch.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/websocket.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/eventsource.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/filereader.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/diagnostics-channel.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/content-type.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/cache.d.ts
+/private/tmp/rp3-api/mono/node_modules/undici-types/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/web-globals/fetch.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/web-globals/navigator.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/web-globals/storage.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/web-globals/streams.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/assert.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/assert/strict.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/async_hooks.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/buffer.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/child_process.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/cluster.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/console.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/constants.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/crypto.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/dgram.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/diagnostics_channel.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/dns.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/dns/promises.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/domain.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/events.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/fs.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/fs/promises.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/http.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/http2.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/https.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/inspector.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/inspector.generated.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/module.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/net.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/os.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/path.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/perf_hooks.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/process.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/punycode.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/querystring.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/readline.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/readline/promises.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/repl.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/sea.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/sqlite.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/stream.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/stream/promises.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/stream/consumers.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/stream/web.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/string_decoder.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/test.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/timers.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/timers/promises.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/tls.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/trace_events.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/tty.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/url.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/util.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/v8.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/vm.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/wasi.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/worker_threads.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/zlib.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/node/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/react/global.d.ts
+/private/tmp/rp3-api/mono/node_modules/csstype/index.d.ts
+/private/tmp/rp3-api/mono/node_modules/@types/react/index.d.ts
+exit=0
+
+$ npx esbuild src/main.ts --bundle --platform=node --format=esm --target=node20 --conditions=source --external:@prisma/client --external:@prisma/adapter-better-sqlite3 --external:better-sqlite3 --outfile=dist/main.mjs --log-level=warning
+exit=0
+--- repository_prisma and @acme/db are inside the bundle (expect markers > 0):
+registerPrismaClient occurrences: 4
+PRISMA_CLIENT_CONFLICT occurrences: 2
+
+$ node dist/main.mjs
+worker-bundle [{"title":"Hello"},{"title":"From the bundle"}]
+exit=0
+
+================ API-06 TypeScript 5.4 (QR-002 lower bound)
+
+$ npm install --no-audit --no-fund typescript@5.4
+
+added 1 package in 377ms
+exit=0
+
+$ node /tmp/rp3-api/ts54/node_modules/typescript/bin/tsc -v
+Version 5.4.5
+exit=0
+
+$ node /tmp/rp3-api/ts54/node_modules/typescript/bin/tsc -p tsconfig.json --noEmit
+exit=0
+--- EXPECT-FAIL with TS2345 naming the declaration
+
+$ node /tmp/rp3-api/ts54/node_modules/typescript/bin/tsc -p tsconfig.controls.json
+controls/missing-declaration.ts(5,22): error TS2345: Argument of type 'typeof import("/private/tmp/rp3-api/mono/packages/db/src/generated/prisma/client", { with: { "resolution-mode": "import" } })' is not assignable to parameter of type 'MissingTypeDeclaration'.
+  Property '"repository_prisma: declare the generated client module: declare module 'repository_prisma' { interface PrismaClientRegistry { client: typeof generated } }"' is missing in type 'typeof import("/private/tmp/rp3-api/mono/packages/db/src/generated/prisma/client", { with: { "resolution-mode": "import" } })' but required in type 'MissingTypeDeclaration'.
+exit=2
+
+$ node /tmp/rp3-api/ts54/node_modules/typescript/bin/tsc -p tsconfig.json --noEmit
+exit=0
+--- EXPECT-FAIL with TS2578 (unused @ts-expect-error)
+
+$ node /tmp/rp3-api/ts54/node_modules/typescript/bin/tsc -p tsconfig.no-db-import.json
+src/no-db-import.ts(9,3): error TS2578: Unused '@ts-expect-error' directive.
+src/no-db-import.ts(11,3): error TS2578: Unused '@ts-expect-error' directive.
+src/no-db-import.ts(13,3): error TS2578: Unused '@ts-expect-error' directive.
+exit=2
+
+$ node /tmp/rp3-api/ts54/node_modules/typescript/bin/tsc -p tsconfig.json
+exit=0
+
+ALL-STEPS-RAN

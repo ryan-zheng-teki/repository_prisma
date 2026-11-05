@@ -1,0 +1,38 @@
+# API-03 / API-05 npm run test:package (non-root): build, package smoke steps incl. registered consumer types under NodeNext, Node16, Bundler and a CJS Node16 consumer, then ESM/CJS interop
+# Code: c97eab8 + API-04 test + API-05 smoke change (incl. registeredConsumerTypes in the summary)
+# Env: macOS Darwin 25.5.0, Node v22.23.1, npm 10.9.8, user normy (uid 501)
+# Date: 2026-11-05T05:07:41Z
+
+
+> repository_prisma@2.0.0 test:package
+> npm run build && node scripts/run-package-smoke.js && node scripts/run-esm-cjs-interop.js
+
+
+> repository_prisma@2.0.0 build
+> tsup
+
+CLI Building entry: src/index.ts
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.1
+CLI Using tsup config: /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/tsup.config.ts
+CLI Target: es2020
+CLI Cleaning output folder
+CJS Build start
+ESM Build start
+CJS You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+ESM You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+CJS dist/index.js     35.85 KB
+CJS dist/index.js.map 73.41 KB
+CJS ⚡️ Build success in 15ms
+ESM dist/index.mjs     32.88 KB
+ESM dist/index.mjs.map 71.33 KB
+ESM ⚡️ Build success in 15ms
+DTS Build start
+DTS ⚡️ Build success in 916ms
+DTS dist/index.d.ts  12.18 KB
+DTS dist/index.d.mts 12.18 KB
+
+added 1 package in 166ms
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","externalDriverAdapter":"pass","noClientOnImport":"pass","noNativeAddonOnImport":"pass","noQueryStringFiles":"pass","readonlyWal":"pass","prismaClientGenerator":"pass","registeredConsumerTypes":["nodenext","node16","bundler","cjs-node16"],"cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-package-smoke-5laX2N"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-esm-cjs-interop-qhw0UZ"}
+exit=0

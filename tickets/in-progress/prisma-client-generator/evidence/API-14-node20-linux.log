@@ -1,0 +1,23 @@
+# API-14 Node 20 (lowest engines range ^20.19) on Linux x64 as the non-root node user
+# Command: git archive 6c950bd | docker run -i --rm --platform linux/amd64 -e CI=true --user node node:20-bookworm bash -c '<steps: npm ci; npm test; npm run build; smoke; interop>' (npm 10 has no --strict-allow-scripts)
+# Commit: 6c950bd
+# Environment: Docker 29.0.1 on macOS host, image node:20-bookworm (linux/amd64)
+# Date: 2026-11-05T05:12:54Z
+
+id: uid=1000(node) gid=1000(node) groups=1000(node)
+node v20.20.2 npm 10.8.2
+$ npm ci
+
+found 0 vulnerabilities
+$ npm test
+ Test Files  16 passed (16)
+      Tests  147 passed (147)
+$ npm run build
+[32mCJS[39m ⚡️ Build success in 145ms
+[32mESM[39m ⚡️ Build success in 146ms
+[32mDTS[39m ⚡️ Build success in 4455ms
+$ node scripts/run-package-smoke.js && node scripts/run-esm-cjs-interop.js
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","externalDriverAdapter":"pass","noClientOnImport":"pass","noNativeAddonOnImport":"pass","noQueryStringFiles":"pass","readonlyWal":"pass","prismaClientGenerator":"pass","registeredConsumerTypes":["nodenext","node16","bundler","cjs-node16"],"cleanup":"/tmp/repository-prisma-package-smoke-H9E4cE"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"/tmp/repository-prisma-esm-cjs-interop-58qe30"}
+ALL-STEPS-OK
+exit=0

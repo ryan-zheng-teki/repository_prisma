@@ -1,0 +1,19 @@
+# API-04 registration recovery with the real generated client (REQ-005, REQ-006, AC-009, AC-010)
+# Command: DATABASE_URL=file:$PWD/test.db npx vitest run src/tests/prisma-client-generator/registration-recovery.test.ts --reporter=verbose
+# Code: c97eab8 + new test file (committed with this round's API/E2E commit)
+# Env: macOS Darwin 25.5.0, Node v22.23.1, npm 10.9.8, user normy
+# Date: 2026-11-05T05:05:55Z
+
+
+ RUN  v4.1.12 /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3
+
+ ✓ src/tests/prisma-client-generator/registration-recovery.test.ts > recovering from a failed start with the registered client > registers after initializePrisma failed for a missing client, without shutdownPrisma (AC-009, REQ-006) 66ms
+ ✓ src/tests/prisma-client-generator/registration-recovery.test.ts > recovering from a failed start with the registered client > accepts a different client after initializePrisma failed to connect, without shutdownPrisma (AC-010, REQ-006) 10ms
+ ✓ src/tests/prisma-client-generator/registration-recovery.test.ts > recovering from a failed start with the registered client > accepts a different client after the first lazy use failed, and binds it on initializePrisma (AC-010, REQ-006) 6ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  06:05:55
+   Duration  309ms (transform 85ms, setup 0ms, import 140ms, tests 83ms, environment 0ms)
+
+exit=0

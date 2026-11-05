@@ -1,0 +1,11 @@
+{
+  "name": "acme-mono",
+  "private": true,
+  "workspaces": ["packages/*", "apps/*"],
+  "devDependencies": {
+    "@types/node": "^22",
+    "esbuild": "^0.25.0",
+    "prisma": "^7.10.1",
+    "typescript": "5.9.3"
+  }
+}

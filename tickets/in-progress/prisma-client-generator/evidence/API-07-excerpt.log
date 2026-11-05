@@ -1,0 +1,78 @@
+# Excerpt of API-07-monorepo-journey.log (key lines only; full transcript in that file)
+
+6:# Sections: '=== API-07 ...' (install, @acme/db, apps/api, apps/worker), '=== API-08 load order', '=== API-06 TypeScript 5.4'. Steps marked EXPECT-FAIL are controls that must fail.
+8:================ API-07 install (npm workspaces, no --legacy-peer-deps)
+10:$ npm install --no-audit --no-fund
+14:exit=0
+16:./node_modules/repository_prisma/package.json
+18:ls: node_modules/.prisma/client: No such file or directory
+20:================ API-07 generate, push, build @acme/db (nodenext, declarations)
+22:$ npx prisma generate
+29:exit=0
+31:$ npx prisma db push
+51:exit=0
+53:$ npx tsc -p tsconfig.json
+54:exit=0
+59:        client: typeof generated;
+64:--- AC-013 control: README db.ts without the declare module block. EXPECT-FAIL with TS2345 naming the declaration
+66:$ npx tsc -p tsconfig.controls.json
+67:controls/missing-declaration.ts(5,22): error TS2345: Argument of type 'typeof import("/private/tmp/rp3-api/mono/packages/db/src/generated/prisma/client", { with: { "resolution-mode": "import" } })' is not assignable to parameter of type 'MissingTypeDeclaration'.
+68:  Property '"repository_prisma: declare the generated client module: declare module 'repository_prisma' { interface PrismaClientRegistry { client: typeof generated } }"' is missing in type 'typeof import("/private/tmp/rp3-api/mono/packages/db/src/generated/prisma/client", { with: { "resolution-mode": "import" } })' but required in type 'MissingTypeDeclaration'.
+69:exit=2
+71:================ API-07 apps/api (ESM, nodenext, compiled): types from @acme/db's declaration
+73:$ npx tsc -p tsconfig.json --listFiles
+147:/private/tmp/rp3-api/mono/packages/db/dist/index.d.ts
+290:exit=0
+292:--- control: same @ts-expect-error lines without importing @acme/db. EXPECT-FAIL with TS2578 (unused) on each
+294:$ npx tsc -p tsconfig.no-db-import.json
+295:src/no-db-import.ts(9,3): error TS2578: Unused '@ts-expect-error' directive.
+296:src/no-db-import.ts(11,3): error TS2578: Unused '@ts-expect-error' directive.
+297:src/no-db-import.ts(13,3): error TS2578: Unused '@ts-expect-error' directive.
+298:exit=2
+302:$ node dist/main.js
+303:api-main {"journal":"wal","rows":[{"id":1,"email":"ada@mono.test","posts":[{"id":1,"title":"Hello","authorId":1}]}],"models":"User"}
+304:exit=0
+306:================ API-08 load order
+307:--- Models.User read in a module evaluated before @acme/db. EXPECT-FAIL with PRISMA_CLIENT_UNAVAILABLE
+309:$ node dist/wrong-order.js
+314:PrismaInitializationError: No generated Prisma client is available. Run `prisma generate`, or pass the client your prisma-client generator created to registerPrismaClient().
+321:  code: 'PRISMA_CLIENT_UNAVAILABLE'
+325:exit=1
+329:$ node dist/readme-order.js
+330:readme-order 1
+331:exit=0
+333:================ API-07 apps/worker (moduleResolution bundler, @acme/db source condition, esbuild bundle)
+335:$ npx tsc -p tsconfig.json --listFiles
+411:/private/tmp/rp3-api/mono/packages/db/src/index.ts
+547:exit=0
+549:$ npx esbuild src/main.ts --bundle --platform=node --format=esm --target=node20 --conditions=source --external:@prisma/client --external:@prisma/adapter-better-sqlite3 --external:better-sqlite3 --outfile=dist/main.mjs --log-level=warning
+550:exit=0
+552:registerPrismaClient occurrences: 4
+553:PRISMA_CLIENT_CONFLICT occurrences: 2
+555:$ node dist/main.mjs
+556:worker-bundle [{"title":"Hello"},{"title":"From the bundle"}]
+557:exit=0
+559:================ API-06 TypeScript 5.4 (QR-002 lower bound)
+561:$ npm install --no-audit --no-fund typescript@5.4
+564:exit=0
+566:$ node /tmp/rp3-api/ts54/node_modules/typescript/bin/tsc -v
+567:Version 5.4.5
+568:exit=0
+570:$ node /tmp/rp3-api/ts54/node_modules/typescript/bin/tsc -p tsconfig.json --noEmit
+571:exit=0
+572:--- EXPECT-FAIL with TS2345 naming the declaration
+574:$ node /tmp/rp3-api/ts54/node_modules/typescript/bin/tsc -p tsconfig.controls.json
+575:controls/missing-declaration.ts(5,22): error TS2345: Argument of type 'typeof import("/private/tmp/rp3-api/mono/packages/db/src/generated/prisma/client", { with: { "resolution-mode": "import" } })' is not assignable to parameter of type 'MissingTypeDeclaration'.
+576:  Property '"repository_prisma: declare the generated client module: declare module 'repository_prisma' { interface PrismaClientRegistry { client: typeof generated } }"' is missing in type 'typeof import("/private/tmp/rp3-api/mono/packages/db/src/generated/prisma/client", { with: { "resolution-mode": "import" } })' but required in type 'MissingTypeDeclaration'.
+577:exit=2
+579:$ node /tmp/rp3-api/ts54/node_modules/typescript/bin/tsc -p tsconfig.json --noEmit
+580:exit=0
+581:--- EXPECT-FAIL with TS2578 (unused @ts-expect-error)
+583:$ node /tmp/rp3-api/ts54/node_modules/typescript/bin/tsc -p tsconfig.no-db-import.json
+584:src/no-db-import.ts(9,3): error TS2578: Unused '@ts-expect-error' directive.
+585:src/no-db-import.ts(11,3): error TS2578: Unused '@ts-expect-error' directive.
+586:src/no-db-import.ts(13,3): error TS2578: Unused '@ts-expect-error' directive.
+587:exit=2
+589:$ node /tmp/rp3-api/ts54/node_modules/typescript/bin/tsc -p tsconfig.json
+590:exit=0
+592:ALL-STEPS-RAN

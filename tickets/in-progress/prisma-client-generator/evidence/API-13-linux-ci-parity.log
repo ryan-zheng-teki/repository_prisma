@@ -1,0 +1,27 @@
+# API-13 CI steps on Linux x64 as the non-root node user (TESTING.md Environments)
+# Command: git archive 6c950bd | docker run -i --rm --platform linux/amd64 -e CI=true --user node node:24-bookworm bash -c '<steps: npm ci --strict-allow-scripts; npm run typecheck; npm test; npm run build; smoke; interop>'
+# Commit: 6c950bd (c97eab8 + this round's durable coverage)
+# Environment: Docker 29.0.1 on macOS host, image node:24-bookworm (linux/amd64)
+# Date: 2026-11-05T05:10:57Z
+
+id: uid=1000(node) gid=1000(node) groups=1000(node)
+node v24.22.2 npm 11.19.1
+$ npm ci --strict-allow-scripts
+47 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+$ npm run typecheck
+{"result":"pass","registeredProgramFiles":{"examples/prisma-client-generator":2,"src/tests/prisma-client-generator":2}}
+$ npm test
+ Test Files  16 passed (16)
+      Tests  147 passed (147)
+$ npm run build
+[32mCJS[39m ⚡️ Build success in 143ms
+[32mESM[39m ⚡️ Build success in 142ms
+[32mDTS[39m ⚡️ Build success in 2906ms
+$ node scripts/run-package-smoke.js && node scripts/run-esm-cjs-interop.js
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","externalDriverAdapter":"pass","noClientOnImport":"pass","noNativeAddonOnImport":"pass","noQueryStringFiles":"pass","readonlyWal":"pass","prismaClientGenerator":"pass","registeredConsumerTypes":["nodenext","node16","bundler","cjs-node16"],"cleanup":"/tmp/repository-prisma-package-smoke-zyQWro"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"/tmp/repository-prisma-esm-cjs-interop-FpNiRU"}
+ALL-STEPS-OK
+exit=0
