@@ -23,7 +23,7 @@ Apps on Prisma 7's `prisma-client` generator call `registerPrismaClient(generate
 - Current implementation revision ID: `IR-001`
 - Related solution revision IDs: `SR-001`..`SR-006`
 - Related architecture-review revision IDs: `ARCH-REV-002`, `ARCH-REV-004`
-- Related code-review revision IDs: `N/A`
+- Related code-review revision IDs: `CRR-001` — Pass for IR-001, no findings (`code-review-report.md`); the reviewer routed to `/software_engineering_team/api_e2e_engineer`
 - Related API/E2E revision IDs: `N/A`
 - Related delivery revision IDs: `N/A`
 - Triggering finding IDs: `N/A`
