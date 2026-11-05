@@ -1,0 +1,92 @@
+# registry publish times: 2.0.0 2026-11-04T15:10:08.431Z | 2.1.0 2026-11-05T06:28:56.766Z | now 2026-11-05T06:31:23.922Z
+# isolated empty pnpm metadata cache: /tmp/rel210-pnpm-cache-a
+# pnpm11 consumer; node v22.23.1; npm 10.9.8; pnpm 11.28.11; Darwin arm64; user normy uid 501; 2026-11-05T06:31:24Z
+# published: 2.0.0 2026-11-04T15:10:08.431Z | 2.1.0 2026-11-05T06:28:56.766Z
+
+$ pnpm add repository_prisma@2 @prisma/client@7
+Packages are cloned from the content-addressable store to the virtual store.
+  Content-addressable store is at: /Users/normy/Library/pnpm/store/v11
+  Virtual store is at:             node_modules/.pnpm
+Progress: resolved 45, reused 45, downloaded 0, added 5
+Progress: resolved 45, reused 45, downloaded 0, added 45, done
+Added 1 entry to minimumReleaseAgeExclude in pnpm-workspace.yaml (set minimumReleaseAgeStrict to true to gate these updates with a prompt):
+  repository_prisma@2.0.0
+dependencies:
++ @prisma/client 7.10.1
++ repository_prisma 2.0.0
+[ERR_PNPM_IGNORED_BUILDS] Ignored build scripts: better-sqlite3@12.11.1
+Run "pnpm approve-builds" to pick which dependencies should be allowed to run scripts.
+exit=1
+
+$ pnpm add -D prisma@7
+Progress: resolved 53, reused 53, downloaded 0, added 0
+Progress: resolved 136, reused 136, downloaded 0, added 0
+[WARN] 1 deprecated subdependencies found: prebuild-install@7.1.3
+Packages: +137 -2
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+Progress: resolved 180, reused 180, downloaded 0, added 43
+Progress: resolved 180, reused 180, downloaded 0, added 134
+Progress: resolved 180, reused 180, downloaded 0, added 137, done
+devDependencies:
++ prisma 7.10.1 (8.0.0-rc.30 is available)
+[ERR_PNPM_IGNORED_BUILDS] Ignored build scripts: @prisma/engines@7.10.1, better-sqlite3@12.11.1, prisma@7.10.1
+Run "pnpm approve-builds" to pick which dependencies should be allowed to run scripts.
+exit=1
+
+$ pnpm approve-builds better-sqlite3
+.../node_modules/better-sqlite3 install$ prebuild-install || node-gyp rebuild --release
+.../node_modules/better-sqlite3 install: Done
+exit=0
+--- pnpm-workspace.yaml
+allowBuilds:
+  better-sqlite3: true
+minimumReleaseAgeExclude:
+  - repository_prisma@2.0.0
+installed repository_prisma: 2.0.0
+uuid installed: no
+
+$ npx prisma generate
+Loaded Prisma config from prisma.config.ts.
+Prisma schema loaded from prisma/schema.prisma.
+✔ Generated Prisma Client (v7.10.1) to ./node_modules/.pnpm/@prisma+client@7.10.1_prisma@7.10.1_@types+node@26.6.6_@types+react@19.3.0_better-sqlit_8d30ceece285447d65420ece44415af0/node_modules/@prisma/client in 62ms
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+exit=0
+
+$ env DATABASE_URL=file:./app.db npx prisma db push
+SQLite database app.db created at file:./app.db
+🚀  Your database is now in sync with your Prisma schema. Done in 15ms
+┌─────────────────────────────────────────────────────────┐
+│  Update available 7.10.1 -> 8.0.0-rc.30                 │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+exit=0
+no adapter import in consumer code
+
+$ node app.mjs
+{"result":"pass","checks":{"opens ./app.db in cwd":"pass","create + findUnique with relation":"pass","update":"pass","delete":"pass","runInTransaction commit":"pass","runInTransaction rollback":"pass","DateTime stored as integer and read back":"pass","non-SQLite rejected with UNSUPPORTED_DATASOURCE_PROVIDER":"pass","message says SQLite only":"pass","message leaks no URL/credentials":"pass"}}
+exit=0
+
+$ node app.cjs
+{"result":"pass","checks":{"opens ./app.db in cwd":"pass","create + findUnique with relation":"pass","update":"pass","delete":"pass","runInTransaction commit":"pass","runInTransaction rollback":"pass","DateTime stored as integer and read back":"pass","non-SQLite rejected with UNSUPPORTED_DATASOURCE_PROVIDER":"pass","message says SQLite only":"pass","message leaks no URL/credentials":"pass"}}
+exit=0
+
+$ DATABASE_URL=file:./app.db node lazy.mjs
+{"DATABASE_URL_kind":"file","outcome":{"ok":true,"count":1}}
+exit=0
+$ DATABASE_URL=file:./app.db node lazy.cjs
+{"DATABASE_URL_kind":"file","outcome":{"ok":true,"count":1}}
+exit=0
+$ DATABASE_URL=postgresql://... node lazy.mjs
+{"DATABASE_URL_kind":"postgresql","outcome":{"ok":false,"name":"PrismaInitializationError","code":"UNSUPPORTED_DATASOURCE_PROVIDER","message":"repository_prisma supports SQLite datasources only; use a file: URL.","isInitError":true,"leaks":false}}
+exit=0
+DONE
+--- pnpm cache view (isolated cache)
+      "2.1.0"
+    "cachedAt": "Thu Nov 05 2026 07:31:25 GMT+0100 (Central European Standard Time)",
+      "latest": "2.1.0"
