@@ -8,11 +8,16 @@ const mocks = vi.hoisted(() => ({
   transaction: vi.fn(),
 }));
 
-vi.mock('../lib/client', () => ({
-  rootPrismaClient: {
-    $transaction: mocks.transaction,
-  },
-}));
+vi.mock('../lib/client', async () => {
+  // `Models` reads the client module through the facade: answer with the default package.
+  const { default: defaultClientModule } = await import('@prisma/client');
+  return {
+    rootPrismaClient: {
+      $transaction: mocks.transaction,
+    },
+    getPrismaClientModule: () => defaultClientModule,
+  };
+});
 
 import { BaseRepository } from '../lib/base-repository';
 import {

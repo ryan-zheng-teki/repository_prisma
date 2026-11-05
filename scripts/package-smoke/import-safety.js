@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 
-/** Checks that importing the CJS and ESM entries loads no `.env`, builds no client and loads no native addon. */
+/** Checks that importing the CJS and ESM entries loads no `.env`, no `@prisma/client` and no native addon. */
 const checkImportSafety = (context) => {
   const { nodeCommand, temporaryRoot, consumerDirectory, run } = context;
   const importCanary = 'repository-prisma-import-canary';
@@ -21,12 +21,14 @@ const Module = require('node:module');
 const originalLoad = Module._load;
 let constructors = 0;
 let nativeAddons = 0;
+let clientRequests = 0;
 const originalDlopen = process.dlopen;
 process.dlopen = function(...args) {
   nativeAddons += 1;
   return originalDlopen.apply(this, args);
 };
 Module._load = function(request, parent, isMain) {
+  if (request === '@prisma/client') clientRequests += 1;
   const loaded = originalLoad.call(this, request, parent, isMain);
   if (request !== '@prisma/client') return loaded;
   return {
@@ -42,6 +44,14 @@ Module._load = function(request, parent, isMain) {
 process.on('exit', () => {
   fs.writeFileSync(process.env.CONSTRUCTOR_SPY_FILE, String(constructors));
   fs.writeFileSync(process.env.CONSTRUCTOR_SPY_FILE + '.native', String(nativeAddons));
+  // Any Prisma client file in the module cache, however it was loaded (CJS require or ESM import).
+  const clientFiles = Object.keys(Module._cache).filter((file) =>
+    /[\\\\/](?:@prisma[\\\\/]client|\\.prisma[\\\\/]client)[\\\\/]/.test(file)
+  );
+  fs.writeFileSync(
+    process.env.CONSTRUCTOR_SPY_FILE + '.client',
+    JSON.stringify({ clientRequests, clientFiles })
+  );
 });
 `;
   fs.writeFileSync(path.join(consumerDirectory, 'constructor-spy.cjs'), constructorSpy);
@@ -84,6 +94,11 @@ process.stdout.write('cjs-import-safety-ok\\n');
   assert.equal(cjsImportResult.stderr.includes(inheritedValue), false);
   assert.equal(fs.readFileSync(cjsImportSpyFile, 'utf8'), '0');
   assert.equal(fs.readFileSync(`${cjsImportSpyFile}.native`, 'utf8'), '0', 'CJS import must not load a native addon');
+  assert.deepEqual(
+    JSON.parse(fs.readFileSync(`${cjsImportSpyFile}.client`, 'utf8')),
+    { clientRequests: 0, clientFiles: [] },
+    'CJS import must not load @prisma/client'
+  );
 
   const esmImportScript = `
 import assert from 'node:assert/strict';
@@ -113,6 +128,11 @@ process.stdout.write('esm-import-safety-ok\\n');
   assert.equal(esmImportResult.stderr.includes(inheritedValue), false);
   assert.equal(fs.readFileSync(esmImportSpyFile, 'utf8'), '0');
   assert.equal(fs.readFileSync(`${esmImportSpyFile}.native`, 'utf8'), '0', 'ESM import must not load a native addon');
+  assert.deepEqual(
+    JSON.parse(fs.readFileSync(`${esmImportSpyFile}.client`, 'utf8')),
+    { clientRequests: 0, clientFiles: [] },
+    'ESM import must not load @prisma/client'
+  );
 };
 
 module.exports = { checkImportSafety };

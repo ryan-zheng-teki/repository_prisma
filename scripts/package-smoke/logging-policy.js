@@ -27,37 +27,13 @@ Module._load = function(request, parent, isMain) {
 };
 process.on('exit', () => fs.writeFileSync(process.env.POLICY_OPTIONS_FILE, JSON.stringify(logLevels)));
 `;
+  // Both builds load `@prisma/client` through a CommonJS require (the ESM build through
+  // `createRequire`), so this one `Module._load` spy covers both formats.
   fs.writeFileSync(
     path.join(consumerDirectory, 'policy-constructor-spy.cjs'),
     policyConstructorSpy
   );
-  const policyPeerStub = `
-import fs from 'node:fs';
-const logLevels = [];
-class PrismaClient {
-  constructor(options) {
-    logLevels.push(Array.isArray(options?.log) ? [...options.log] : []);
-  }
-  async $connect() {}
-  async $disconnect() {}
-  async $queryRawUnsafe() { return []; }
-}
-const Prisma = { ModelName: {} };
-export default { PrismaClient, Prisma };
-process.on('exit', () => fs.writeFileSync(process.env.POLICY_OPTIONS_FILE, JSON.stringify(logLevels)));
-`;
-  fs.writeFileSync(path.join(consumerDirectory, 'policy-peer-stub.mjs'), policyPeerStub);
-  fs.writeFileSync(
-    path.join(consumerDirectory, 'policy-peer-loader.mjs'),
-    `import { pathToFileURL } from 'node:url';
-export async function resolve(specifier, context, nextResolve) {
-  if (specifier === '@prisma/client') {
-    return { url: pathToFileURL(process.env.POLICY_PEER_STUB).href, shortCircuit: true };
-  }
-  return nextResolve(specifier, context);
-}
-`
-  );
+  const spyArguments = ['--require', './policy-constructor-spy.cjs'];
   const cjsPolicyScript = `
 const assert = require('node:assert/strict');
 const repo = require('repository_prisma');
@@ -148,21 +124,13 @@ process.stdout.write('esm-policy-probe-ok\\n');
     }
     const script = format === 'cjs' ? 'cjs-policy.cjs' : 'esm-policy.mjs';
     const marker = format === 'cjs' ? 'cjs-policy-probe-ok' : 'esm-policy-probe-ok';
-    const commandArgs = format === 'cjs'
-      ? ['--require', './policy-constructor-spy.cjs', script]
-      : ['--no-warnings', '--experimental-loader', './policy-peer-loader.mjs', script];
     const result = run(
       nodeCommand,
-      commandArgs,
+      [...spyArguments, script],
       {
         cwd: consumerDirectory,
         capture: true,
-        env: {
-          ...environment,
-          ...(format === 'esm'
-            ? { POLICY_PEER_STUB: path.join(consumerDirectory, 'policy-peer-stub.mjs') }
-            : {}),
-        },
+        env: environment,
         unsetEnv: unsetEnvironment,
       }
     );
@@ -182,12 +150,9 @@ process.stdout.write('esm-policy-probe-ok\\n');
     const optionsFile = path.join(temporaryRoot, `${format}-policy-lazy-conflict.json`);
     const script = format === 'cjs' ? 'cjs-policy.cjs' : 'esm-policy.mjs';
     const marker = format === 'cjs' ? 'cjs-policy-probe-ok' : 'esm-policy-probe-ok';
-    const commandArgs = format === 'cjs'
-      ? ['--require', './policy-constructor-spy.cjs', script]
-      : ['--no-warnings', '--experimental-loader', './policy-peer-loader.mjs', script];
     const result = run(
       nodeCommand,
-      commandArgs,
+      [...spyArguments, script],
       {
         cwd: consumerDirectory,
         capture: true,
@@ -197,9 +162,6 @@ process.stdout.write('esm-policy-probe-ok\\n');
           LOG_QUERY_CASE: 'lazy-conflict',
           DATABASE_URL: 'file:repository-prisma-synthetic?mode=memory',
           PRISMA_LOG_QUERIES: 'off',
-          ...(format === 'esm'
-            ? { POLICY_PEER_STUB: path.join(consumerDirectory, 'policy-peer-stub.mjs') }
-            : {}),
         },
         unsetEnv: [
           'DATABASE_URL_TEST',

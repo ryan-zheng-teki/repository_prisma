@@ -91,12 +91,37 @@ const checkPackedArtifact = (context) => {
     for (const field of [
       'maxWait?: number',
       'timeout?: number',
-      'isolationLevel?: Prisma.TransactionIsolationLevel',
+      'isolationLevel?: TransactionIsolationLevel',
     ]) {
       assert.equal(
         declarationSource.includes(field),
         true,
         `${declarationPath} must expose ${field}`
+      );
+    }
+    for (const [marker, description] of [
+      [
+        'declare const registerPrismaClient: (module: RegisteredClientModule) => void',
+        'registerPrismaClient typed by the registry',
+      ],
+      ['interface PrismaClientRegistry', 'the PrismaClientRegistry type registry'],
+      ["'PRISMA_CLIENT_UNAVAILABLE'", 'the missing-client code'],
+      ["'PRISMA_CLIENT_CONFLICT'", 'the client-conflict code'],
+      // Public values keep the registry alias; an inlined client type would ignore the registry.
+      ['declare const prisma: RegisteredPrismaClient', 'prisma typed by the registry'],
+      ['declare const rootPrismaClient: RegisteredPrismaClient', 'rootPrismaClient typed by the registry'],
+    ]) {
+      assert.equal(
+        declarationSource.includes(marker),
+        true,
+        `${declarationPath} must expose ${description}`
+      );
+    }
+    for (const internalName of ['getPrismaClientModule', 'PrismaClientModule']) {
+      assert.equal(
+        new RegExp(`\\b${internalName}\\b`).test(declarationSource),
+        false,
+        `${declarationPath} must not expose the internal ${internalName}`
       );
     }
   }

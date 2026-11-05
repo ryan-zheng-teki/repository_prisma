@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+- Support for Prisma 7's `prisma-client` generator (ESM and `moduleFormat = "cjs"` clients):
+  register the generated client module once with the new `registerPrismaClient()` and declare
+  its types in the new `PrismaClientRegistry` interface; every runtime feature and public type
+  then follows that client. `registerPrismaClient` accepts only the declared module: without the
+  declaration the call fails to compile, and the error names the declaration to add. The README
+  has a copy-paste `db.ts`, and `examples/prisma-client-generator/` shows the setup.
+  Non-breaking: prisma-client-js applications change nothing, and their public types are
+  identical.
+- Importing the package no longer loads `@prisma/client`; the prisma-client-js client is loaded
+  the first time a client or `Models` is needed. `Models` is now a read-only view that reads the
+  client's model names on access.
+- New initialization codes: `PRISMA_CLIENT_UNAVAILABLE` (no registered client and no
+  prisma-client-js output) and `PRISMA_CLIENT_CONFLICT` (a different client registered while one
+  is bound). `registerPrismaClient()` throws a `TypeError` for an argument that is not a
+  generated client module.
+- Build: the bundles target es2020 (was es2018).
 - README: npm 12+ and pnpm 10+ skip `better-sqlite3`'s native build by default; the setup section
   shows the symptom and how to allow it (npm, pnpm 11+, pnpm 10). pnpm users add `@prisma/client`
   directly. The earlier "pnpm installs the peers automatically" wording is corrected.

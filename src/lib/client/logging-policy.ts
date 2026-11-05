@@ -1,4 +1,4 @@
-import type { Prisma } from '@prisma/client';
+type QueryLogLevel = 'info' | 'query' | 'warn' | 'error';
 
 const QUERY_LOG_TRUTHY_VALUES = new Set(['1', 'true', 'yes', 'on']);
 
@@ -10,5 +10,5 @@ export const resolveQueryLoggingPolicy = (explicit?: boolean): boolean =>
     ? explicit
     : parseQueryLogFlag(process.env.PRISMA_LOG_QUERIES);
 
-export const queryLogLevels = (logQueries: boolean): Prisma.LogLevel[] =>
+export const queryLogLevels = (logQueries: boolean): QueryLogLevel[] =>
   logQueries ? ['info', 'warn', 'error', 'query'] : ['info', 'warn', 'error'];

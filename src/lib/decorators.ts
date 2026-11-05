@@ -1,6 +1,6 @@
 import { rootPrismaClient } from './prisma-manager';
 import { runInTransactionContext, getTransactionClient } from './context';
-import type { Prisma } from '@prisma/client';
+import type { TransactionClient } from './prisma-types';
 
 export function Transactional() {
   return function <T extends (...args: any[]) => Promise<any>>(
@@ -21,7 +21,7 @@ export function Transactional() {
       }
 
       // 2. Not in a transaction, start one
-      return rootPrismaClient.$transaction(async (tx: Prisma.TransactionClient) => {
+      return rootPrismaClient.$transaction(async (tx: TransactionClient) => {
         return runInTransactionContext(tx, async () => {
           return originalMethod.apply(this, args);
         });

@@ -7,3 +7,6 @@ dist
 *.db-wal
 
 /src/generated/prisma
+
+# The prisma-client generator output for the registered tests and example
+/generated

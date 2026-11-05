@@ -1,12 +1,12 @@
-import type { Prisma, PrismaClient } from '@prisma/client';
+import type { ModelName, RegisteredPrismaClient } from './prisma-types';
 import { getPrismaClient } from './prisma-manager';
 
 // Type helper: Extracts the Delegate type from the Model Name
 // e.g. Delegate<'User'> -> PrismaClient['user']
-export type Delegate<T extends Prisma.ModelName> = PrismaClient[Uncapitalize<T>];
+export type Delegate<T extends ModelName> = RegisteredPrismaClient[Uncapitalize<T>];
 
-export abstract class BaseRepository<M extends Prisma.ModelName> {
-  static forModel<M extends Prisma.ModelName>(modelName: M) {
+export abstract class BaseRepository<M extends ModelName> {
+  static forModel<M extends ModelName>(modelName: M) {
     const delegateName = (modelName.charAt(0).toLowerCase() +
       modelName.slice(1)) as Uncapitalize<M>;
 
@@ -39,7 +39,7 @@ export abstract class BaseRepository<M extends Prisma.ModelName> {
   }
 
   get delegate(): Delegate<M> {
-    const client = getPrismaClient() as PrismaClient;
+    const client = getPrismaClient() as RegisteredPrismaClient;
     
     const modelName = this.resolveModelName();
     const delegate = client[modelName];

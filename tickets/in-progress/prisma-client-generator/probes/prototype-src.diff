@@ -1,0 +1,361 @@
+diff -ruN -x node_modules -x dist -x *.db* -x tickets -x .git /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/index.ts /tmp/rp3-proto/src/index.ts
+--- /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/index.ts	2026-11-04 17:58:08
++++ /tmp/rp3-proto/src/index.ts	2026-11-04 18:03:50
+@@ -8,6 +8,7 @@
+   initializePrisma,
+   shutdownPrisma,
+   rootPrismaClient,
++  registerPrismaClient,
+   PrismaInitializationError,
+ } from './lib/client';
+ export type {
+@@ -21,3 +22,4 @@
+ export { buildContainsFilter, filterContainsCaseInsensitive } from './lib/filters';
+ export type { Delegate } from './lib/base-repository';
+ export type { ModelName } from './lib/models';
++export type { PrismaClientRegistry } from './lib/prisma-types';
+diff -ruN -x node_modules -x dist -x *.db* -x tickets -x .git /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/base-repository.ts /tmp/rp3-proto/src/lib/base-repository.ts
+--- /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/base-repository.ts	2026-11-04 17:58:08
++++ /tmp/rp3-proto/src/lib/base-repository.ts	2026-11-04 18:03:50
+@@ -1,12 +1,12 @@
+-import type { Prisma, PrismaClient } from '@prisma/client';
++import type { ModelName, RegisteredPrismaClient as PrismaClient } from './prisma-types';
+ import { getPrismaClient } from './prisma-manager';
+ 
+ // Type helper: Extracts the Delegate type from the Model Name
+ // e.g. Delegate<'User'> -> PrismaClient['user']
+-export type Delegate<T extends Prisma.ModelName> = PrismaClient[Uncapitalize<T>];
++export type Delegate<T extends ModelName> = PrismaClient[Uncapitalize<T>];
+ 
+-export abstract class BaseRepository<M extends Prisma.ModelName> {
+-  static forModel<M extends Prisma.ModelName>(modelName: M) {
++export abstract class BaseRepository<M extends ModelName> {
++  static forModel<M extends ModelName>(modelName: M) {
+     const delegateName = (modelName.charAt(0).toLowerCase() +
+       modelName.slice(1)) as Uncapitalize<M>;
+ 
+diff -ruN -x node_modules -x dist -x *.db* -x tickets -x .git /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/client/client-module.ts /tmp/rp3-proto/src/lib/client/client-module.ts
+--- /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/client/client-module.ts	1970-01-01 01:00:00
++++ /tmp/rp3-proto/src/lib/client/client-module.ts	2026-11-04 18:06:24
+@@ -0,0 +1,26 @@
++import { createRequire } from 'node:module';
++import { InitializationStageFailure } from './initialization-error';
++
++// eslint-disable-next-line @typescript-eslint/no-explicit-any
++export type PrismaClientConstructor = new (options: any) => any;
++export type PrismaClientModule = {
++  PrismaClient: PrismaClientConstructor;
++  Prisma: { ModelName: Record<string, string> };
++};
++
++let registered: PrismaClientModule | undefined;
++const requireFromPackage = createRequire(import.meta.url);
++
++export const getRegisteredModule = () => registered;
++export const setRegisteredModule = (module: PrismaClientModule) => {
++  registered = module;
++};
++
++export const resolvePrismaClientModule = (): PrismaClientModule => {
++  if (registered) return registered;
++  try {
++    return requireFromPackage('@prisma/client') as PrismaClientModule;
++  } catch (error) {
++    throw new InitializationStageFailure('PRISMA_CLIENT_UNAVAILABLE' as any, error);
++  }
++};
+diff -ruN -x node_modules -x dist -x *.db* -x tickets -x .git /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/client/lifecycle.ts /tmp/rp3-proto/src/lib/client/lifecycle.ts
+--- /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/client/lifecycle.ts	2026-11-04 17:58:08
++++ /tmp/rp3-proto/src/lib/client/lifecycle.ts	2026-11-04 18:03:50
+@@ -1,5 +1,5 @@
+-import PrismaClientPackage from '@prisma/client';
+-import type { PrismaClient as PrismaClientType } from '@prisma/client';
++import type { RegisteredPrismaClient as PrismaClientType } from '../prisma-types';
++import { resolvePrismaClientModule, setRegisteredModule, getRegisteredModule, type PrismaClientModule } from './client-module';
+ import type { ResolvedDatasourceTarget } from './datasource-target';
+ import { resolveDatasourceTarget } from './datasource-target';
+ import {
+@@ -18,7 +18,6 @@
+ import { createSqliteDriverAdapter } from './sqlite-driver-adapter';
+ import { queryLogLevels, resolveQueryLoggingPolicy } from './logging-policy';
+ 
+-const { PrismaClient: PrismaClientRuntime } = PrismaClientPackage;
+ 
+ type IdleState = { kind: 'idle' };
+ type LazyBoundState = {
+@@ -66,7 +65,7 @@
+ ) => PrismaClientType;
+ 
+ const defaultClientFactory: PrismaClientFactory = (target, logQueries) =>
+-  new PrismaClientRuntime({
++  new (resolvePrismaClientModule().PrismaClient)({
+     adapter: createSqliteDriverAdapter(target),
+     log: queryLogLevels(logQueries),
+   });
+@@ -189,6 +188,15 @@
+         }
+         return this.state.task;
+     }
++  }
++
++  registerClientModule(module: PrismaClientModule): void {
++    const current = getRegisteredModule();
++    if (current && current.PrismaClient === module.PrismaClient) return;
++    if (this.state.kind !== 'idle' && this.state.kind !== 'failed') {
++      throw new PrismaInitializationError('CLIENT_NOT_READY');
++    }
++    setRegisteredModule(module);
+   }
+ 
+   shutdown(): Promise<void> {
+diff -ruN -x node_modules -x dist -x *.db* -x tickets -x .git /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/client/logging-policy.ts /tmp/rp3-proto/src/lib/client/logging-policy.ts
+--- /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/client/logging-policy.ts	2026-11-04 17:58:08
++++ /tmp/rp3-proto/src/lib/client/logging-policy.ts	2026-11-04 18:03:50
+@@ -1,4 +1,3 @@
+-import type { Prisma } from '@prisma/client';
+ 
+ const QUERY_LOG_TRUTHY_VALUES = new Set(['1', 'true', 'yes', 'on']);
+ 
+@@ -10,5 +9,5 @@
+     ? explicit
+     : parseQueryLogFlag(process.env.PRISMA_LOG_QUERIES);
+ 
+-export const queryLogLevels = (logQueries: boolean): Prisma.LogLevel[] =>
++export const queryLogLevels = (logQueries: boolean): Array<'info' | 'query' | 'warn' | 'error'> =>
+   logQueries ? ['info', 'warn', 'error', 'query'] : ['info', 'warn', 'error'];
+diff -ruN -x node_modules -x dist -x *.db* -x tickets -x .git /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/client/sqlite-readiness.ts /tmp/rp3-proto/src/lib/client/sqlite-readiness.ts
+--- /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/client/sqlite-readiness.ts	2026-11-04 17:58:08
++++ /tmp/rp3-proto/src/lib/client/sqlite-readiness.ts	2026-11-04 18:03:50
+@@ -1,6 +1,6 @@
+ import { realpath } from 'node:fs/promises';
+ import path from 'node:path';
+-import type { PrismaClient } from '@prisma/client';
++type PrismaClient = { $queryRawUnsafe<T = unknown>(query: string): PromiseLike<T> };
+ import type { SqliteFileDatasourceTarget } from './datasource-target';
+ 
+ type DatabaseListRow = {
+diff -ruN -x node_modules -x dist -x *.db* -x tickets -x .git /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/client.ts /tmp/rp3-proto/src/lib/client.ts
+--- /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/client.ts	2026-11-04 17:58:08
++++ /tmp/rp3-proto/src/lib/client.ts	2026-11-04 18:05:31
+@@ -1,4 +1,5 @@
+-import type { PrismaClient } from '@prisma/client';
++import type { RegisteredPrismaClient as PrismaClient } from './prisma-types';
++import type { PrismaClientModule } from './client/client-module';
+ import { createForwardingPrismaProxy } from './forwarding-proxy';
+ import { PrismaClientLifecycle } from './client/lifecycle';
+ import type { InitializePrismaOptions } from './client/initialization-error';
+@@ -16,9 +17,12 @@
+   options: InitializePrismaOptions = {}
+ ): Promise<void> => lifecycle.initialize(options);
+ 
++export const registerPrismaClient = (module: PrismaClientModule): void =>
++  lifecycle.registerClientModule(module);
++
+ export const shutdownPrisma = (): Promise<void> => lifecycle.shutdown();
+ 
+-export const rootPrismaClient = createForwardingPrismaProxy<PrismaClient>(
++export const rootPrismaClient: PrismaClient = createForwardingPrismaProxy<PrismaClient>(
+   () => lifecycle.getClientForOperation(),
+   {
+     $connect: initializePrisma,
+diff -ruN -x node_modules -x dist -x *.db* -x tickets -x .git /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/context.ts /tmp/rp3-proto/src/lib/context.ts
+--- /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/context.ts	2026-11-04 17:58:08
++++ /tmp/rp3-proto/src/lib/context.ts	2026-11-04 18:03:50
+@@ -1,17 +1,17 @@
+ import { AsyncLocalStorage } from 'async_hooks';
+-import type { Prisma } from '@prisma/client';
++import type { TransactionClient, TransactionIsolationLevel } from './prisma-types';
+ import { rootPrismaClient } from './client';
+ 
+ // The storage holds the Transaction Client
+-export const prismaContext = new AsyncLocalStorage<Prisma.TransactionClient>();
++export const prismaContext = new AsyncLocalStorage<TransactionClient>();
+ 
+-export const getTransactionClient = (): Prisma.TransactionClient | undefined => {
++export const getTransactionClient = (): TransactionClient | undefined => {
+   return prismaContext.getStore();
+ };
+ 
+ // Internal helper for running within ALS
+ export const runInTransactionContext = <T>(
+-  tx: Prisma.TransactionClient,
++  tx: TransactionClient,
+   callback: () => Promise<T>
+ ): Promise<T> => {
+   return prismaContext.run(tx, callback);
+@@ -20,7 +20,7 @@
+ export type RunInTransactionOptions = {
+   maxWait?: number;
+   timeout?: number;
+-  isolationLevel?: Prisma.TransactionIsolationLevel;
++  isolationLevel?: TransactionIsolationLevel;
+ };
+ 
+ // Public HOF that STARTS a transaction and puts it in ALS
+@@ -34,7 +34,7 @@
+     return runInTransactionContext(existing, callback);
+   }
+ 
+-  const execute = (tx: Prisma.TransactionClient) =>
++  const execute = (tx: TransactionClient) =>
+     runInTransactionContext(tx, callback);
+ 
+   // Preserve Prisma's one-argument call and defaults when options are omitted.
+diff -ruN -x node_modules -x dist -x *.db* -x tickets -x .git /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/decorators.ts /tmp/rp3-proto/src/lib/decorators.ts
+--- /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/decorators.ts	2026-11-04 17:58:08
++++ /tmp/rp3-proto/src/lib/decorators.ts	2026-11-04 18:03:50
+@@ -1,6 +1,6 @@
+ import { rootPrismaClient } from './prisma-manager';
+ import { runInTransactionContext, getTransactionClient } from './context';
+-import type { Prisma } from '@prisma/client';
++import type { TransactionClient, TransactionIsolationLevel } from './prisma-types';
+ 
+ export function Transactional() {
+   return function <T extends (...args: any[]) => Promise<any>>(
+@@ -21,7 +21,7 @@
+       }
+ 
+       // 2. Not in a transaction, start one
+-      return rootPrismaClient.$transaction(async (tx: Prisma.TransactionClient) => {
++      return rootPrismaClient.$transaction(async (tx: TransactionClient) => {
+         return runInTransactionContext(tx, async () => {
+           return originalMethod.apply(this, args);
+         });
+diff -ruN -x node_modules -x dist -x *.db* -x tickets -x .git /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/filters.ts /tmp/rp3-proto/src/lib/filters.ts
+--- /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/filters.ts	2026-11-04 17:58:08
++++ /tmp/rp3-proto/src/lib/filters.ts	2026-11-04 18:03:50
+@@ -1,8 +1,7 @@
+-import type { Prisma } from '@prisma/client';
+ import { supportsCaseInsensitiveMode } from './database';
+ 
+-type StringFilter = Prisma.StringFilter;
+-type StringFilterWithMode = Prisma.StringFilter & { mode?: 'insensitive' };
++type StringFilter = { contains: string; mode?: 'insensitive' };
++type StringFilterWithMode = StringFilter;
+ 
+ type ContainsFilterOptions = {
+   caseInsensitive?: boolean;
+diff -ruN -x node_modules -x dist -x *.db* -x tickets -x .git /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/models.ts /tmp/rp3-proto/src/lib/models.ts
+--- /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/models.ts	2026-11-04 17:58:08
++++ /tmp/rp3-proto/src/lib/models.ts	2026-11-04 18:03:50
+@@ -1,8 +1,7 @@
+-import PrismaClientPackage from '@prisma/client';
+-import type { Prisma as PrismaTypes } from '@prisma/client';
++import { resolvePrismaClientModule } from './client/client-module';
++import type { ModelName as RegisteredModelName } from './prisma-types';
+ 
+-const { Prisma: PrismaRuntime } = PrismaClientPackage;
+-
+-// Runtime model names from Prisma; helps avoid string literals in repositories.
+-export const Models = PrismaRuntime.ModelName;
+-export type ModelName = PrismaTypes.ModelName;
++export type ModelName = RegisteredModelName;
++export const Models = new Proxy({} as { readonly [K in ModelName]: K }, {
++  get: (_t, p) => (resolvePrismaClientModule().Prisma.ModelName as any)[p as string],
++});
+diff -ruN -x node_modules -x dist -x *.db* -x tickets -x .git /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/prisma-manager.ts /tmp/rp3-proto/src/lib/prisma-manager.ts
+--- /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/prisma-manager.ts	2026-11-04 17:58:08
++++ /tmp/rp3-proto/src/lib/prisma-manager.ts	2026-11-04 18:03:50
+@@ -1,11 +1,11 @@
+-import type { PrismaClient, Prisma } from '@prisma/client';
++import type { RegisteredPrismaClient as PrismaClient, TransactionClient } from './prisma-types';
+ import { getTransactionClient } from './context';
+ import { rootPrismaClient } from './client';
+ 
+ // Re-export for convenience if needed, or consumers import from client
+ export { rootPrismaClient };
+ 
+-export type PrismaClientLike = PrismaClient | Prisma.TransactionClient;
++export type PrismaClientLike = PrismaClient | TransactionClient;
+ 
+ export const getPrismaClient = (): PrismaClientLike => {
+   const tx = getTransactionClient();
+diff -ruN -x node_modules -x dist -x *.db* -x tickets -x .git /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/prisma-proxy.ts /tmp/rp3-proto/src/lib/prisma-proxy.ts
+--- /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/prisma-proxy.ts	2026-11-04 17:58:08
++++ /tmp/rp3-proto/src/lib/prisma-proxy.ts	2026-11-04 18:05:31
+@@ -1,9 +1,9 @@
+-import type { PrismaClient } from '@prisma/client';
++import type { RegisteredPrismaClient as PrismaClient } from './prisma-types';
+ import { initializePrisma, shutdownPrisma } from './client';
+ import { createForwardingPrismaProxy } from './forwarding-proxy';
+ import { getPrismaClient } from './prisma-manager';
+ 
+-export const prisma = createForwardingPrismaProxy<PrismaClient>(
++export const prisma: PrismaClient = createForwardingPrismaProxy<PrismaClient>(
+   () => getPrismaClient() as PrismaClient,
+   {
+     $connect: initializePrisma,
+diff -ruN -x node_modules -x dist -x *.db* -x tickets -x .git /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/prisma-types.ts /tmp/rp3-proto/src/lib/prisma-types.ts
+--- /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/prisma-types.ts	1970-01-01 01:00:00
++++ /tmp/rp3-proto/src/lib/prisma-types.ts	2026-11-04 18:03:50
+@@ -0,0 +1,19 @@
++import type { ITXClientDenyList } from '@prisma/client/runtime/client';
++import type { Prisma as DefaultPrisma, PrismaClient as DefaultPrismaClient } from '@prisma/client';
++
++/** Applications using the prisma-client generator augment this interface. */
++export interface PrismaClientRegistry {}
++
++export type RegisteredPrismaClient = PrismaClientRegistry extends { client: infer C extends object }
++  ? C
++  : DefaultPrismaClient;
++
++export type ModelName = PrismaClientRegistry extends { modelName: infer N extends string }
++  ? N
++  : DefaultPrisma.ModelName;
++
++export type TransactionClient = Omit<RegisteredPrismaClient, ITXClientDenyList>;
++
++type TransactionMethod = RegisteredPrismaClient extends { $transaction: infer T } ? T : never;
++type InteractiveOptions = TransactionMethod extends (fn: any, options?: infer O) => any ? O : never;
++export type TransactionIsolationLevel = NonNullable<NonNullable<InteractiveOptions> extends { isolationLevel?: infer L } ? L : never>;
+diff -ruN -x node_modules -x dist -x *.db* -x tickets -x .git /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/repository-factory.ts /tmp/rp3-proto/src/lib/repository-factory.ts
+--- /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/repository-factory.ts	2026-11-04 17:58:08
++++ /tmp/rp3-proto/src/lib/repository-factory.ts	2026-11-04 18:03:50
+@@ -1,6 +1,6 @@
+-import type { Prisma } from '@prisma/client';
++import type { ModelName } from './prisma-types';
+ import { BaseRepository } from './base-repository';
+ 
+-export const defineRepository = <M extends Prisma.ModelName>(modelName: M) => {
++export const defineRepository = <M extends ModelName>(modelName: M) => {
+   return BaseRepository.forModel(modelName);
+ };
+diff -ruN -x node_modules -x dist -x *.db* -x tickets -x .git /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/types-experiment.ts /tmp/rp3-proto/src/lib/types-experiment.ts
+--- /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/src/lib/types-experiment.ts	2026-11-04 17:58:08
++++ /tmp/rp3-proto/src/lib/types-experiment.ts	2026-11-04 18:03:50
+@@ -1,9 +1,9 @@
+-import type { PrismaClient, Prisma } from '@prisma/client';
++import type { ModelName, RegisteredPrismaClient as PrismaClient } from './prisma-types';
+ 
+ // Goal: class UserRepository extends BaseRepository<'User'> {}
+ 
+ // 1. Define a utility to extract Delegate from Model Name
+-type ModelName = Prisma.ModelName; 
++
+ 
+ // This map extracts the Delegate type relative to the Model Name string
+ // PrismaClient has all models as properties, e.g. client.user, client.post
+--- /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/tsup.config.ts	2026-11-04 17:58:08
++++ /tmp/rp3-proto/tsup.config.ts	2026-11-04 18:04:06
+@@ -6,7 +6,8 @@
+   dts: true,
+   sourcemap: true,
+   clean: true,
+-  target: 'es2018',
++  shims: true,
++  target: 'es2020',
+   platform: 'node',
+   external: ['@prisma/client', '@prisma/adapter-better-sqlite3'],
+ });
+--- /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/tsconfig.json	2026-11-04 17:58:08
++++ /tmp/rp3-proto/tsconfig.json	2026-11-04 18:06:24
+@@ -1,7 +1,8 @@
+ {
+   "compilerOptions": {
+     "target": "es2018",
+-    "module": "commonjs",
++    "module": "esnext",
++    "moduleResolution": "bundler",
+     "strict": true,
+     "esModuleInterop": true,
+     "experimentalDecorators": true,

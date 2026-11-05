@@ -2,6 +2,13 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// The prisma-client generator's output, for the registered tests and example
+// (src/tests/prisma-client-generator/, examples/prisma-client-generator/). Git-ignored.
+generator prismaClient {
+  provider = "prisma-client"
+  output   = "../generated/prisma-client"
+}
+
 datasource db {
   provider = "sqlite"
 }

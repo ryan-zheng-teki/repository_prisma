@@ -82,7 +82,7 @@ describe('query logging policy', () => {
       policies.push(logQueries);
       return asPrismaClient(clients.shift()!);
     };
-    const lifecycle = new PrismaClientLifecycle(factory);
+    const lifecycle = new PrismaClientLifecycle({ clientFactory: factory });
     const target = 'file::memory:';
     delete process.env.DATABASE_URL_TEST;
     process.env.DATABASE_URL = target;

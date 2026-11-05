@@ -1,5 +1,9 @@
-import PrismaClientPackage from '@prisma/client';
-import type { PrismaClient as PrismaClientType } from '@prisma/client';
+import type { RegisteredPrismaClient as PrismaClientType } from '../prisma-types';
+import {
+  assertPrismaClientModule,
+  PrismaClientSource,
+  type PrismaClientModule,
+} from './client-source';
 import type { ResolvedDatasourceTarget } from './datasource-target';
 import { resolveDatasourceTarget } from './datasource-target';
 import {
@@ -17,8 +21,6 @@ import {
 } from './sqlite-readiness';
 import { createSqliteDriverAdapter } from './sqlite-driver-adapter';
 import { queryLogLevels, resolveQueryLoggingPolicy } from './logging-policy';
-
-const { PrismaClient: PrismaClientRuntime } = PrismaClientPackage;
 
 type IdleState = { kind: 'idle' };
 type LazyBoundState = {
@@ -65,11 +67,20 @@ export type PrismaClientFactory = (
   logQueries: boolean
 ) => PrismaClientType;
 
-const defaultClientFactory: PrismaClientFactory = (target, logQueries) =>
-  new PrismaClientRuntime({
-    adapter: createSqliteDriverAdapter(target),
-    log: queryLogLevels(logQueries),
-  });
+export type PrismaClientLifecycleOptions = {
+  clientFactory?: PrismaClientFactory;
+  clientSource?: PrismaClientSource;
+};
+
+const clientFactoryFrom =
+  (source: PrismaClientSource): PrismaClientFactory =>
+  (target, logQueries) => {
+    const { PrismaClient } = source.current();
+    return new PrismaClient({
+      adapter: createSqliteDriverAdapter(target),
+      log: queryLogLevels(logQueries),
+    });
+  };
 
 const failureFrom = (
   error: unknown,
@@ -83,8 +94,41 @@ const failureFrom = (
 
 export class PrismaClientLifecycle {
   private state: LifecycleState = { kind: 'idle' };
+  private readonly source: PrismaClientSource;
+  private readonly clientFactory: PrismaClientFactory;
 
-  constructor(private readonly clientFactory: PrismaClientFactory = defaultClientFactory) {}
+  constructor(options: PrismaClientLifecycleOptions = {}) {
+    this.source = options.clientSource ?? new PrismaClientSource();
+    this.clientFactory = options.clientFactory ?? clientFactoryFrom(this.source);
+  }
+
+  /** The Prisma client module in use; throws a stage failure when none is available. */
+  getClientModule(): PrismaClientModule {
+    return this.source.current();
+  }
+
+  /**
+   * Registers the application's generated client module. Anything that is not one is a
+   * `TypeError` (the public parameter type is compile-time only). The same module again is a
+   * no-op; a different one is accepted only while no client is bound or binding.
+   */
+  registerClientModule(module: unknown): void {
+    assertPrismaClientModule(module);
+    if (this.source.holds(module)) {
+      return;
+    }
+    switch (this.state.kind) {
+      case 'idle':
+      case 'failed':
+        this.source.register(module);
+        return;
+      case 'lazy-bound':
+      case 'initializing':
+      case 'ready':
+      case 'shutting-down':
+        throw new PrismaInitializationError('PRISMA_CLIENT_CONFLICT');
+    }
+  }
 
   getClientForOperation(): PrismaClientType {
     switch (this.state.kind) {
@@ -223,9 +267,10 @@ export class PrismaClientLifecycle {
       const client = this.clientFactory(target, logQueries);
       this.state = { kind: 'lazy-bound', target, client, logQueries };
       return client;
-    } catch {
+    } catch (error) {
+      const failure = failureFrom(error, 'CONNECTION_FAILED');
       this.state = { kind: 'failed' };
-      throw new PrismaInitializationError('CONNECTION_FAILED');
+      throw new PrismaInitializationError(failure.code);
     }
   }
 
@@ -238,9 +283,10 @@ export class PrismaClientLifecycle {
     let client: PrismaClientType;
     try {
       client = this.clientFactory(target, logQueries);
-    } catch (cause) {
+    } catch (error) {
+      const failure = failureFrom(error, 'CONNECTION_FAILED');
       this.state = { kind: 'failed' };
-      return this.rejectRequest('CONNECTION_FAILED', cause, listener);
+      return this.rejectRequest(failure.code, failure.cause, listener);
     }
     return this.startInitialization(target, client, logQueries, enableWAL, false, listener);
   }

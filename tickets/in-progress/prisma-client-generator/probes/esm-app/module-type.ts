@@ -1,0 +1,13 @@
+import type { PrismaClient, Prisma } from '../src/generated/prisma/client.ts';
+import type { ITXClientDenyList } from '@prisma/client/runtime/client';
+type M = typeof import('../src/generated/prisma/client.ts');
+type C = InstanceType<M['PrismaClient']>;
+type T = Omit<C, ITXClientDenyList>;
+declare const c: C; declare const p: PrismaClient; declare const t: T; declare const pt: Prisma.TransactionClient;
+export const a: PrismaClient = c;
+export const b: C = p;
+export const d: Prisma.TransactionClient = t;
+export const e: T = pt;
+type Iso = NonNullable<NonNullable<Parameters<C['$transaction']>[1]>['isolationLevel']>;
+type Eq<A, B> = (<X>() => X extends A ? 1 : 2) extends (<X>() => X extends B ? 1 : 2) ? true : false;
+export const iso: Eq<Iso, Prisma.TransactionIsolationLevel> = true;

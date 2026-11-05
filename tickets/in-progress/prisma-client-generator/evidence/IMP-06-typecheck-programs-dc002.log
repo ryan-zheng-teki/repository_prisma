@@ -1,0 +1,46 @@
+# IMP-06 typecheck programs: file lists and negative controls (DESIGN.md DC-002)
+# Commit: working tree on 0a4e824 (uncommitted IR-001 work, SR-006)
+# Environment: macOS (Darwin 25.5.0), Node v22.23.1, npm 10.9.8, non-root user normy
+# Date: 2026-11-05T04:50:02Z
+
+## Registered-folder files in each program (tsc -p <config> --listFilesOnly, filtered; paths relative to the repo)
+--- tsconfig.json (default program): registered-folder files
+count: 0
+type-equality test present: 1
+--- tsconfig.prisma-client-generator.json (registered program)
+src/index.ts
+generated/prisma-client/client.ts
+examples/prisma-client-generator/db.ts
+examples/prisma-client-generator/demo.ts
+src/tests/prisma-client-generator/registered-client.test.ts
+
+## Check script: node scripts/check-typecheck-programs.js
+{"result":"pass","registeredProgramFiles":{"examples/prisma-client-generator":2,"src/tests/prisma-client-generator":1}}
+exit=0
+
+## Negative control 1: deliberate type error appended to examples/prisma-client-generator/demo.ts
+examples/prisma-client-generator/demo.ts(63,14): error TS2322: Type 'string' is not assignable to type 'number'.
+registered tsc exit=2 (must be non-zero)
+
+## Negative control 2: registered config without its own exclude (inherits the base exclude; the ARCH-REV-003 AR-003 mistake)
+registered tsc exit=0 (passes, yet compiles none of the registered files)
+AssertionError [ERR_ASSERTION]: examples/prisma-client-generator/db.ts is not in tsconfig.prisma-client-generator.json
+check exit=1 (must be non-zero)
+
+## Negative control 3: the registered example folder is empty
+AssertionError [ERR_ASSERTION]: examples/prisma-client-generator has no TypeScript files
+check exit=1 (must be non-zero)
+
+## After restoring: npm run typecheck
+{"result":"pass","registeredProgramFiles":{"examples/prisma-client-generator":2,"src/tests/prisma-client-generator":1}}
+exit=0
+
+## Negative control 4 (AC-013): both 'declare module' blocks removed (db.ts and the registered test)
+examples/prisma-client-generator/db.ts:0
+src/tests/prisma-client-generator/registered-client.test.ts:0
+examples/prisma-client-generator/db.ts(7,22): error TS2345: Argument of type 'typeof import("generated/prisma-client/client")' is not assignable to parameter of type 'MissingTypeDeclaration'.
+src/tests/prisma-client-generator/registered-client.test.ts(44,22): error TS2345: Argument of type 'typeof import("generated/prisma-client/client")' is not assignable to parameter of type 'MissingTypeDeclaration'.
+src/tests/prisma-client-generator/registered-client.test.ts(78,24): error TS2345: Argument of type 'typeof import("generated/prisma-client/client")' is not assignable to parameter of type 'MissingTypeDeclaration'.
+registered tsc exit=2 (must be non-zero; the error names the declaration to add)
+hint line in the tsc output:
+  Property '"repository_prisma: declare the generated client module: declare module 'repository_prisma' { interface PrismaClientRegistry { client: typeof generated } }"' is missing in type 'typeof import("/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3/generated/prisma-client/client")' but required in type 'MissingTypeDeclaration'.

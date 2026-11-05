@@ -1,6 +1,6 @@
-import type { Prisma } from '@prisma/client';
+import type { ModelName } from './prisma-types';
 import { BaseRepository } from './base-repository';
 
-export const defineRepository = <M extends Prisma.ModelName>(modelName: M) => {
+export const defineRepository = <M extends ModelName>(modelName: M) => {
   return BaseRepository.forModel(modelName);
 };

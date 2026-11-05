@@ -1,0 +1,40 @@
+# IMP-01 P1 reproduction on the base package (before the change)
+# Commit: 0a4e824 (origin/main, unchanged src); package built with npm run build, packed with npm pack
+# Environment: macOS (Darwin 25.5.0), Node v22.23.1, npm 10.9.8, non-root user normy
+# Date: 2026-11-05T04:33:37Z
+# Consumer: /tmp/rp3-impl/p1, prisma/@prisma/client/@prisma/adapter-better-sqlite3 7.10.1, only the prisma-client generator (probes/esm-app/schema.prisma), npx prisma generate
+
+$ node --input-type=module -e "await import('repository_prisma')"
+node:internal/modules/cjs/loader:1430
+  const err = new Error(message);
+              ^
+
+Error: Cannot find module '.prisma/client/default'
+Require stack:
+- /private/tmp/rp3-impl/p1/node_modules/@prisma/client/default.js
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [ '/private/tmp/rp3-impl/p1/node_modules/@prisma/client/default.js' ]
+}
+
+Node.js v22.23.1
+exit=0
+
+$ node -e "require('repository_prisma')"
+node:internal/modules/cjs/loader:1433
+  throw err;
+  ^
+
+Error: Cannot find module '.prisma/client/default'
+Require stack:
+- /private/tmp/rp3-impl/p1/node_modules/@prisma/client/default.js
+- /private/tmp/rp3-impl/p1/node_modules/repository_prisma/dist/index.js
+- /private/tmp/rp3-impl/p1/[eval]
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/private/tmp/rp3-impl/p1/node_modules/@prisma/client/default.js',
+    '/private/tmp/rp3-impl/p1/node_modules/repository_prisma/dist/index.js',
+    '/private/tmp/rp3-impl/p1/[eval]'
+  ]
+}
+
+Node.js v22.23.1

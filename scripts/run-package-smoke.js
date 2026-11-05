@@ -9,6 +9,7 @@ const { checkLoggingPolicy } = require('./package-smoke/logging-policy');
 const { checkCjsRuntime } = require('./package-smoke/cjs-runtime');
 const { checkEsmRuntime } = require('./package-smoke/esm-runtime');
 const { checkConsumerTypes } = require('./package-smoke/consumer-types');
+const { checkPrismaClientGenerator } = require('./package-smoke/prisma-client-generator');
 
 const context = createSmokeContext();
 const { temporaryRoot } = context;
@@ -20,7 +21,8 @@ try {
   checkLoggingPolicy(context);
   const { readonlyWal } = checkCjsRuntime(context);
   checkEsmRuntime(context);
-  checkConsumerTypes(context);
+  const { appDirectory: prismaClientConsumer } = checkPrismaClientGenerator(context);
+  checkConsumerTypes(context, { prismaClientConsumer });
 
   console.log(
     JSON.stringify({
@@ -32,9 +34,11 @@ try {
       installedArtifact: 'pass',
       safeFailureOutput: 'pass',
       externalDriverAdapter: 'pass',
+      noClientOnImport: 'pass',
       noNativeAddonOnImport: 'pass',
       noQueryStringFiles: 'pass',
       readonlyWal,
+      prismaClientGenerator: 'pass',
       cleanup: temporaryRoot,
     })
   );

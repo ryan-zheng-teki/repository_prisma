@@ -1,11 +1,11 @@
-import type { PrismaClient, Prisma } from '@prisma/client';
+import type { RegisteredPrismaClient, TransactionClient } from './prisma-types';
 import { getTransactionClient } from './context';
 import { rootPrismaClient } from './client';
 
 // Re-export for convenience if needed, or consumers import from client
 export { rootPrismaClient };
 
-export type PrismaClientLike = PrismaClient | Prisma.TransactionClient;
+export type PrismaClientLike = RegisteredPrismaClient | TransactionClient;
 
 export const getPrismaClient = (): PrismaClientLike => {
   const tx = getTransactionClient();

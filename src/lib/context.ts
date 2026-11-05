@@ -1,17 +1,17 @@
 import { AsyncLocalStorage } from 'async_hooks';
-import type { Prisma } from '@prisma/client';
+import type { TransactionClient, TransactionIsolationLevel } from './prisma-types';
 import { rootPrismaClient } from './client';
 
 // The storage holds the Transaction Client
-export const prismaContext = new AsyncLocalStorage<Prisma.TransactionClient>();
+export const prismaContext = new AsyncLocalStorage<TransactionClient>();
 
-export const getTransactionClient = (): Prisma.TransactionClient | undefined => {
+export const getTransactionClient = (): TransactionClient | undefined => {
   return prismaContext.getStore();
 };
 
 // Internal helper for running within ALS
 export const runInTransactionContext = <T>(
-  tx: Prisma.TransactionClient,
+  tx: TransactionClient,
   callback: () => Promise<T>
 ): Promise<T> => {
   return prismaContext.run(tx, callback);
@@ -20,7 +20,7 @@ export const runInTransactionContext = <T>(
 export type RunInTransactionOptions = {
   maxWait?: number;
   timeout?: number;
-  isolationLevel?: Prisma.TransactionIsolationLevel;
+  isolationLevel?: TransactionIsolationLevel;
 };
 
 // Public HOF that STARTS a transaction and puts it in ALS
@@ -34,7 +34,7 @@ export const runInTransaction = <T>(
     return runInTransactionContext(existing, callback);
   }
 
-  const execute = (tx: Prisma.TransactionClient) =>
+  const execute = (tx: TransactionClient) =>
     runInTransactionContext(tx, callback);
 
   // Preserve Prisma's one-argument call and defaults when options are omitted.

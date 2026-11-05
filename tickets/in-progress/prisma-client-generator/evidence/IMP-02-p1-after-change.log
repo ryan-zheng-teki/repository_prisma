@@ -1,0 +1,16 @@
+# IMP-02 P1 reproduction consumer after the change
+# Commit: working tree on 0a4e824 (uncommitted implementation, IR-001 in progress); npm run build + npm pack
+# Environment: macOS (Darwin 25.5.0), Node v22.23.1, npm 10.9.8, non-root user normy
+# Date: 2026-11-05T04:45:29Z
+# Consumer: /tmp/rp3-impl/p1 (same as IMP-01: only the prisma-client generator)
+
+$ node -e "require('@prisma/client')"   # the default package is still unusable here
+MODULE_NOT_FOUND
+
+$ node --input-type=module -e "const r = await import('repository_prisma'); console.log('esm import ok', typeof r.registerPrismaClient)"
+esm import ok function
+exit=0
+
+$ node -e "const r = require('repository_prisma'); console.log('cjs import ok', typeof r.registerPrismaClient)"
+cjs import ok function
+exit=0

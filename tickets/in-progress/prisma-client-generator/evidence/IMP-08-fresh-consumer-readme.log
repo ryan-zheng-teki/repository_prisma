@@ -1,0 +1,192 @@
+# IMP-08 fresh consumers following only the README prisma-client setup (TESTING.md 'Choosing The Layer')
+# Package: npm pack of the working tree on 0a4e824 (uncommitted IR-001 work, SR-006) -> /tmp/rp3-impl/pack-new/repository_prisma-2.0.0.tgz
+# Install: npm install <tarball> (no --legacy-peer-deps; peers installed automatically), npm install -D prisma@7 typescript@5.9 @types/node
+# Environment: macOS (Darwin 25.5.0), Node v22.23.1, npm 10.9.8, non-root user normy
+# Date: 2026-11-05T04:53:56Z
+
+================ esm consumer (/tmp/rp3-impl/fresh-esm)
+--- package.json
+{"name":"fresh-esm","private":true,"type":"module","dependencies":{"repository_prisma":"file:../../../../tmp/rp3-impl/pack-new/repository_prisma-2.0.0.tgz"},"devDependencies":{"@types/node":"^26.6.6","prisma":"^7.10.1","typescript":"5.9"}}--- prisma/schema.prisma
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id    Int    @id @default(autoincrement())
+  email String @unique
+  posts Post[]
+}
+
+model Post {
+  id       Int    @id @default(autoincrement())
+  title    String
+  authorId Int
+  author   User   @relation(fields: [authorId], references: [id])
+}
+--- prisma.config.ts
+// prisma.config.ts
+import { defineConfig } from 'prisma/config';
+
+export default defineConfig({
+  schema: 'prisma/schema.prisma',
+  datasource: { url: process.env.DATABASE_URL },
+});
+--- tsconfig.json
+{ "compilerOptions": { "target": "es2022", "module": "nodenext", "moduleResolution": "nodenext", "strict": true, "skipLibCheck": true, "rootDir": "src", "outDir": "dist" }, "include": ["src/**/*.ts"] }
+--- src/db.ts
+// src/db.ts
+import * as generated from './generated/prisma/client.js';
+import { registerPrismaClient } from 'repository_prisma';
+
+registerPrismaClient(generated);
+
+declare module 'repository_prisma' {
+  interface PrismaClientRegistry {
+    client: typeof generated;
+  }
+}
+--- src/repositories.ts
+import { Prisma } from './generated/prisma/client.js';
+import { BaseRepository } from 'repository_prisma';
+
+export class UserRepository extends BaseRepository.forModel(Prisma.ModelName.User) {}
+export class PostRepository extends BaseRepository<'Post'> {}
+--- src/main.ts
+// src/main.ts
+import './db.js';
+import { initializePrisma, prisma, runInTransaction, shutdownPrisma, Models } from 'repository_prisma';
+import { PostRepository, UserRepository } from './repositories.js';
+
+  await initializePrisma({ datasourceUrl: 'file:./app.db' });
+  const users = new UserRepository();
+  const user = await users.create({ data: { email: 'ada-esm@example.test' } });
+  await runInTransaction(async () => {
+    await new PostRepository().create({ data: { title: 'Hello', authorId: user.id } });
+  });
+  await runInTransaction(async () => {
+    await users.create({ data: { email: 'rolled-back@example.test' } });
+    throw new Error('rollback');
+  }).catch(() => undefined);
+  const rows = await prisma.user.findMany({ include: { posts: true }, orderBy: { id: 'asc' } });
+  console.log('esm', JSON.stringify(rows), Models.User);
+  await shutdownPrisma();
+--- installed peers: adapter-better-sqlite3 client client-runtime-utils config debug dev driver-adapter-utils engines engines-version fetch-engine get-platform query-plan-executor streams-local studio-core 
+$ npx prisma generate
+✔ Generated Prisma Client (7.10.1) to ./src/generated/prisma in 25ms
+$ DATABASE_URL=file:./app.db npx prisma db push
+🚀  Your database is now in sync with your Prisma schema. Done in 10ms
+$ npx tsc -p tsconfig.json
+exit=0
+$ node dist/main.js
+esm [{"id":1,"email":"ada-esm@example.test","posts":[{"id":1,"title":"Hello","authorId":1}]}] User
+exit=0
+$ node -e "require('@prisma/client')"   # no prisma-client-js output in this app
+MODULE_NOT_FOUND
+
+================ cjs consumer (/tmp/rp3-impl/fresh-cjs)
+--- package.json
+{"name":"fresh-cjs","private":true,"type":"commonjs","dependencies":{"repository_prisma":"file:../../../../tmp/rp3-impl/pack-new/repository_prisma-2.0.0.tgz"},"devDependencies":{"@types/node":"^26.6.6","prisma":"^7.10.1","typescript":"5.9"}}--- prisma/schema.prisma
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id    Int    @id @default(autoincrement())
+  email String @unique
+  posts Post[]
+}
+
+model Post {
+  id       Int    @id @default(autoincrement())
+  title    String
+  authorId Int
+  author   User   @relation(fields: [authorId], references: [id])
+}
+--- prisma.config.ts
+// prisma.config.ts
+import { defineConfig } from 'prisma/config';
+
+export default defineConfig({
+  schema: 'prisma/schema.prisma',
+  datasource: { url: process.env.DATABASE_URL },
+});
+--- tsconfig.json
+{ "compilerOptions": { "target": "es2022", "module": "node16", "moduleResolution": "node16", "strict": true, "skipLibCheck": true, "rootDir": "src", "outDir": "dist" }, "include": ["src/**/*.ts"] }
+--- src/db.ts
+// src/db.ts
+import * as generated from './generated/prisma/client';
+import { registerPrismaClient } from 'repository_prisma';
+
+registerPrismaClient(generated);
+
+declare module 'repository_prisma' {
+  interface PrismaClientRegistry {
+    client: typeof generated;
+  }
+}
+--- src/repositories.ts
+import { Prisma } from './generated/prisma/client';
+import { BaseRepository } from 'repository_prisma';
+
+export class UserRepository extends BaseRepository.forModel(Prisma.ModelName.User) {}
+export class PostRepository extends BaseRepository<'Post'> {}
+--- src/main.ts
+// src/main.ts
+import './db';
+import { initializePrisma, prisma, runInTransaction, shutdownPrisma, Models } from 'repository_prisma';
+import { PostRepository, UserRepository } from './repositories';
+
+const main = async (): Promise<void> => {
+  await initializePrisma({ datasourceUrl: 'file:./app.db' });
+  const users = new UserRepository();
+  const user = await users.create({ data: { email: 'ada-cjs@example.test' } });
+  await runInTransaction(async () => {
+    await new PostRepository().create({ data: { title: 'Hello', authorId: user.id } });
+  });
+  await runInTransaction(async () => {
+    await users.create({ data: { email: 'rolled-back@example.test' } });
+    throw new Error('rollback');
+  }).catch(() => undefined);
+  const rows = await prisma.user.findMany({ include: { posts: true }, orderBy: { id: 'asc' } });
+  console.log('cjs', JSON.stringify(rows), Models.User);
+  await shutdownPrisma();
+};
+void main();
+--- installed peers: adapter-better-sqlite3 client client-runtime-utils config debug dev driver-adapter-utils engines engines-version fetch-engine get-platform query-plan-executor streams-local studio-core 
+$ npx prisma generate
+✔ Generated Prisma Client (7.10.1) to ./src/generated/prisma in 26ms
+$ DATABASE_URL=file:./app.db npx prisma db push
+🚀  Your database is now in sync with your Prisma schema. Done in 11ms
+$ npx tsc -p tsconfig.json
+exit=0
+$ node dist/main.js
+cjs [{"id":1,"email":"ada-cjs@example.test","posts":[{"id":1,"title":"Hello","authorId":1}]}] User
+exit=0
+$ node -e "require('@prisma/client')"   # no prisma-client-js output in this app
+MODULE_NOT_FOUND
+
+================ missing declaration (esm consumer, src/db.ts without the declare module block)
+// src/db.ts
+import * as generated from './generated/prisma/client.js';
+import { registerPrismaClient } from 'repository_prisma';
+
+registerPrismaClient(generated);
+
+$ npx tsc -p tsconfig.json
+src/db.ts(5,22): error TS2345: Argument of type 'typeof import("/private/tmp/rp3-impl/fresh-esm/src/generated/prisma/client", { with: { "resolution-mode": "import" } })' is not assignable to parameter of type 'MissingTypeDeclaration'.
+  Property '"repository_prisma: declare the generated client module: declare module 'repository_prisma' { interface PrismaClientRegistry { client: typeof generated } }"' is missing in type 'typeof import("/private/tmp/rp3-impl/fresh-esm/src/generated/prisma/client", { with: { "resolution-mode": "import" } })' but required in type 'MissingTypeDeclaration'.
+exit=2

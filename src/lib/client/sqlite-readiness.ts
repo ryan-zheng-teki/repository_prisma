@@ -1,7 +1,11 @@
 import { realpath } from 'node:fs/promises';
 import path from 'node:path';
-import type { PrismaClient } from '@prisma/client';
 import type { SqliteFileDatasourceTarget } from './datasource-target';
+
+/** The part of a Prisma client that the readiness checks use. */
+type SqliteRawQueryClient = {
+  $queryRawUnsafe<T = unknown>(query: string, ...values: any[]): PromiseLike<T>;
+};
 
 type DatabaseListRow = {
   name?: unknown;
@@ -16,7 +20,7 @@ const canonicalPath = async (filePath: string): Promise<string> => {
 };
 
 export const verifySqliteIdentity = async (
-  client: PrismaClient,
+  client: SqliteRawQueryClient,
   target: SqliteFileDatasourceTarget
 ): Promise<void> => {
   const rows = await client.$queryRawUnsafe<DatabaseListRow[]>('PRAGMA database_list;');
@@ -40,11 +44,11 @@ export const verifySqliteIdentity = async (
   }
 };
 
-export const activateSqliteWal = async (client: PrismaClient): Promise<void> => {
+export const activateSqliteWal = async (client: SqliteRawQueryClient): Promise<void> => {
   await client.$queryRawUnsafe('PRAGMA journal_mode = WAL;');
 };
 
-export const verifySqliteWal = async (client: PrismaClient): Promise<void> => {
+export const verifySqliteWal = async (client: SqliteRawQueryClient): Promise<void> => {
   const rows = await client.$queryRawUnsafe<JournalModeRow[]>('PRAGMA journal_mode;');
   if (!Array.isArray(rows) || rows.length !== 1) {
     throw new Error('SQLite journal mode response was malformed.');

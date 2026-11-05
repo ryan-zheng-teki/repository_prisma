@@ -84,7 +84,18 @@ root-client and lifecycle owner.
 
 - Resolve one explicit datasource target and build the root client with Prisma 7's SQLite driver
   adapter: `PrismaClient({ adapter: createSqliteDriverAdapter(target), log })`. Prisma 7 no longer
-  accepts a datasource URL in the client constructor.
+  accepts a datasource URL in the client constructor. `PrismaClient` comes from the Prisma client
+  module of the lifecycle's client source (below), read when the client is built.
+- Own the client source and its registration rule. `registerPrismaClient(module)` reaches
+  `registerClientModule`: a malformed argument is a `TypeError`; the module already registered
+  (same `PrismaClient` and `Prisma`) is a no-op; a different module is accepted in `Idle` and
+  `Failed` and rejected with `PRISMA_CLIENT_CONFLICT` while a client is bound, binding or shutting
+  down, like the datasource and logging-policy conflicts. `getClientModule()` is the one read of
+  the source, used by `Models` through the facade.
+- A client module that cannot be loaded keeps its code `PRISMA_CLIENT_UNAVAILABLE` through both
+  entry forms: explicit initialization rejects (raw cause to `onDiagnostic`), and the first lazy
+  use throws; as for any construction failure the lifecycle is then `Failed`, so later lazy use
+  throws `CLIENT_NOT_READY` until `initializePrisma()` or `shutdownPrisma()`.
 - Construct and disconnect the raw root client only inside the lifecycle owner.
 - Resolve query logging at construction through `src/lib/client/logging-policy.ts`.
   The default levels are `info`, `warn`, and `error`; `query` is appended only when
@@ -103,6 +114,13 @@ root-client and lifecycle owner.
 
 The related internal files remain subordinate to this owner:
 
+- `client/client-source.ts` (`PrismaClientSource`) owns where the Prisma client module comes
+  from, as explicit state: `default-package` from the start, or `registered` with the module the
+  application passed. `current()` switches on that state: a registered module is returned as is;
+  the default package, `@prisma/client` (prisma-client-js output), is required on first need and
+  any load failure is classified `PRISMA_CLIENT_UNAVAILABLE` with the raw cause. It also owns the
+  module shape check. It knows no lifecycle state. Only the lifecycle constructs and holds it
+  (tests may inject one), and it is the only runtime loader of `@prisma/client`.
 - `client/datasource-target.ts` selects, classifies, and normalizes the target. Physical SQLite
   relative paths are `process.cwd()`-relative. It owns the supported-provider rule: the library
   supports SQLite only, so any other URL is rejected here with `UNSUPPORTED_DATASOURCE_PROVIDER`,
@@ -153,19 +171,61 @@ and `exports.require` conditions. Both Prisma peers, `@prisma/client` and `@pris
 `external`) and supplied by the consumer, which keeps the adapter in version lockstep with the
 client and leaves the native better-sqlite3 build to the consumer's platform. The adapter is a real
 ESM package, so the lifecycle imports `PrismaBetterSqlite3` by name; its native module loads only
-when a database is opened, never at package import. Because `@prisma/client` is a
-CommonJS-generated external peer,
-ESM source must consume it through the default CommonJS namespace rather than named runtime
-imports, which rely on Node's heuristic named-export detection. The lifecycle owner destructures
-`PrismaClient` for raw client construction, and the model-value owner destructures `Prisma` for
-`Models`; each keeps a separate aliased `import type` binding for TypeScript-only references.
+when a database is opened, never at package import.
 
-All other Prisma references in package source use explicit `import type`, so declarations retain
-the existing contracts without adding runtime peer edges. The package does not add a fallback or
-`createRequire` path. Package validation includes a synthetic dynamic CommonJS-peer ESM probe in
-addition to the installed generated-peer smoke.
+The package imports no Prisma client module at load time. Prisma 7's `prisma-client` generator
+writes the client into the application, and `@prisma/client`'s root entry then fails to load
+(it needs prisma-client-js output), so a static import would make the package unimportable for
+those applications. The client source loads `@prisma/client` only when the default package is
+first needed, with `createRequire(import.meta.url)('@prisma/client')`. That is a CommonJS require
+in both builds, so it never depends on Node's named-export detection for the CommonJS peer, and
+Node's module cache makes repeated loads free. The build targets es2020 so the ESM output keeps
+`import.meta`; tsup's `shims` supply `import.meta.url` in the CommonJS output. The source
+typecheck uses `module: esnext` with `moduleResolution: bundler`, which allows `import.meta`.
+Bundlers do not trace a `createRequire` call, so an application that bundles the library and
+relies on the default package must keep `@prisma/client` external (registered clients are
+unaffected). This replaces the earlier rule that the package adds no `createRequire` path.
 
-### F. `src/lib/forwarding-proxy.ts` and `src/lib/prisma-proxy.ts` (Access Routing)
+Prisma types come only from `src/lib/prisma-types.ts` (below), through `import type`, so
+declarations add no runtime peer edges. Package validation includes a synthetic dynamic
+CommonJS-peer ESM probe, the installed generated-peer smoke, and a consumer on the
+`prisma-client` generator without prisma-client-js output.
+
+### F. `src/lib/prisma-types.ts` and `src/lib/models.ts` (Client Types and Model Names)
+
+**Responsibility**: the public types follow the same client as the runtime.
+
+- `prisma-types.ts` owns the type registry `PrismaClientRegistry` and every type derived from
+  it: the client (`RegisteredPrismaClient`), `ModelName`, the `Models` object type, the
+  transaction client, the interactive-transaction isolation level and the filter type of
+  `buildContainsFilter`. An application on the `prisma-client` generator declares its generated
+  module once (`interface PrismaClientRegistry { client: typeof generated }`); without a
+  declaration every type is exactly the `@prisma/client` type, as in 2.0.0. Public values are
+  annotated with these aliases (`prisma`, `rootPrismaClient`) so the declaration bundler keeps
+  the alias instead of inlining the default client type.
+- The registration and the declaration cannot disagree. `registerPrismaClient`'s parameter is
+  `RegisteredClientModule`: exactly the declared module, or, with no declaration (or one that is
+  not a generated module), `MissingTypeDeclaration`, an object type whose one property name is
+  the declaration to add, so the call fails to compile with the fix in the message. It references
+  no `@prisma/client` type: without prisma-client-js output those types are `any`, so a check
+  built on them could never fail. The runtime shape check stays in the lifecycle
+  (`registerClientModule(value: unknown)`) for JavaScript callers and casts; the runtime shape
+  `PrismaClientModule` is internal and not exported.
+- A `PrismaClientRegistry` augmentation applies to its whole TypeScript program, so the repository
+  type-checks two programs: `tsconfig.json` (no declaration; it holds the prisma-client-js
+  type-equality cases) and `tsconfig.prisma-client-generator.json` (the registered example and
+  tests, with `repository_prisma` path-mapped to `src/index.ts`, its own `exclude`, and the
+  generated client in `generated/prisma-client/`). `scripts/check-typecheck-programs.js` checks
+  which files each program compiles (DC-002).
+- `Models` is a read-only view of the current client module's `Prisma.ModelName`, read on every
+  access through the facade (`getPrismaClientModule()`, not exported by the package) and the
+  lifecycle. It follows a later registration and loads nothing at import. It forwards `get`,
+  `has`, `ownKeys` and property descriptors (reported configurable, because the proxy target does
+  not own the keys), so `Object.keys`, `in` and spread work; writes are rejected. A missing client
+  throws `PrismaInitializationError` with `PRISMA_CLIENT_UNAVAILABLE`. Because `Models` resolves on
+  access, a module that reads `Models.X` at load time must be evaluated after the registration.
+
+### G. `src/lib/forwarding-proxy.ts` and `src/lib/prisma-proxy.ts` (Access Routing)
 
 **Responsibility**: Preserve Prisma-shaped public access without leaking a retained raw root or ALS
 delegate.
@@ -274,6 +334,23 @@ or reviewing a change of the same shape. New cases are appended with the next `D
   lock per connection that a transaction holds until it ends.
 - **Lesson:** trace each entry form of a mechanism (concurrent as well as sequential requests)
   through the real dependency before declaring a risk outside the contract.
+
+### DC-002: A type check that compiled none of the files it was meant to check (prisma-client generator, ARCH-REV-003 AR-003)
+
+- **Problem:** the design added a second typecheck program for the registered example and tests,
+  `tsconfig.prisma-client-generator.json`, extending `tsconfig.json` and overriding only `include`.
+  TypeScript inherits `include` and `exclude` separately, so the child kept the base `exclude`,
+  which named exactly the registered folders. The program compiled none of them, and `tsc` passed.
+- **How it was found:** architecture review reproduced it with `tsc --listFilesOnly` and a
+  deliberately broken file in the excluded folder; `tsc` still exited 0.
+- **Wrong assumption:** the design's feasibility probe read "no errors" as "the files compile",
+  without checking which files were in the program.
+- **Fix:** the registered config sets its own `exclude`, and `npm run typecheck` runs
+  `scripts/check-typecheck-programs.js`, which fails unless each registered file is in the
+  registered program and absent from the default one.
+- **Lesson:** a passing check proves nothing about inputs it never saw. Before relying on a
+  passing type check or test run, confirm the files are in it (`--listFilesOnly`, the test list)
+  and run one negative control that must fail.
 
 ## 5. FAQ / Architectural Decisions
 

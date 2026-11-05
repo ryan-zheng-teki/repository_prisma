@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": { "repository_prisma": ["./src/index.ts"] }
+  },
+  "include": [
+    "src/lib/**/*",
+    "src/index.ts",
+    "examples/prisma-client-generator/**/*",
+    "src/tests/prisma-client-generator/**/*"
+  ],
+  "exclude": ["node_modules", "dist"]
+}

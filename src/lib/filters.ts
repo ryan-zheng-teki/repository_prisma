@@ -1,8 +1,5 @@
-import type { Prisma } from '@prisma/client';
+import type { ContainsStringFilter } from './prisma-types';
 import { supportsCaseInsensitiveMode } from './database';
-
-type StringFilter = Prisma.StringFilter;
-type StringFilterWithMode = Prisma.StringFilter & { mode?: 'insensitive' };
 
 type ContainsFilterOptions = {
   caseInsensitive?: boolean;
@@ -11,13 +8,13 @@ type ContainsFilterOptions = {
 export const buildContainsFilter = (
   value: string,
   options: ContainsFilterOptions = {}
-): StringFilter => {
+): ContainsStringFilter => {
   if (!options.caseInsensitive) {
     return { contains: value };
   }
 
   if (supportsCaseInsensitiveMode()) {
-    return { contains: value, mode: 'insensitive' } as StringFilterWithMode;
+    return { contains: value, mode: 'insensitive' } as ContainsStringFilter;
   }
 
   return { contains: value };

@@ -83,9 +83,9 @@ describe.sequential('PrismaClientLifecycle classified failure and recovery', () 
       ]),
     });
     const clients = [failedClient, recoveredClient];
-    const lifecycle = new PrismaClientLifecycle(() =>
-      asPrismaClient(clients.shift()!)
-    );
+    const lifecycle = new PrismaClientLifecycle({
+      clientFactory: () => asPrismaClient(clients.shift()!),
+    });
     const diagnostic = vi.fn(() => {
       throw new Error('listener failure must be ignored');
     });
@@ -143,7 +143,7 @@ describe.sequential('PrismaClientLifecycle classified failure and recovery', () 
   }) => {
     const { databasePath, url } = await physicalTarget();
     const client = fakeClient({ $queryRawUnsafe: query(databasePath) });
-    const lifecycle = new PrismaClientLifecycle(() => asPrismaClient(client));
+    const lifecycle = new PrismaClientLifecycle({ clientFactory: () => asPrismaClient(client) });
     const diagnostic = vi.fn();
 
     await expectInitializationCode(
@@ -164,7 +164,7 @@ describe.sequential('PrismaClientLifecycle classified failure and recovery', () 
     ['file:memory-name?mode=memory&cache=shared', 'SQLite mode=memory'],
   ])('rejects strict WAL for %s before connection or SQLite SQL', async (url) => {
     const client = fakeClient();
-    const lifecycle = new PrismaClientLifecycle(() => asPrismaClient(client));
+    const lifecycle = new PrismaClientLifecycle({ clientFactory: () => asPrismaClient(client) });
 
     await expectInitializationCode(
       lifecycle.initialize({ datasourceUrl: url, enableWAL: true }),
@@ -202,9 +202,9 @@ describe.sequential('PrismaClientLifecycle concurrency and shutdown', () => {
     });
     const secondClient = fakeClient();
     const clients = [firstClient, secondClient];
-    const lifecycle = new PrismaClientLifecycle(() =>
-      asPrismaClient(clients.shift()!)
-    );
+    const lifecycle = new PrismaClientLifecycle({
+      clientFactory: () => asPrismaClient(clients.shift()!),
+    });
     const target = `file:${databasePath}`;
 
     const first = lifecycle.initialize({ datasourceUrl: target });
@@ -246,9 +246,9 @@ describe.sequential('PrismaClientLifecycle concurrency and shutdown', () => {
     });
     const replacementClient = fakeClient();
     const clients = [firstClient, replacementClient];
-    const lifecycle = new PrismaClientLifecycle(() =>
-      asPrismaClient(clients.shift()!)
-    );
+    const lifecycle = new PrismaClientLifecycle({
+      clientFactory: () => asPrismaClient(clients.shift()!),
+    });
 
     await lifecycle.initialize({ datasourceUrl: 'file:first?mode=memory' });
     await expect(lifecycle.shutdown()).rejects.toBe(disconnectFailure);
@@ -261,7 +261,7 @@ describe.sequential('PrismaClientLifecycle concurrency and shutdown', () => {
   it('keeps a healthy ready client authoritative when a different target is rejected', async () => {
     const client = fakeClient();
     const factory = vi.fn(() => asPrismaClient(client));
-    const lifecycle = new PrismaClientLifecycle(factory);
+    const lifecycle = new PrismaClientLifecycle({ clientFactory: factory });
     const firstTarget = 'file:first?mode=memory';
 
     await lifecycle.initialize({ datasourceUrl: firstTarget });
@@ -306,7 +306,7 @@ describe.sequential('PrismaClientLifecycle concurrency and shutdown', () => {
         throw new Error(`Unexpected SQL: ${sql}`);
       });
       const client = fakeClient({ $queryRawUnsafe: query });
-      const lifecycle = new PrismaClientLifecycle(() => asPrismaClient(client));
+      const lifecycle = new PrismaClientLifecycle({ clientFactory: () => asPrismaClient(client) });
 
       const initialization = lifecycle.initialize({
         datasourceUrl: `file:${databasePath}`,
@@ -326,9 +326,9 @@ describe.sequential('PrismaClientLifecycle concurrency and shutdown', () => {
       expect(client.$disconnect).toHaveBeenCalledTimes(1);
 
       const replacement = fakeClient();
-      const replacementLifecycle = new PrismaClientLifecycle(() =>
-        asPrismaClient(replacement)
-      );
+      const replacementLifecycle = new PrismaClientLifecycle({
+        clientFactory: () => asPrismaClient(replacement),
+      });
       await replacementLifecycle.initialize({
         datasourceUrl: `file:${stage}?mode=memory`,
       });
@@ -376,7 +376,7 @@ describe.sequential('PrismaClientLifecycle non-SQLite datasource rejection', () 
     enableWAL,
   }) => {
     const factory = vi.fn(() => asPrismaClient(fakeClient()));
-    const lifecycle = new PrismaClientLifecycle(factory);
+    const lifecycle = new PrismaClientLifecycle({ clientFactory: factory });
     const diagnostic = vi.fn();
 
     const error = await expectInitializationCode(
@@ -399,7 +399,7 @@ describe.sequential('PrismaClientLifecycle non-SQLite datasource rejection', () 
   it('rejects a non-SQLite URL while a SQLite client is lazily bound and keeps that client', async () => {
     const client = fakeClient();
     const factory = vi.fn(() => asPrismaClient(client));
-    const lifecycle = new PrismaClientLifecycle(factory);
+    const lifecycle = new PrismaClientLifecycle({ clientFactory: factory });
     useEnvironmentUrl('file::memory:');
     expect(lifecycle.getClientForOperation()).toBe(client);
 
@@ -419,7 +419,7 @@ describe.sequential('PrismaClientLifecycle non-SQLite datasource rejection', () 
     const connect = deferred<void>();
     const client = fakeClient({ $connect: vi.fn(() => connect.promise) });
     const factory = vi.fn(() => asPrismaClient(client));
-    const lifecycle = new PrismaClientLifecycle(factory);
+    const lifecycle = new PrismaClientLifecycle({ clientFactory: factory });
 
     const initialization = lifecycle.initialize({ datasourceUrl: 'file::memory:' });
     const error = await expectInitializationCode(
@@ -438,7 +438,7 @@ describe.sequential('PrismaClientLifecycle non-SQLite datasource rejection', () 
   it('rejects a non-SQLite URL while a SQLite client is ready and keeps that client', async () => {
     const client = fakeClient();
     const factory = vi.fn(() => asPrismaClient(client));
-    const lifecycle = new PrismaClientLifecycle(factory);
+    const lifecycle = new PrismaClientLifecycle({ clientFactory: factory });
     await lifecycle.initialize({ datasourceUrl: 'file::memory:' });
 
     const error = await expectInitializationCode(
@@ -455,7 +455,7 @@ describe.sequential('PrismaClientLifecycle non-SQLite datasource rejection', () 
 
   it('rejects a lazy bind from a non-SQLite DATABASE_URL before building a client', () => {
     const factory = vi.fn(() => asPrismaClient(fakeClient()));
-    const lifecycle = new PrismaClientLifecycle(factory);
+    const lifecycle = new PrismaClientLifecycle({ clientFactory: factory });
     useEnvironmentUrl(nonSqliteUrl);
 
     let error: unknown;
@@ -480,7 +480,7 @@ describe.sequential('PrismaClientLifecycle non-SQLite datasource rejection', () 
     const disconnect = deferred<void>();
     const client = fakeClient({ $disconnect: vi.fn(() => disconnect.promise) });
     const factory = vi.fn(() => asPrismaClient(client));
-    const lifecycle = new PrismaClientLifecycle(factory);
+    const lifecycle = new PrismaClientLifecycle({ clientFactory: factory });
     await lifecycle.initialize({ datasourceUrl: 'file::memory:' });
 
     const shutdown = lifecycle.shutdown();

@@ -15,7 +15,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsup",
-    "typecheck": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.prisma-client-generator.json && node scripts/check-typecheck-programs.js",
     "test": "node scripts/run-tests.js",
     "test:package": "npm run build && node scripts/run-package-smoke.js && node scripts/run-esm-cjs-interop.js",
     "prepare": "prisma generate",

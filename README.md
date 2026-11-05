@@ -45,7 +45,8 @@ file". Allow it once in your project:
     - better-sqlite3
   ```
 
-Keep the `prisma-client-js` generator and leave the URL out of the schema:
+With the `prisma-client-js` generator, leave the URL out of the schema (on Prisma 7's
+`prisma-client` generator, see [Using the prisma-client generator](#using-the-prisma-client-generator)):
 
 ```prisma
 // prisma/schema.prisma
@@ -95,6 +96,93 @@ Good to know:
   `UNSUPPORTED_DATASOURCE_PROVIDER`.
 - `@prisma/adapter-better-sqlite3` uses the native `better-sqlite3` module. Prebuilt binaries cover
   the common platforms; on others, npm builds it and needs a C++ toolchain.
+
+### Using the prisma-client generator
+
+Prisma 7's default generator, `prisma-client`, writes the client into your project instead of
+`@prisma/client`. Give that client to the library once; everything else in this README stays the
+same. ESM and CommonJS apps both work (for CommonJS, add `moduleFormat = "cjs"` to the generator).
+
+1. Generate the client into your source tree (`prisma.config.ts` as above):
+
+   ```prisma
+   // prisma/schema.prisma
+   generator client {
+     provider = "prisma-client"
+     output   = "../src/generated/prisma"
+   }
+
+   datasource db {
+     provider = "sqlite"
+   }
+   ```
+
+   ```bash
+   npx prisma generate
+   ```
+
+2. Copy this `db.ts` next to the generated folder. It registers the client at runtime and declares
+   its types, so every library type (repositories, `prisma`, transactions, `Models`) follows your
+   schema:
+
+   ```typescript
+   // src/db.ts
+   import * as generated from './generated/prisma/client'; // './generated/prisma/client.js' with module nodenext
+   import { registerPrismaClient } from 'repository_prisma';
+
+   registerPrismaClient(generated);
+
+   declare module 'repository_prisma' {
+     interface PrismaClientRegistry {
+       client: typeof generated;
+     }
+   }
+   ```
+
+3. Import it first in your entry file, before any module that uses the library:
+
+   ```typescript
+   // src/main.ts
+   import './db';
+   import { initializePrisma } from 'repository_prisma';
+
+   await initializePrisma({ datasourceUrl: 'file:./app.db' });
+   ```
+
+4. Name models with your own generated `Prisma.ModelName` or the type parameter, which work in any
+   load order:
+
+   ```typescript
+   import { Prisma } from './generated/prisma/client';
+   import { BaseRepository } from 'repository_prisma';
+
+   export class UserRepository extends BaseRepository.forModel(Prisma.ModelName.User) {}
+   export class PostRepository extends BaseRepository<'Post'> {}
+   ```
+
+   The library's `Models` reads the registered client when it is accessed, so `Models.User` in a
+   module that runs before `db.ts` throws `PRISMA_CLIENT_UNAVAILABLE`.
+
+Good to know:
+
+- Without the `declare module` block, the `registerPrismaClient(generated)` line does not compile.
+  The error names the block to add:
+
+  ```text
+  error TS2345: Argument of type 'typeof import(".../generated/prisma/client")' is not assignable to parameter of type 'MissingTypeDeclaration'.
+    Property '"repository_prisma: declare the generated client module: declare module 'repository_prisma' { interface PrismaClientRegistry { client: typeof generated } }"' is missing ...
+  ```
+
+  Passing anything other than the declared module does not compile either.
+- Keep `skipLibCheck: true` in `tsconfig.json` (the `tsc --init` default). Without prisma-client-js
+  output, the type files inside `@prisma/client` itself report errors.
+- If the app runs without `registerPrismaClient`, the library has no client:
+  `initializePrisma` rejects and the first query throws `PRISMA_CLIENT_UNAVAILABLE`.
+- One client per process: registering a different client while one is in use throws
+  `PRISMA_CLIENT_CONFLICT`; call and await `shutdownPrisma()` first. Registering the same module
+  again does nothing.
+- [`examples/prisma-client-generator/`](./examples/prisma-client-generator/) shows the setup with
+  a repository, `@Transactional` and a transaction.
 
 ## The Problem: Explicit Transactions (Standard Pattern)
 
@@ -297,6 +385,12 @@ Available codes are:
 - `WAL_VERIFICATION_FAILED`
 - `LOGGING_POLICY_CONFLICT`
 - `CLIENT_NOT_READY`
+- `PRISMA_CLIENT_UNAVAILABLE`: no Prisma client module is available: nothing was registered with
+  `registerPrismaClient()` and no prisma-client-js client was generated. `initializePrisma`
+  rejects with it (the raw load error goes to `onDiagnostic`), the first lazy use and `Models`
+  throw it.
+- `PRISMA_CLIENT_CONFLICT`: `registerPrismaClient()` received a different client module while a
+  client is bound or binding; call and await `shutdownPrisma()` first.
 
 The library does not print caught initialization causes. `onDiagnostic` is the only opt-in raw-cause
 channel in this API, and callback failures do not replace the stable initialization error. A failed
@@ -313,11 +407,15 @@ required.
 The package preserves both published entrypoints: ESM consumers resolve `exports.import`,
 and CommonJS consumers resolve `exports.require`. Both Prisma peers, `@prisma/client` and
 `@prisma/adapter-better-sqlite3`, stay external and are supplied by the consuming application.
-Importing the package loads no native module; better-sqlite3 is loaded only when a database is
-opened. At runtime, the package reads its
-CommonJS-generated Prisma peer through the default namespace and then selects the required
-`PrismaClient` or `Prisma` value. This avoids depending on Node's heuristic CommonJS named-export
-detection while preserving the existing public exports and Prisma behavior.
+Importing the package loads no Prisma client and no native module; better-sqlite3 is loaded only
+when a database is opened. A client registered with `registerPrismaClient()` is used as passed.
+Otherwise the package loads `@prisma/client` (prisma-client-js output) the first time it needs a
+client or `Models`, through a CommonJS `require` in both builds, so it does not depend on Node's
+heuristic CommonJS named-export detection.
+
+Bundlers do not follow that `require`: if you bundle your application and rely on
+prisma-client-js, keep `@prisma/client` external. A registered client is bundled like any other
+application module.
 
 Type-only Prisma references are kept compile-time-only with explicit `import type` declarations.
 
@@ -383,6 +481,11 @@ and runs `prisma generate` to ensure the correct client is used for this repo.
 You can override it by setting `DATABASE_URL_TEST`. If you set a SQLite file URL, prefer an absolute path
 (`file:/...`). On macOS, Prisma's schema engine can fail on relative `file:./...` URLs, while Linux often accepts them.
 The test script normalizes relative `file:` URLs to absolute paths for cross-platform reliability.
+
+`prisma generate` also writes a `prisma-client` generator client to `generated/prisma-client/`
+(git-ignored) for the prisma-client tests and example. `npm run typecheck` checks two TypeScript
+programs, the default one and `tsconfig.prisma-client-generator.json` with the registered client;
+see [TESTING.md](./TESTING.md).
 
 Install scripts: `package.json` `allowScripts` approves only `better-sqlite3`, pinned to its
 installed version, because the tests need its native module. `esbuild`, `prisma`,

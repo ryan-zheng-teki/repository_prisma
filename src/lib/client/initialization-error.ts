@@ -8,7 +8,9 @@ export type PrismaInitializationErrorCode =
   | 'WAL_ACTIVATION_FAILED'
   | 'WAL_VERIFICATION_FAILED'
   | 'LOGGING_POLICY_CONFLICT'
-  | 'CLIENT_NOT_READY';
+  | 'CLIENT_NOT_READY'
+  | 'PRISMA_CLIENT_UNAVAILABLE'
+  | 'PRISMA_CLIENT_CONFLICT';
 
 export type PrismaInitializationDiagnostic = {
   code: PrismaInitializationErrorCode;
@@ -39,6 +41,12 @@ const SAFE_ERROR_MESSAGES: Record<PrismaInitializationErrorCode, string> = {
   LOGGING_POLICY_CONFLICT:
     'The requested query logging policy differs from the bound Prisma client.',
   CLIENT_NOT_READY: 'The Prisma client is not ready for operations.',
+  PRISMA_CLIENT_UNAVAILABLE:
+    'No generated Prisma client is available. Run `prisma generate`, or pass the client your ' +
+    'prisma-client generator created to registerPrismaClient().',
+  PRISMA_CLIENT_CONFLICT:
+    'A different Prisma client is already in use; call and await shutdownPrisma() before ' +
+    'registering another.',
 };
 
 export class PrismaInitializationError extends Error {
