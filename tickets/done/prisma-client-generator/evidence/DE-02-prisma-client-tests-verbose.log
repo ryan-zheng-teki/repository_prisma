@@ -1,0 +1,36 @@
+# DE-02 prisma-client test names (delivery, 2026-11-05): the cases behind AC-002..AC-005, AC-009, AC-010 on the branch head 2222ebb
+$ DATABASE_URL=file:$PWD/test.db npx vitest run src/tests/prisma-client-generator src/tests/missing-client.test.ts src/tests/client-registration.test.ts --reporter=verbose
+ ✓ src/tests/client-registration.test.ts > PrismaClientSource > starts on the default package and loads it only when asked
+ ✓ src/tests/client-registration.test.ts > PrismaClientSource > classifies a default package that cannot load as PRISMA_CLIENT_UNAVAILABLE with the raw cause
+ ✓ src/tests/client-registration.test.ts > PrismaClientSource > returns the registered module without loading the default package
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle without a usable client (AC-009) > rejects explicit initialization with PRISMA_CLIENT_UNAVAILABLE and gives onDiagnostic the cause
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle without a usable client (AC-009) > throws PRISMA_CLIENT_UNAVAILABLE on the first lazy use, then CLIENT_NOT_READY until shutdown
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle without a usable client (AC-009) > reports the missing client through getClientModule as a stage failure
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle without a usable client (AC-009) > builds the client from a module registered after the failure
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle registration rule (AC-010) > rejects 'undefined' with a TypeError and changes nothing
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle registration rule (AC-010) > rejects 'a class instead of the module' with a TypeError and changes nothing
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle registration rule (AC-010) > rejects 'a module without PrismaClient' with a TypeError and changes nothing
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle registration rule (AC-010) > rejects 'a module without Prisma' with a TypeError and changes nothing
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle registration rule (AC-010) > rejects 'a module without Prisma.ModelName' with a TypeError and changes nothing
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle registration rule (AC-010) > accepts a module in idle and treats the same module again as a no-op while bound
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle registration rule (AC-010) > rejects a different module while lazily bound and keeps the bound client
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle registration rule (AC-010) > rejects a different module while initializing and still publishes the bound client
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle registration rule (AC-010) > rejects a different module while ready and while shutting down, then accepts it after shutdown
+ ✓ src/tests/client-registration.test.ts > PrismaClientLifecycle registration rule (AC-010) > accepts a different module after a failed initialization
+ ✓ src/tests/missing-client.test.ts > public API without a registered client and without prisma-client-js output > imports the package and rejects initializePrisma with the cause on onDiagnostic
+ ✓ src/tests/missing-client.test.ts > public API without a registered client and without prisma-client-js output > throws PRISMA_CLIENT_UNAVAILABLE on the first lazy use and CLIENT_NOT_READY after it
+ ✓ src/tests/missing-client.test.ts > public API without a registered client and without prisma-client-js output > throws PRISMA_CLIENT_UNAVAILABLE from Models
+ ✓ src/tests/prisma-client-generator/registration-recovery.test.ts > recovering from a failed start with the registered client > registers after initializePrisma failed for a missing client, without shutdownPrisma (AC-009, REQ-006)
+ ✓ src/tests/prisma-client-generator/registration-recovery.test.ts > recovering from a failed start with the registered client > accepts a different client after initializePrisma failed to connect, without shutdownPrisma (AC-010, REQ-006)
+ ✓ src/tests/prisma-client-generator/registration-recovery.test.ts > recovering from a failed start with the registered client > accepts a different client after the first lazy use failed, and binds it on initializePrisma (AC-010, REQ-006)
+ ✓ src/tests/prisma-client-generator/registered-client.test.ts > registered prisma-client generator client > initializes with WAL on the target file and runs repository and prisma queries (AC-002)
+ ✓ src/tests/prisma-client-generator/registered-client.test.ts > registered prisma-client generator client > binds the registered client lazily from DATABASE_URL (AC-003)
+ ✓ src/tests/prisma-client-generator/registered-client.test.ts > registered prisma-client generator client > commits and rolls back runInTransaction and @Transactional work (AC-004)
+ ✓ src/tests/prisma-client-generator/registered-client.test.ts > registered prisma-client generator client > reads Models from the registered module and builds repositories from its model names (AC-005)
+ ✓ src/tests/prisma-client-generator/registered-client.test.ts > registered prisma-client generator client > keeps the bound client on a conflicting registration and uses the new one after shutdown (AC-010)
+ ✓ src/tests/prisma-client-generator/registered-client.test.ts > registered prisma-client generator client > rejects a malformed registration with a TypeError and keeps the registered client
+ ✓ src/tests/prisma-client-generator/registered-client.test.ts > concurrent requests on the registered client > keeps a request without a transaction out of another request's open transaction
+ ✓ src/tests/prisma-client-generator/registered-client.test.ts > concurrent requests on the registered client > commits two concurrent transactions
+ Test Files  4 passed (4)
+      Tests  31 passed (31)
+exit=0

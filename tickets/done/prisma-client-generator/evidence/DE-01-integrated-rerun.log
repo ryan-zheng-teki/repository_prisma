@@ -1,0 +1,26 @@
+# DE-01 integrated-state rerun (delivery, 2026-11-05) on the ticket branch head; origin/main fetched and not advanced
+# Commands: npm run typecheck; npm test (summary lines); npm run build; npm run test:package (last lines); git status of src/scripts/package.json
+HEAD 2222ebb71d5b74f5143b875785d404743edfcf4c
+origin/main 0a4e824756e692a0f537e743549f5a4c1479d7ea
+v22.23.1
+10.9.8
+normy
+$ npm run typecheck
+
+> repository_prisma@2.0.0 typecheck
+> tsc -p tsconfig.json && tsc -p tsconfig.prisma-client-generator.json && node scripts/check-typecheck-programs.js
+
+{"result":"pass","registeredProgramFiles":{"examples/prisma-client-generator":2,"src/tests/prisma-client-generator":2}}
+exit=0
+$ npm test
+ Test Files  16 passed (16)
+      Tests  147 passed (147)
+exit=0
+$ npm run build
+exit=0
+$ npm run test:package
+added 1 package in 168ms
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","externalDriverAdapter":"pass","noClientOnImport":"pass","noNativeAddonOnImport":"pass","noQueryStringFiles":"pass","readonlyWal":"pass","prismaClientGenerator":"pass","registeredConsumerTypes":["nodenext","node16","bundler","cjs-node16"],"cleanup":"<tmp>"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"<tmp>"}
+exit=0
+$ git status --porcelain -- src scripts package.json
