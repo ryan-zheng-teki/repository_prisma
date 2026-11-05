@@ -1,0 +1,72 @@
+# Check: IMP-06 (AC-004 E2E: fresh consumers following only the README setup with the pinned major, on npm 12.2.1, pnpm 11.28.9 and pnpm 12.16.1; published registry versions)
+# Command: bash evidence/IMP-05-06-consumer-scripts/run-ac004.sh (uses app.mjs, app.cjs, schema.prisma, prisma.config.ts from the same folder)
+# Commit: README at bcf2be0; packages from the registry (repository_prisma 2.0.0 is the newest version and was ~15 h old, inside pnpm 11+'s minimum release age)
+# Environment: macOS 26.5.2 arm64, Node v22.23.1
+# Date: 2026-11-05T06:05Z
+
+## now 2026-11-05T06:04Z; repository_prisma 2.0.0 published 2026-11-04T15:10:08.431Z (the newest version); node v22.23.1
+
+==== A. npm 12.2.1
+npm 12.2.1
+$ npm install repository_prisma@2
+added 45 packages in 1s
+npm warn install-scripts 1 package had install scripts blocked because they are not covered by allowScripts:
+exit=0
+$ npm install -D prisma@7
+exit=0
+$ npm install-scripts approve better-sqlite3; npm rebuild better-sqlite3
+  added better-sqlite3@12.11.1
+rebuilt dependencies successfully
+generate exit=0
+installed repository_prisma: 2.0.0
+RESULT ok count 0
+RESULT ok (cjs) count 0
+
+==== pnpm 11.28.9
+$ pnpm add repository_prisma@2 @prisma/client@7
+Added 1 entry to minimumReleaseAgeExclude in pnpm-workspace.yaml (set minimumReleaseAgeStrict to true to gate these updates with a prompt):
+  repository_prisma@2.0.0
++ @prisma/client 7.10.1
++ repository_prisma 2.0.0
+[ERR_PNPM_IGNORED_BUILDS] Ignored build scripts: better-sqlite3@12.11.1
+exit=1
+$ pnpm add -D prisma@7
+exit=1
+$ pnpm approve-builds better-sqlite3
+.../node_modules/better-sqlite3 install$ prebuild-install || node-gyp rebuild --release
+.../node_modules/better-sqlite3 install: Done
+exit=0
+--- pnpm-workspace.yaml
+allowBuilds:
+  better-sqlite3: true
+minimumReleaseAgeExclude:
+  - repository_prisma@2.0.0
+generate exit=0
+installed repository_prisma: 2.0.0
+RESULT ok count 0
+RESULT ok (cjs) count 0
+
+==== pnpm 12.16.1
+$ pnpm add repository_prisma@2 @prisma/client@7
+Added 1 entry to minimumReleaseAgeExclude in pnpm-workspace.yaml (set minimumReleaseAgeStrict to true to gate these updates with a prompt):
+  repository_prisma@2.0.0
++ @prisma/client 7.10.1
++ repository_prisma 2.0.0
+Error: ERR_PNPM_IGNORED_BUILDS
+  ╰─▶ Ignored build scripts: better-sqlite3@12.11.1
+exit=1
+$ pnpm add -D prisma@7
+exit=1
+$ pnpm approve-builds better-sqlite3
+.../node_modules/better-sqlite3 install$ prebuild-install || node-gyp rebuild --release
+.../node_modules/better-sqlite3 install: Done
+exit=0
+--- pnpm-workspace.yaml
+allowBuilds:
+  better-sqlite3: true
+minimumReleaseAgeExclude:
+  - repository_prisma@2.0.0
+generate exit=0
+installed repository_prisma: 2.0.0
+RESULT ok count 0
+RESULT ok (cjs) count 0

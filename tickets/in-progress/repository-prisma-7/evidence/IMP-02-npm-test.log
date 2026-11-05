@@ -1,0 +1,76 @@
+# Check: IMP-02
+# Command: npm test (DATABASE_URL_TEST unset); then the verbose new suite and the real CONNECTION_FAILED case in registration-recovery
+# Commit: bcf2be0 (worktree /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-7)
+# Environment: macOS 26.5.2 arm64, Node v22.23.1, npm 10.9.8, uid 501
+# Date: 2026-11-05T06:00Z
+
+
+> repository_prisma@2.0.0 test
+> node scripts/run-tests.js
+
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+Datasource "db": SQLite database "test.db" at "file:///Users/normy/autobyteus_org/worktrees/codex/repository-prisma-7/test.db"
+
+SQLite database test.db created at file:///Users/normy/autobyteus_org/worktrees/codex/repository-prisma-7/test.db
+
+🚀  Your database is now in sync with your Prisma schema. Done in 15ms
+┌─────────────────────────────────────────────────────────┐
+│  Update available 7.10.1 -> 8.0.0-rc.30                 │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+
+✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 46ms
+
+✔ Generated Prisma Client (7.10.1) to ./generated/prisma-client in 24ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+
+
+ RUN  v4.1.12 /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-7
+
+
+ Test Files  17 passed (17)
+      Tests  167 passed (167)
+   Start at  07:00:38
+   Duration  3.44s (transform 1.41s, setup 0ms, import 2.34s, tests 4.86s, environment 1ms)
+
+exit=0
+
+$ npx vitest run --reporter=verbose src/tests/sqlite-driver-unavailable.test.ts src/tests/prisma-client-generator/registration-recovery.test.ts
+ ✓ src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > recognizes the bindings "not found" error 1ms
+ ✓ src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > recognizes an ERR_DLOPEN_FAILED error 0ms
+ ✓ src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > recognizes a bindings error as a cause 0ms
+ ✓ src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > recognizes an ERR_DLOPEN_FAILED error four causes deep 0ms
+ ✓ src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > recognizes a plain object with the code 0ms
+ ✓ src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > does not recognize an unrelated error 0ms
+ ✓ src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > does not recognize an error with another code 0ms
+ ✓ src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > does not recognize the bindings text not at the start 0ms
+ ✓ src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > does not recognize a driver error deeper than the inspected chain 0ms
+ ✓ src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > does not recognize a string 0ms
+ ✓ src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > does not recognize undefined 0ms
+ ✓ src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > does not recognize null 0ms
+ ✓ src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > does not recognize a number 0ms
+ ✓ src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > stops on a cause cycle 0ms
+ ✓ src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > never throws, even when reading the error throws 0ms
+ ✓ src/tests/sqlite-driver-unavailable.test.ts > PrismaClientLifecycle when the SQLite driver cannot load (AC-001) > rejects (a) the bindings "not found" error with SQLITE_DRIVER_UNAVAILABLE and a path-free message 4ms
+ ✓ src/tests/sqlite-driver-unavailable.test.ts > PrismaClientLifecycle when the SQLite driver cannot load (AC-001) > rejects (b) an ERR_DLOPEN_FAILED error with SQLITE_DRIVER_UNAVAILABLE and a path-free message 1ms
+ ✓ src/tests/sqlite-driver-unavailable.test.ts > PrismaClientLifecycle when the SQLite driver cannot load (AC-001) > rejects (c) a bindings error as a cause with SQLITE_DRIVER_UNAVAILABLE and a path-free message 2ms
+ ✓ src/tests/sqlite-driver-unavailable.test.ts > PrismaClientLifecycle when the SQLite driver cannot load (AC-001) > rejects (c) an ERR_DLOPEN_FAILED error as a cause with SQLITE_DRIVER_UNAVAILABLE and a path-free message 2ms
+ ✓ src/tests/sqlite-driver-unavailable.test.ts > PrismaClientLifecycle when the SQLite driver cannot load (AC-001) > (d) keeps CONNECTION_FAILED for any other connect failure 1ms
+ ✓ src/tests/prisma-client-generator/registration-recovery.test.ts > recovering from a failed start with the registered client > registers after initializePrisma failed for a missing client, without shutdownPrisma (AC-009, REQ-006) 66ms
+ ✓ src/tests/prisma-client-generator/registration-recovery.test.ts > recovering from a failed start with the registered client > accepts a different client after initializePrisma failed to connect, without shutdownPrisma (AC-010, REQ-006) 9ms
+ ✓ src/tests/prisma-client-generator/registration-recovery.test.ts > recovering from a failed start with the registered client > accepts a different client after the first lazy use failed, and binds it on initializePrisma (AC-010, REQ-006) 5ms
+      Tests  23 passed (23)

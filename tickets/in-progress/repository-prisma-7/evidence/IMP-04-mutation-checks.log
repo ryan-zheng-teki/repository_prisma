@@ -1,0 +1,39 @@
+# Check: IMP-04 (mutation checks for AC-001)
+# Command: (a) isSqliteDriverLoadFailure always returns false; (b) always returns true. sed inserts 'return false;' / 'return true;' as the first statement of the function; run the new suite and the real missing-directory case; git checkout -- src/lib/client/sqlite-driver-adapter.ts
+# Commit: bcf2be0 (working tree only, restored)
+# Environment: macOS 26.5.2, Node v22.23.1
+# Date: 2026-11-05T06:01Z
+
+## mutation: always false
+42:export const isSqliteDriverLoadFailure = (error: unknown): boolean => { return false;
+ × src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > recognizes the bindings "not found" error 4ms
+ × src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > recognizes an ERR_DLOPEN_FAILED error 0ms
+ × src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > recognizes a bindings error as a cause 0ms
+ × src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > recognizes an ERR_DLOPEN_FAILED error four causes deep 0ms
+ × src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > recognizes a plain object with the code 0ms
+ × src/tests/sqlite-driver-unavailable.test.ts > PrismaClientLifecycle when the SQLite driver cannot load (AC-001) > rejects (a) the bindings "not found" error with SQLITE_DRIVER_UNAVAILABLE and a path-free message 6ms
+ × src/tests/sqlite-driver-unavailable.test.ts > PrismaClientLifecycle when the SQLite driver cannot load (AC-001) > rejects (b) an ERR_DLOPEN_FAILED error with SQLITE_DRIVER_UNAVAILABLE and a path-free message 1ms
+ × src/tests/sqlite-driver-unavailable.test.ts > PrismaClientLifecycle when the SQLite driver cannot load (AC-001) > rejects (c) a bindings error as a cause with SQLITE_DRIVER_UNAVAILABLE and a path-free message 2ms
+ × src/tests/sqlite-driver-unavailable.test.ts > PrismaClientLifecycle when the SQLite driver cannot load (AC-001) > rejects (c) an ERR_DLOPEN_FAILED error as a cause with SQLITE_DRIVER_UNAVAILABLE and a path-free message 1ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  9 failed | 14 passed (23)
+
+## mutation: always true
+42:export const isSqliteDriverLoadFailure = (error: unknown): boolean => { return true;
+ × src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > does not recognize an unrelated error 4ms
+ × src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > does not recognize an error with another code 0ms
+ × src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > does not recognize the bindings text not at the start 0ms
+ × src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > does not recognize a driver error deeper than the inspected chain 1ms
+ × src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > does not recognize a string 1ms
+ × src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > does not recognize undefined 0ms
+ × src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > does not recognize null 0ms
+ × src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > does not recognize a number 0ms
+ × src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > stops on a cause cycle 0ms
+ × src/tests/sqlite-driver-unavailable.test.ts > isSqliteDriverLoadFailure > never throws, even when reading the error throws 0ms
+ × src/tests/sqlite-driver-unavailable.test.ts > PrismaClientLifecycle when the SQLite driver cannot load (AC-001) > (d) keeps CONNECTION_FAILED for any other connect failure 2ms
+ × src/tests/prisma-client-generator/registration-recovery.test.ts > recovering from a failed start with the registered client > accepts a different client after initializePrisma failed to connect, without shutdownPrisma (AC-010, REQ-006) 8ms
+⎯⎯⎯⎯⎯⎯ Failed Tests 12 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  12 failed | 11 passed (23)
+
+## restored
+working tree restored: src/lib/client/sqlite-driver-adapter.ts unchanged from bcf2be0

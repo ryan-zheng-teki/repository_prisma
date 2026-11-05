@@ -1,0 +1,1 @@
+{ "compilerOptions": { "target": "ES2022", "module": "NodeNext", "moduleResolution": "NodeNext", "outDir": "reg-out", "rootDir": "reg-generated", "skipLibCheck": true, "declaration": false }, "include": ["reg-generated/**/*.ts"] }

@@ -1,0 +1,12 @@
+# Check: IMP-01
+# Command: npm run typecheck
+# Commit: bcf2be0 (worktree /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-7)
+# Environment: macOS 26.5.2 arm64, Node v22.23.1, npm 10.9.8, uid 501
+# Date: 2026-11-05T06:00Z
+
+
+> repository_prisma@2.0.0 typecheck
+> tsc -p tsconfig.json && tsc -p tsconfig.prisma-client-generator.json && node scripts/check-typecheck-programs.js
+
+{"result":"pass","registeredProgramFiles":{"examples/prisma-client-generator":2,"src/tests/prisma-client-generator":2}}
+exit=0
