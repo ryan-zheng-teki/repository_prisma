@@ -96,31 +96,42 @@ None (version `2.0.0`, no tag).
 
 - Bootstrap context source: `handoff.md` (finalization target `origin/main`)
 - Ticket branch: `codex/repository-prisma-3-prisma-client-generator`
-- Ticket branch commit result: see Finalization Record
-- Ticket branch push result: see Finalization Record
+- Ticket branch commit result: `Completed`: archive commit `c7bb033` on top of `2222ebb`
+- Ticket branch push result: `Completed`: new remote branch `origin/codex/repository-prisma-3-prisma-client-generator` = `c7bb033`
 - Finalization target remote: `origin`
 - Finalization target branch: `main`
-- Target advanced after verification / acceptance: see Finalization Record
-- Delivery-owned edits protected before re-integration: see Finalization Record
-- Re-integration before final merge result: see Finalization Record
-- Target branch update result: see Finalization Record
-- Merge into target result: see Finalization Record
-- Push target branch result: see Finalization Record
-- Repository finalization status: see Finalization Record
+- Target advanced after verification / acceptance: `No` (`origin/main` = `0a4e824` when fetched before the merge)
+- Delivery-owned edits protected before re-integration: `Not needed`
+- Re-integration before final merge result: `Not needed`
+- Target branch update result: `Completed`
+- Merge into target result: `Completed`: fast-forward `0a4e824..c7bb033` in the shared checkout
+- Push target branch result: `Completed`: `0a4e824..c7bb033  main -> main`
+- Repository finalization status: `Completed`
 - Blocker (if applicable): None
+
+### Finalization Record
+
+- Post-merge CI: run `41973567839` on `main@c7bb033`, `completed success`, https://github.com/ryan-zheng-teki/repository_prisma/actions/runs/41973567839. Log: `evidence/DE-03-ci-main-c7bb033.log`.
+  - Toolchain: Node v24.22.2.
+  - Every step succeeded: `npm ci --strict-allow-scripts` (both clients generated), typecheck (`registeredProgramFiles` 2/2), `npm test` 147/147, and build.
+- Cleanup:
+  - `git worktree remove /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3`. The worktree was clean, and its HEAD `c7bb033` matched the remote branch.
+  - `git worktree prune`; `git branch -d codex/repository-prisma-3-prisma-client-generator`.
+  - Other worktrees (`repository-prisma-esm-cjs-interop`, `personal/repository_prisma`) were left untouched.
+- This record and DE-03 are committed directly on `main`, staging only this ticket folder. The user's untracked `pnpm-lock.yaml` and `.claude/` are untouched.
 - Cross-OS file names: delivery checked every tracked and to-be-committed path. No Windows-reserved characters or names, no trailing dot or space, and no names that collide when case is ignored. The longest path is 114 characters.
 
 ## Release / Publication / Deployment
 
 - Applicable: `No`
 - Release/publication/deployment result: `Not required`
-- Pipelines triggered and their results: `ci.yml` on the push to `main` (see Finalization Record). No tag, so `release.yml` does not run.
+- Pipelines triggered and their results: `ci.yml` run `41973567839` on `c7bb033`: success. No tag, so `release.yml` did not run.
 - Release notes handoff result: `Not required`
 
 ## Post-Finalization Cleanup
 
 - Dedicated ticket worktree path: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3`
-- Worktree cleanup, prune, local branch cleanup: see Finalization Record
+- Worktree cleanup, prune, local branch cleanup: `Completed`
 - Remote branch cleanup result: `Not required` (the remote ticket branch is kept, as for earlier tickets)
 
 ## Escalation / Reroute (Use Only If Final Handoff Cannot Complete)
@@ -142,7 +153,7 @@ None. The repository deploys no service; users receive changes through an npm re
 
 ## Verification Checks
 
-DE-01, DE-02 and API-01..API-14; the post-merge CI run is in the Finalization Record.
+DE-01, DE-02 and API-01..API-14; DE-03 is the post-merge CI run (Finalization Record).
 
 ## Rollback Criteria
 
@@ -152,10 +163,10 @@ DE-01, DE-02 and API-01..API-14; the post-merge CI run is in the Finalization Re
 ## Final Status
 
 - Verification complete (from the evidence, or the user's check where needed): `Yes`
-- Repository finalization complete: see Finalization Record
+- Repository finalization complete: `Yes` (post-merge CI green)
 - Applicable release/deployment/rollout complete or not required: `Yes` (not required)
-- Applicable safe cleanup complete or not required: see Finalization Record
+- Applicable safe cleanup complete or not required: `Yes`
 - Unresolved blocker: `None`
-- Successful terminal package eligible for return: see Finalization Record
-- Terminal package sent to the Solution Designer: see Finalization Record
-- Terminal message/reference: see Finalization Record
+- Successful terminal package eligible for return: `Yes`
+- Terminal package sent to the Solution Designer: `Yes`, after this record was pushed
+- Terminal message/reference: `Delivery Completed`, 2026-11-05, to the address from `get_handoff_rules`

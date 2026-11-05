@@ -2,7 +2,7 @@
 
 ## Status
 
-Verified from evidence. Finalization into `origin/main` is recorded in `release-deployment-report.md`. No release, tag or version bump (DEC-007): the version stays `2.0.0` and the CHANGELOG entry is under `## Unreleased`.
+Verified from evidence and fast-forwarded into `main` (`0a4e824..c7bb033`, pushed). Post-merge CI run `41973567839` passed (147/147, both typecheck programs). Cleanup is done. No release, tag or version bump (DEC-007): the version stays `2.0.0` and the CHANGELOG entry is under `## Unreleased`.
 
 ## Classification And Route
 
@@ -17,7 +17,7 @@ Verified from evidence. Finalization into `origin/main` is recorded in `release-
 - Repository: `/Users/normy/autobyteus_org/repository_prisma`
 - Ticket worktree (removed after finalization): `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-3`
 - Branch: `codex/repository-prisma-3-prisma-client-generator`; base `origin/main@0a4e824`
-- Code: `c97eab8`. Ticket documents: `a330e2b`, `7ee3746`. API/E2E durable tests: `6c950bd`. API/E2E reports and evidence: `2222ebb`. CRR-002 and delivery documents: the archive commit.
+- Code: `c97eab8`. Ticket documents: `a330e2b`, `7ee3746`. API/E2E durable tests: `6c950bd`. API/E2E reports and evidence: `2222ebb`. CRR-002 and delivery documents: archive commit `c7bb033`; the finalization record follows it on `main`.
 - Finalization target: `origin/main` (fast-forward)
 
 ## What Changed
@@ -63,4 +63,4 @@ None. There is no `follow-ups.md`.
 ## Artifact Package (archived)
 
 - Folder: `/Users/normy/autobyteus_org/repository_prisma/tickets/done/prisma-client-generator/`.
-- It holds the requirements, investigation, design, solution history and probes; the architecture review; the implementation handoff and record; the code reviews (CRR-001, CRR-002); the API/E2E documents; the delivery documents; and `evidence/` (IMP-*, API-*, DE-*).
+- It holds the requirements, investigation, design, solution history and probes; the architecture review; the implementation handoff and record; the code reviews (CRR-001, CRR-002); the API/E2E documents; the delivery documents; and `evidence/` (IMP-*, API-*, DE-01..DE-03).
