@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- New initialization code `SQLITE_DRIVER_UNAVAILABLE`: `initializePrisma` reports it when
+  `better-sqlite3` cannot load its native module (not built, for example when npm 12+ or pnpm
+  blocked its install script, or built for another Node.js version). Its message points to the
+  README's "Allow the native SQLite build" step and contains no path; `onDiagnostic` gets the
+  driver's error. Other connection failures stay `CONNECTION_FAILED`. With lazy binding, the first
+  query still throws the driver's own error.
+- README: the install lines pin the major (`repository_prisma@2`), so pnpm 11+ installs it even
+  while the newest release is younger than pnpm's minimum release age, instead of silently
+  installing the previous major. The release guide reminds maintainers to update the pin on a
+  major release.
 - Support for Prisma 7's `prisma-client` generator (ESM and `moduleFormat = "cjs"` clients):
   register the generated client module once with the new `registerPrismaClient()` and declare
   its types in the new `PrismaClientRegistry` interface; every runtime feature and public type

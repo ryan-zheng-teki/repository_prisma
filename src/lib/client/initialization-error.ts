@@ -3,6 +3,7 @@ export type PrismaInitializationErrorCode =
   | 'UNSUPPORTED_DATASOURCE_PROVIDER'
   | 'DATASOURCE_CONFLICT'
   | 'CONNECTION_FAILED'
+  | 'SQLITE_DRIVER_UNAVAILABLE'
   | 'DATABASE_IDENTITY_MISMATCH'
   | 'WAL_UNSUPPORTED_PROVIDER'
   | 'WAL_ACTIVATION_FAILED'
@@ -34,6 +35,10 @@ const SAFE_ERROR_MESSAGES: Record<PrismaInitializationErrorCode, string> = {
     'repository_prisma supports SQLite datasources only; use a file: URL.',
   DATASOURCE_CONFLICT: 'The Prisma client is already bound to another datasource.',
   CONNECTION_FAILED: 'The Prisma client could not connect to its datasource.',
+  SQLITE_DRIVER_UNAVAILABLE:
+    'The SQLite driver (better-sqlite3) could not load its native module. Allow its build or ' +
+    'rebuild it for this Node.js version; see "Allow the native SQLite build" in the ' +
+    'repository_prisma README.',
   DATABASE_IDENTITY_MISMATCH: 'The connected SQLite database identity could not be verified.',
   WAL_UNSUPPORTED_PROVIDER: 'Strict WAL readiness requires a physical SQLite datasource.',
   WAL_ACTIVATION_FAILED: 'SQLite WAL mode could not be activated.',

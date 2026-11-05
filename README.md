@@ -15,7 +15,7 @@ It solves the common problem of "Prop-Drilling" transaction objects (`tx`) throu
 Install the library and the Prisma CLI:
 
 ```bash
-npm install repository_prisma
+npm install repository_prisma@2
 npm install -D prisma@7
 ```
 
@@ -23,17 +23,25 @@ npm 7+ installs the peers `@prisma/client` and `@prisma/adapter-better-sqlite3` 
 With pnpm, also add `@prisma/client` directly, or `prisma generate` cannot find it:
 
 ```bash
-pnpm add repository_prisma @prisma/client@7
+pnpm add repository_prisma@2 @prisma/client@7
 pnpm add -D prisma@7
 ```
+
+Keep the major (`@2`) in the install line. pnpm 11+ does not install versions younger than its
+minimum release age (about a day). With the major pinned, pnpm still installs that major and
+records a `minimumReleaseAgeExclude` entry in `pnpm-workspace.yaml`; without it, pnpm would
+silently install the previous major.
 
 With Yarn or `--legacy-peer-deps`, add the peers yourself:
 `npm install @prisma/client@7 @prisma/adapter-better-sqlite3@7`.
 
-Allow the native SQLite build. npm 12+ and pnpm 10+ do not run dependencies' install scripts by
-default, so `better-sqlite3` is installed without its native module. `initializePrisma` then
-rejects with `CONNECTION_FAILED`, and the `onDiagnostic` cause says "Could not locate the bindings
-file". Allow it once in your project:
+### Allow the native SQLite build
+
+npm 12+ and pnpm 10+ do not run dependencies' install scripts by default, so `better-sqlite3` is
+installed without its native module. `initializePrisma` then rejects with
+`SQLITE_DRIVER_UNAVAILABLE`, and the `onDiagnostic` cause says "Could not locate the bindings
+file". Without `initializePrisma` (lazy binding), the first query throws that driver error itself.
+Allow the build once in your project:
 
 - npm 12+: `npm install-scripts approve better-sqlite3`, then `npm rebuild better-sqlite3`.
 - pnpm 11+: `pnpm approve-builds better-sqlite3`. (`pnpm add` may stop with
@@ -44,6 +52,12 @@ file". Allow it once in your project:
   onlyBuiltDependencies:
     - better-sqlite3
   ```
+
+The same code is reported when the native module was built for a different Node.js version (the
+driver's error says it "was compiled against a different Node.js version"). Rebuild it for the
+Node.js you run: `npm rebuild better-sqlite3`. For Electron, rebuild it against Electron's Node.js.
+
+### Schema, configuration and client
 
 With the `prisma-client-js` generator, leave the URL out of the schema (on Prisma 7's
 `prisma-client` generator, see [Using the prisma-client generator](#using-the-prisma-client-generator)):
@@ -379,6 +393,10 @@ Available codes are:
 - `UNSUPPORTED_DATASOURCE_PROVIDER`
 - `DATASOURCE_CONFLICT`
 - `CONNECTION_FAILED`
+- `SQLITE_DRIVER_UNAVAILABLE`: `better-sqlite3` could not load its native module (it was not
+  built, or was built for another Node.js version); see
+  [Allow the native SQLite build](#allow-the-native-sqlite-build). Only `initializePrisma`
+  reports it; with lazy binding, the first query throws the driver's own error.
 - `DATABASE_IDENTITY_MISMATCH`
 - `WAL_UNSUPPORTED_PROVIDER`
 - `WAL_ACTIVATION_FAILED`
@@ -499,6 +517,8 @@ uncovered or stale approval fails the install. After upgrading `better-sqlite3`,
 We use a tag-based release flow. Releases are finalized on `main`: the release commit (the
 `version` in `package.json` and `package-lock.json`, plus its `CHANGELOG.md` section) lands on
 `main`, and the tag points to that commit. The tag must match the `version` in `package.json`.
+For a major release, the release commit also updates the pinned major in the README install lines
+(`repository_prisma@2`).
 
 Before tagging, on the release commit, in order:
 

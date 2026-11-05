@@ -107,6 +107,7 @@ const checkPackedArtifact = (context) => {
       ['interface PrismaClientRegistry', 'the PrismaClientRegistry type registry'],
       ["'PRISMA_CLIENT_UNAVAILABLE'", 'the missing-client code'],
       ["'PRISMA_CLIENT_CONFLICT'", 'the client-conflict code'],
+      ["'SQLITE_DRIVER_UNAVAILABLE'", 'the SQLite driver code'],
       // Public values keep the registry alias; an inlined client type would ignore the registry.
       ['declare const prisma: RegisteredPrismaClient', 'prisma typed by the registry'],
       ['declare const rootPrismaClient: RegisteredPrismaClient', 'rootPrismaClient typed by the registry'],

@@ -136,6 +136,16 @@ The related internal files remain subordinate to this owner:
   and ordering miss rows written by Prisma 5, so existing databases stay directly usable without a
   migration. The adapter does not know lifecycle state. It wraps the adapter in the
   connection gate.
+- The same file owns the driver's failure shapes: `isSqliteDriverLoadFailure` recognizes that
+  better-sqlite3 could not load its native module, from the `bindings` message "Could not locate
+  the bindings file" (no module built) or Node's `ERR_DLOPEN_FAILED` (built for another Node.js
+  version), on the error or in its `cause` chain (bounded and cycle-safe; it never throws). The
+  lifecycle asks it in the `$connect()` catch: such a failure is `SQLITE_DRIVER_UNAVAILABLE`, any
+  other stays `CONNECTION_FAILED`. If a driver version changes these shapes, the result falls back
+  to `CONNECTION_FAILED`. The lazy path is unchanged: Prisma rewraps coded errors thrown from the
+  adapter, so lazy callers get the driver's own error. The `SQLITE_DRIVER_UNAVAILABLE` message
+  cites the README heading "Allow the native SQLite build"; renaming that heading needs a message
+  update.
 - `client/sqlite-connection-gate.ts` keeps transactions isolated on the adapter's single
   connection. The better-sqlite3 adapter runs every operation of a client on one connection,
   and only its transactions take the adapter's own lock. Without the gate, a plain query from

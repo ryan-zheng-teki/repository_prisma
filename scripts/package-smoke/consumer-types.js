@@ -33,6 +33,7 @@ const queryOptions: InitializePrismaOptions = { logQueries: true };
 const conflictCode: PrismaInitializationErrorCode = 'LOGGING_POLICY_CONFLICT';
 const unsupportedCode: PrismaInitializationErrorCode = 'UNSUPPORTED_DATASOURCE_PROVIDER';
 const clientCodes: PrismaInitializationErrorCode[] = ['PRISMA_CLIENT_UNAVAILABLE', 'PRISMA_CLIENT_CONFLICT'];
+const driverCode: PrismaInitializationErrorCode = 'SQLITE_DRIVER_UNAVAILABLE';
 const transactionOptions: RunInTransactionOptions = {
   maxWait: 2_000,
   timeout: 10_000,
@@ -52,6 +53,7 @@ void invalidTransactionOptions;
 void invalidWait;
 void conflictCode;
 void unsupportedCode;
+void driverCode;
 void clientCodes;
 void diagnostic;
 void PrismaInitializationError;

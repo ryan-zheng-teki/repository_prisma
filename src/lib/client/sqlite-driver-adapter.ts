@@ -26,3 +26,45 @@ export const createSqliteDriverAdapter = (
       { timestampFormat: 'unixepoch-ms' }
     )
   );
+
+/** The message prefix of the `bindings` loader when better-sqlite3's native module is missing. */
+const BINDINGS_NOT_FOUND = 'Could not locate the bindings file';
+/** How many errors of a `cause` chain are inspected: the error and up to four causes. */
+const MAX_INSPECTED_ERRORS = 5;
+
+/**
+ * Whether an error from opening the SQLite connection means that better-sqlite3 could not
+ * load its native module: the `bindings` loader found no built module, or Node could not
+ * load it (`ERR_DLOPEN_FAILED`, for example a module built for another Node.js version).
+ * The error and its `cause` chain are inspected. Any other error, including one whose shape
+ * a future driver version changes, is not a driver-load failure. Never throws.
+ */
+export const isSqliteDriverLoadFailure = (error: unknown): boolean => {
+  const inspected = new Set<object>();
+  let current = error;
+  while (
+    typeof current === 'object' &&
+    current !== null &&
+    !inspected.has(current) &&
+    inspected.size < MAX_INSPECTED_ERRORS
+  ) {
+    inspected.add(current);
+    try {
+      const { code, message, cause } = current as {
+        code?: unknown;
+        message?: unknown;
+        cause?: unknown;
+      };
+      if (code === 'ERR_DLOPEN_FAILED') {
+        return true;
+      }
+      if (typeof message === 'string' && message.startsWith(BINDINGS_NOT_FOUND)) {
+        return true;
+      }
+      current = cause;
+    } catch {
+      return false;
+    }
+  }
+  return false;
+};

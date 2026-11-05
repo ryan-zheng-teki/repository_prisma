@@ -19,7 +19,7 @@ import {
   verifySqliteIdentity,
   verifySqliteWal,
 } from './sqlite-readiness';
-import { createSqliteDriverAdapter } from './sqlite-driver-adapter';
+import { createSqliteDriverAdapter, isSqliteDriverLoadFailure } from './sqlite-driver-adapter';
 import { queryLogLevels, resolveQueryLoggingPolicy } from './logging-policy';
 
 type IdleState = { kind: 'idle' };
@@ -337,7 +337,10 @@ export class PrismaClientLifecycle {
       try {
         await request.client.$connect();
       } catch (error) {
-        throw new InitializationStageFailure('CONNECTION_FAILED', error);
+        throw new InitializationStageFailure(
+          isSqliteDriverLoadFailure(error) ? 'SQLITE_DRIVER_UNAVAILABLE' : 'CONNECTION_FAILED',
+          error
+        );
       }
 
       if (request.target.kind === 'sqlite-file') {
