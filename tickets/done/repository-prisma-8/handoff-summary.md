@@ -2,7 +2,7 @@
 
 ## Status
 
-Verified from evidence and merged into `main`. No release, tag or version bump (version stays `2.1.0`). The post-merge CI result (AC-A2) and cleanup are in `release-deployment-report.md` § Finalization Record. Part B (application-supplied driver adapter) waits for the user's DEC-B1 and is not included.
+Verified from evidence and merged into `main` (`4a2f312..2371455`, pushed). Post-merge CI run `41991159003` passed with `actions/setup-node@v6` (AC-A2). Cleanup is done. No release, tag or version bump (version stays `2.1.0`). Part B (application-supplied driver adapter) waits for the user's DEC-B1 and is not included.
 
 ## Classification And Route
 
@@ -55,4 +55,4 @@ None new.
 
 ## Artifact Package (archived)
 
-Folder: `/Users/normy/autobyteus_org/repository_prisma/tickets/done/repository-prisma-8/`. It holds requirements, investigation, design, solution history, probes, the implementation handoff and record, the API/E2E documents, the delivery documents and `evidence/` (IMP-*, API-*, DE-*).
+Folder: `/Users/normy/autobyteus_org/repository_prisma/tickets/done/repository-prisma-8/`. It holds requirements, investigation, design, solution history, probes, the implementation handoff and record, the API/E2E documents, the delivery documents and `evidence/` (IMP-*, API-*, DE-02).

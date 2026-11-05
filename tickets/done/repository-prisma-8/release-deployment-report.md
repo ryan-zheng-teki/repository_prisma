@@ -50,7 +50,7 @@ Repository finalization only (fast-forward `main`, push). No release, tag or ver
 | Acceptance-Criteria ID | Cases And Files Checked | What You Saw | Judgement (`Proven`/`Not Proven`/`User Check`) |
 | --- | --- | --- | --- |
 | AC-A1 | API-03, API-02, IMP-02 | v6 `.npmrc`: `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}` and `registry=https://registry.npmjs.org/` only. Every release step reports `always-auth warnings: 0` through `Publishing to https://registry.npmjs.org/ ... (dry-run)`, with npm 11.21.2. v5 control: same two lines plus `always-auth=false`, with warnings 1,1,1,1,2. actionlint `Found 0 errors in 2 files`. | Proven |
-| AC-A2 | API-02, IMP-03; post-merge CI run | Both workflows use `setup-node@v6`; v6 runs on node24 with the needed inputs; no `packageManager`/`devEngines`, so caching is unchanged. Post-merge: see Finalization Record | Proven up to the merge; the post-merge run is in the Finalization Record |
+| AC-A2 | API-02, IMP-03; post-merge CI run | Both workflows use `setup-node@v6`; v6 runs on node24 with the needed inputs; no `packageManager`/`devEngines`, so caching is unchanged. Post-merge run `41991159003`: `Run actions/setup-node@v6: success` (SHA `2499707`), Node v24.22.2, 167/167, job success | Proven |
 | AC-A3 | API-04, API-04b, API-05 | `npm_config_cache_dir`: 0 files written (ignored); `pnpm_config_cache_dir` and `--cache-dir`: 2 files; `pnpm cache view` shows the stale cache (`cachedAt` 06:15Z, `latest 2.0.0`) vs an empty cache listing 2.1.0. TESTING.md text matches. | Proven |
 | AC-A4 | API-07, this report | Recorded: the OIDC `npm publish --provenance` under setup-node v6 is unproven until the next real release (token lines identical to v5, which published 2.1.0 with provenance) | Recorded |
 
@@ -84,34 +84,40 @@ None (version `2.1.0`).
 
 - Bootstrap context source: `handoff.md` (finalization target `origin/main`)
 - Ticket branch: `codex/repository-prisma-8`
-- Ticket branch commit result: see Finalization Record
-- Ticket branch push result: see Finalization Record
+- Ticket branch commit result: `Completed`: archive commit `2371455` on top of `6465d44`
+- Ticket branch push result: `Completed`: new remote branch `origin/codex/repository-prisma-8` = `2371455`
 - Finalization target remote: `origin`
 - Finalization target branch: `main`
-- Target advanced after verification / acceptance: see Finalization Record
+- Target advanced after verification / acceptance: `No` (`origin/main` = `4a2f312` when fetched before the merge)
 - Delivery-owned edits protected before re-integration: `Not needed`
-- Re-integration before final merge result: see Finalization Record
-- Target branch update result: see Finalization Record
-- Merge into target result: see Finalization Record
-- Push target branch result: see Finalization Record
-- Repository finalization status: see Finalization Record
-- Blocker (if applicable): see Finalization Record
+- Re-integration before final merge result: `Not needed`
+- Target branch update result: `Completed`
+- Merge into target result: `Completed`: fast-forward `4a2f312..2371455` in the shared checkout
+- Push target branch result: `Completed`: `4a2f312..2371455  main -> main`
+- Repository finalization status: `Completed`
+- Blocker (if applicable): None
 
 ### Finalization Record
 
-(Filled in after the merge, the post-merge CI check and cleanup.)
+- Post-merge CI (AC-A2, API-06 handed to delivery): run `41991159003` on `main@2371455`, `completed success`, https://github.com/ryan-zheng-teki/repository_prisma/actions/runs/41991159003. Log: `evidence/DE-02-ci-main-2371455.log`.
+  - Step `Run actions/setup-node@v6`: success. The runner downloaded `actions/setup-node@v6 (SHA:249970729cb0…)`, the commit API-03 executed.
+  - `node-version: 24`, `node: v24.22.2`, `npm: 11.19.1`.
+  - `npm ci --strict-allow-scripts`, typecheck, `Tests 167 passed (167)` and build all succeeded.
+  - 0 `always-auth` lines and 0 install-script warnings.
+- Cleanup: `git worktree remove /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-8` (clean, HEAD `2371455` = remote branch); `git worktree prune`; `git branch -d codex/repository-prisma-8`.
+- This record and DE-02 are committed directly on `main`, staging only this ticket folder. The user's untracked `pnpm-lock.yaml` and `.claude/` are untouched.
 
 ## Release / Publication / Deployment
 
 - Applicable: `No`
 - Release/publication/deployment result: `Not required`
-- Pipelines triggered and their results: the `main` push triggers `ci.yml` only (see Finalization Record)
+- Pipelines triggered and their results: `ci.yml` run `41991159003` on `2371455`: success. No tag, so `release.yml` did not run.
 - Release notes handoff result: `Not required`
 
 ## Post-Finalization Cleanup
 
 - Dedicated ticket worktree path: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-8`
-- Worktree cleanup, prune, local branch cleanup: see Finalization Record
+- Worktree cleanup, prune, local branch cleanup: `Completed`
 - Remote branch cleanup result: `Not required` (remote ticket branch kept, as for earlier tickets)
 
 ## Escalation / Reroute (Use Only If Final Handoff Cannot Complete)
@@ -142,11 +148,11 @@ API-02..05, IMP-03; the post-merge CI run is in the Finalization Record.
 
 ## Final Status
 
-- Verification complete (from the evidence, or the user's check where needed): see Finalization Record (AC-A2 post-merge)
-- Repository finalization complete: see Finalization Record
+- Verification complete (from the evidence, or the user's check where needed): `Yes` (AC-A2 confirmed on the post-merge run; AC-A4 recorded as unproven until the next release)
+- Repository finalization complete: `Yes`
 - Applicable release/deployment/rollout complete or not required: `Yes` (not required)
-- Applicable safe cleanup complete or not required: see Finalization Record
-- Unresolved blocker: see Finalization Record
-- Successful terminal package eligible for return: see Finalization Record
-- Terminal package sent to the Solution Designer: see Finalization Record
-- Terminal message/reference: see Finalization Record
+- Applicable safe cleanup complete or not required: `Yes`
+- Unresolved blocker: `None`
+- Successful terminal package eligible for return: `Yes`
+- Terminal package sent to the Solution Designer: `Yes`, after this record was pushed
+- Terminal message/reference: `Delivery Completed` (Part A), 2026-11-05, to the address from `get_handoff_rules`
