@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.1.1
 
 - Repository: CI and the release workflow use `actions/setup-node@v6`, so npm no longer warns
   about the unknown `always-auth` config during releases.
