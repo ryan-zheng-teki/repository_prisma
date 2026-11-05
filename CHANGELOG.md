@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Repository: CI and the release workflow use `actions/setup-node@v6`, so npm no longer warns
+  about the unknown `always-auth` config during releases.
+
 ## 2.1.0
 
 - New initialization code `SQLITE_DRIVER_UNAVAILABLE`: `initializePrisma` reports it when

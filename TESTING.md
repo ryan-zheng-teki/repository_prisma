@@ -76,6 +76,12 @@ There are no gated suites: no layer needs a service, key or account.
   - pnpm 11+ does not resolve versions younger than its minimum release age
     (about a day). To test a just-published release, add a test-only
     `minimumReleaseAgeExclude` entry in the consumer's `pnpm-workspace.yaml`.
+  - pnpm also caches registry metadata and resolves from it, so a cache from
+    before the release does not list the new version, even with that entry.
+    To test a just-published version, also use an empty cache
+    (`pnpm_config_cache_dir=<tmp dir>` or `--cache-dir <tmp dir>`; pnpm 11 and
+    12 ignore `npm_config_cache_dir`), or check that `pnpm cache view <pkg>`
+    lists the version.
 
 ## Rules
 
