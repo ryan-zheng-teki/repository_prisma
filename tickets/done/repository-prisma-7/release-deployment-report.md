@@ -82,34 +82,40 @@ None in Part A (version `2.0.0`).
 
 - Bootstrap context source: `handoff.md` (finalization target `origin/main`)
 - Ticket branch: `codex/repository-prisma-7-driver-error-and-release`
-- Ticket branch commit result: see Finalization Record
-- Ticket branch push result: see Finalization Record
+- Ticket branch commit result: `Completed`: `87acf4a` (README FU-001 line + archive + delivery documents), on top of `a275b8e`
+- Ticket branch push result: `Completed`: new remote branch `origin/codex/repository-prisma-7-driver-error-and-release` = `87acf4a`
 - Finalization target remote: `origin`
 - Finalization target branch: `main`
-- Target advanced after verification / acceptance: see Finalization Record
+- Target advanced after verification / acceptance: `No` (`origin/main` = `32f003d` when fetched before the merge)
 - Delivery-owned edits protected before re-integration: `Not needed`
-- Re-integration before final merge result: see Finalization Record
-- Target branch update result: see Finalization Record
-- Merge into target result: see Finalization Record
-- Push target branch result: see Finalization Record
-- Repository finalization status: see Finalization Record
-- Blocker (if applicable): see Finalization Record
+- Re-integration before final merge result: `Not needed`
+- Target branch update result: `Completed`
+- Merge into target result: `Completed`: fast-forward `32f003d..87acf4a` in the shared checkout
+- Push target branch result: `Completed`: `32f003d..87acf4a  main -> main`
+- Repository finalization status: `Completed`
+- Blocker (if applicable): None
 
 ### Finalization Record
 
-(Filled in after the merge, the post-merge CI check and cleanup.)
+- Post-merge CI: run `41979919260` on `main@87acf4a`, `completed success`, https://github.com/ryan-zheng-teki/repository_prisma/actions/runs/41979919260. Log: `evidence/DE-02-ci-main-87acf4a.log`.
+  - Every step succeeded, including `Run npm ci --strict-allow-scripts`, with 0 install-script warnings.
+  - Toolchain: Node v24.22.1, npm 11.19.1.
+  - `Tests 167 passed (167)`.
+  - This green CI on `main` is Part B's precondition.
+- Cleanup: `git worktree remove /Users/normy/autobyteus_org/worktrees/codex/repository-prisma-7` (clean, HEAD `87acf4a` = remote branch); `git worktree prune`; `git branch -d codex/repository-prisma-7-driver-error-and-release`.
+- This record and DE-02 are committed directly on `main`, staging only this ticket folder. The user's untracked `pnpm-lock.yaml` and `.claude/` are untouched.
 
 ## Release / Publication / Deployment
 
 - Applicable: `No` (Part B)
 - Release/publication/deployment result: `Not required` in Part A
-- Pipelines triggered and their results: the `main` push triggers `ci.yml` only (see Finalization Record)
+- Pipelines triggered and their results: `ci.yml` run `41979919260` on `87acf4a`: success. No tag, so `release.yml` did not run.
 - Release notes handoff result: `Not required`
 
 ## Post-Finalization Cleanup
 
 - Dedicated ticket worktree path: `/Users/normy/autobyteus_org/worktrees/codex/repository-prisma-7`
-- Worktree cleanup, prune, local branch cleanup: see Finalization Record
+- Worktree cleanup, prune, local branch cleanup: `Completed`
 - Remote branch cleanup result: `Not required` (the remote ticket branch is kept, as for earlier tickets)
 
 ## Escalation / Reroute (Use Only If Final Handoff Cannot Complete)
@@ -140,10 +146,10 @@ DE-01; API-02..06; IMP-01..06; the post-merge CI run is in the Finalization Reco
 ## Final Status
 
 - Verification complete (from the evidence, or the user's check where needed): `Yes`
-- Repository finalization complete: see Finalization Record
+- Repository finalization complete: `Yes`
 - Applicable release/deployment/rollout complete or not required: `Yes` (not in Part A)
-- Applicable safe cleanup complete or not required: see Finalization Record
-- Unresolved blocker: see Finalization Record
-- Successful terminal package eligible for return: see Finalization Record
-- Terminal package sent to the Solution Designer: see Finalization Record
-- Terminal message/reference: see Finalization Record
+- Applicable safe cleanup complete or not required: `Yes`
+- Unresolved blocker: `None`
+- Successful terminal package eligible for return: `Yes`
+- Terminal package sent to the Solution Designer: `Yes`, after this record was pushed
+- Terminal message/reference: `Delivery Completed` (Part A), 2026-11-05, to the address from `get_handoff_rules`

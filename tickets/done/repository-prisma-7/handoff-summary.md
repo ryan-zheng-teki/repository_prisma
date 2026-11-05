@@ -2,7 +2,7 @@
 
 ## Status
 
-Verified from evidence and merged into `main`; no release in this step. The finalization and post-merge CI result are in `release-deployment-report.md` § Finalization Record. Part B, the release (recommended 2.1.0), is a separate `Release Requested` step: the Solution Designer re-confirms the version from the final CHANGELOG.
+Verified from evidence and merged into `main` (`32f003d..87acf4a`, pushed). Post-merge CI run `41979919260` passed (strict install, 167/167). Cleanup is done. No release in this step. Part B, the release (recommended 2.1.0), is a separate `Release Requested` step: the Solution Designer re-confirms the version from the final CHANGELOG.
 
 ## Classification And Route
 
