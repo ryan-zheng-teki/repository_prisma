@@ -1,0 +1,14 @@
+# Check: IMP-01 (REQ-A2 accuracy: which setting isolates pnpm's metadata cache)
+# Command: bash evidence/IMP-scripts/pnpm-cache-dir.sh /tmp/rp7/pnpm11-prefix/bin /tmp/rp6-pnpm12-prefix/bin
+# Commit: 4167580 (no repository code involved)
+# Environment: macOS 26.5.2 arm64, Node v22.23.1; pnpm 11.28.9 and 12.16.1 from temporary prefixes
+# Date: 2026-11-05T07:42Z
+
+pnpm 11.28.9 npm_config_cache_dir=<tmp>: files written to <tmp>: 0
+pnpm 11.28.9 pnpm_config_cache_dir=<tmp>: files written to <tmp>: 2
+pnpm 11.28.9 --cache-dir=<tmp>: files written to <tmp>: 2
+pnpm 11.28.9 pnpm cache view is-number (pnpm_config_cache_dir=<tmp>) lists 7.0.0: 2 line(s)
+pnpm 12.16.1 npm_config_cache_dir=<tmp>: files written to <tmp>: 0
+pnpm 12.16.1 pnpm_config_cache_dir=<tmp>: files written to <tmp>: 2
+pnpm 12.16.1 --cache-dir=<tmp>: files written to <tmp>: 2
+pnpm 12.16.1 pnpm cache view is-number (pnpm_config_cache_dir=<tmp>) lists 7.0.0: 2 line(s)

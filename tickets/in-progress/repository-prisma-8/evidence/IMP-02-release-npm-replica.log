@@ -1,0 +1,85 @@
+# Check: IMP-02 (AC-A1: replica of release.yml's npm steps with the .npmrc setup-node v6 writes, plus a v5-style control)
+# Command: git archive e44ea62 > src.tar; docker run --rm --platform linux/amd64 -e CI=true --user node -v <dir>:/in:ro node:24-bookworm bash /in/replica.sh (script: evidence/IMP-scripts/release-npm-steps-replica.sh)
+# Commit: e44ea62
+# Environment: Docker 29.0.1, linux/amd64 (emulated on macOS arm64), node:24-bookworm, user node (uid 1000), CI=true; dummy NODE_AUTH_TOKEN; publish is --dry-run only (never published)
+# Date: 2026-11-05T07:46Z
+# Notes: the throwaway version 2.1.1 is set only inside the container copy (npm 11 refuses a prerelease without --tag). hash -r after the npm upgrade mirrors the fresh shell of the next workflow step.
+
+--- actions/setup-node src/authutil.ts (gh api ... ?ref=v6 and ?ref=v5; v6 tag -> 249970729cb0ef3589644e2896645e5dc5ba9c38)
+@ v6
+38:        newContents += line + os.EOL;
+44:    registryUrl.replace(/(^\w+:|^)/, '') + ':_authToken=${NODE_AUTH_TOKEN}';
+45:  const registryString = `${scope}registry=${registryUrl}`;
+46:  newContents += `${authString}${os.EOL}${registryString}`;
+48:  core.exportVariable('NPM_CONFIG_USERCONFIG', fileLocation);
+52:    process.env.NODE_AUTH_TOKEN || 'XXXXX-XXXXX-XXXXX-XXXXX'
+@ v5
+7:export function configAuthentication(registryUrl: string, alwaysAuth: string) {
+16:  writeRegistryToFile(registryUrl, npmrc, alwaysAuth);
+22:  alwaysAuth: string
+42:        newContents += line + os.EOL;
+48:    registryUrl.replace(/(^\w+:|^)/, '') + ':_authToken=${NODE_AUTH_TOKEN}';
+49:  const registryString = `${scope}registry=${registryUrl}`;
+50:  const alwaysAuthString = `always-auth=${alwaysAuth}`;
+51:  newContents += `${authString}${os.EOL}${registryString}${os.EOL}${alwaysAuthString}`;
+53:  core.exportVariable('NPM_CONFIG_USERCONFIG', fileLocation);
+57:    process.env.NODE_AUTH_TOKEN || 'XXXXX-XXXXX-XXXXX-XXXXX'
+
+--- replica output
+## Linux x86_64, node v24.22.2, bundled npm 11.19.1, user node uid 1000, CI=true
+
+==== A. .npmrc as setup-node v6 writes it (no always-auth)
+--- job .npmrc (/tmp/npmrc-v6), as written for this case:
+//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}
+registry=https://registry.npmjs.org/
+$ npm --version; npm i -g npm@^11.5.1; npm --version  (the workflow step)
+exit=0
+npm after the upgrade: 11.21.2 (/home/node/.npm-global/bin/npm)
+$ npm ci
+exit=0
+$ npm run build
+exit=0
+$ npm version 2.1.1 --no-git-tag-version  (throwaway copy only; never published)
+exit=0
+$ npm publish --dry-run --provenance=false --access public
+exit=0
+npm notice name: repository_prisma
+npm notice version: 2.1.1
+npm notice total files: 10
+npm notice Publishing to https://registry.npmjs.org/ with tag latest and public access (dry-run)
++ repository_prisma@2.1.1
+--- always-auth warnings per step:
+  upgrade: 0
+  ci: 0
+  build: 0
+  version: 0
+  publish: 0
+
+==== B. control: .npmrc with always-auth=false (as setup-node v5 wrote it)
+--- job .npmrc (/tmp/npmrc-v5-control), as written for this case:
+//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}
+registry=https://registry.npmjs.org/
+always-auth=false
+$ npm --version; npm i -g npm@^11.5.1; npm --version  (the workflow step)
+exit=0
+npm after the upgrade: 11.21.2 (/home/node/.npm-global/bin/npm)
+$ npm ci
+exit=0
+$ npm run build
+exit=0
+$ npm version 2.1.1 --no-git-tag-version  (throwaway copy only; never published)
+exit=0
+$ npm publish --dry-run --provenance=false --access public
+exit=0
+npm notice name: repository_prisma
+npm notice version: 2.1.1
+npm notice total files: 10
+npm notice Publishing to https://registry.npmjs.org/ with tag latest and public access (dry-run)
++ repository_prisma@2.1.1
+--- always-auth warnings per step:
+  upgrade: 1
+  ci: 1
+  build: 1
+  version: 1
+  publish: 2
+npm warn Unknown user config "always-auth". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.

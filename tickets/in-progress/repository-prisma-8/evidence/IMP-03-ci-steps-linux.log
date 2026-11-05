@@ -1,0 +1,21 @@
+# Check: IMP-03 (ci.yml steps in a clean Linux x64 checkout as non-root, per TESTING.md)
+# Command: git archive e44ea62 > src.tar; docker run --rm --platform linux/amd64 -e CI=true --user node -v <dir>:/in:ro node:24-bookworm bash /in/ci-steps.sh (script: evidence/IMP-scripts/ci-steps.sh)
+# Commit: e44ea62
+# Environment: Docker, linux/amd64 (emulated), node:24-bookworm (Node 24.22.2, npm 11.19.1 as on CI), user node
+# Date: 2026-11-05T07:46Z
+# Note: the setup-node action itself runs only on GitHub (AC-A2); this proves the steps after it are unaffected.
+
+## Linux x86_64, node v24.22.2, npm 11.19.1, user node uid 1000, CI=true
+$ npm ci --strict-allow-scripts
+exit=0
+
+found 0 vulnerabilities
+$ npm run typecheck
+exit=0
+{"result":"pass","registeredProgramFiles":{"examples/prisma-client-generator":2,"src/tests/prisma-client-generator":2}}
+$ npm test
+ Test Files  17 passed (17)
+      Tests  167 passed (167)
+exit=0
+$ npm run build
+exit=0
