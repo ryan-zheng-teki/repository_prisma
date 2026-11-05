@@ -55,7 +55,8 @@ Allow the build once in your project:
 
 The same code is reported when the native module was built for a different Node.js version (the
 driver's error says it "was compiled against a different Node.js version"). Rebuild it for the
-Node.js you run: `npm rebuild better-sqlite3`. For Electron, rebuild it against Electron's Node.js.
+Node.js you run: `npm rebuild better-sqlite3` (pnpm: `pnpm rebuild better-sqlite3`). For Electron,
+rebuild it against Electron's Node.js.
 
 ### Schema, configuration and client
 

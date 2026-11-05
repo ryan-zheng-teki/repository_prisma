@@ -1,0 +1,19 @@
+# Delivery rerun on a275b8e + delivery README edit (docs only) — 2026-11-05T06:20:07Z; user normy uid 501; node v22.23.1 Darwin arm64
+ README.md | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+exit=0 (npm@11.19.1 ci --strict-allow-scripts)
+install-script warning lines: 0
+found 0 vulnerabilities
+
+{"result":"pass","registeredProgramFiles":{"examples/prisma-client-generator":2,"src/tests/prisma-client-generator":2}}
+exit=0 (typecheck)
+ Test Files  17 passed (17)
+      Tests  167 passed (167)
+exit=0 (npm test)
+exit=0 (build)
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","externalDriverAdapter":"pass","noClientOnImport":"pass","noNativeAddonOnImport":"pass","noQueryStringFiles":"pass","readonlyWal":"pass","prismaClientGenerator":"pass","registeredConsumerTypes":["nodenext","node16","bundler","cjs-node16"],"cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-package-smoke-kzJ1on"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-esm-cjs-interop-suhXzX"}
+exit=0 (test:package, npm 10.9.8)
+46:- npm 12+: `npm install-scripts approve better-sqlite3`, then `npm rebuild better-sqlite3`.
+58:Node.js you run: `npm rebuild better-sqlite3` (pnpm: `pnpm rebuild better-sqlite3`). For Electron,
+diff-check ok
