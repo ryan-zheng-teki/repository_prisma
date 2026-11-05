@@ -1,0 +1,39 @@
+# Release 2.1.1 pre-tag checks 1-6 on f527c0a — 2026-11-05T08:42:59Z
+# user: normy uid 501; node v22.23.1; npm 10.9.8; Darwin arm64
+$ 1. rm -rf node_modules && npm ci
+
+found 0 vulnerabilities
+exit=0 (npm ci)
+$ 1b. CI parity: npx npm@11.19.1 ci --strict-allow-scripts
+exit=0 (npm@11.19.1 ci --strict-allow-scripts)
+install-script warning lines: 0
+found 0 vulnerabilities
+$ 2. npm run typecheck
+{"result":"pass","registeredProgramFiles":{"examples/prisma-client-generator":2,"src/tests/prisma-client-generator":2}}
+exit=0 (typecheck)
+$ 3. npm test
+ Test Files  17 passed (17)
+      Tests  167 passed (167)
+exit=0 (npm test)
+$ 4. npm run build
+exit=0 (build)
+$ 5. npm run test:package (non-root)
+{"result":"pass","packedFiles":10,"cjs":"pass","esm":"pass","declarations":"pass","installedArtifact":"pass","safeFailureOutput":"pass","externalDriverAdapter":"pass","noClientOnImport":"pass","noNativeAddonOnImport":"pass","noQueryStringFiles":"pass","readonlyWal":"pass","prismaClientGenerator":"pass","registeredConsumerTypes":["nodenext","node16","bundler","cjs-node16"],"cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-package-smoke-JVay5d"}
+{"result":"pass","emittedEsmNamedImports":"absent","dynamicCommonJsPeer":"pass","packageExportsImport":"pass","cleanup":"/var/folders/7w/9r4_s1_s42z3f7c136bpjf0r0000gn/T/repository-prisma-esm-cjs-interop-ZdZS50"}
+exit=0 (test:package)
+$ 6. npm pack --dry-run
+npm notice 7.0kB CHANGELOG.md
+npm notice 27.0kB DESIGN.md
+npm notice 24.2kB README.md
+npm notice 12.5kB dist/index.d.mts
+npm notice 12.5kB dist/index.d.ts
+npm notice 37.7kB dist/index.js
+npm notice 77.6kB dist/index.js.map
+npm notice 34.7kB dist/index.mjs
+npm notice 75.5kB dist/index.mjs.map
+npm notice 1.8kB package.json
+npm notice name: repository_prisma
+npm notice version: 2.1.1
+npm notice filename: repository_prisma-2.1.1.tgz
+npm notice total files: 10
+exit=0 (pack dry-run)

@@ -1,0 +1,376 @@
+# Release 2.1.1 publication verification — 2026-11-05T08:47:45Z
+
+$ CI on main@f527c0a (pre-tag check 7): run 41996707604
+success f527c0ad1af9892a0545eb75c67b091821723519 https://github.com/ryan-zheng-teki/repository_prisma/actions/runs/41996707604
+
+$ git ls-remote --tags origin refs/tags/v2.1.1 refs/tags/v2.1.1^{}
+32f442b805b17fc188231e9421a4d1571c690041	refs/tags/v2.1.1
+f527c0ad1af9892a0545eb75c67b091821723519	refs/tags/v2.1.1^{}
+
+$ Release run 41996833453 (jobs API)
+job: completed success https://github.com/ryan-zheng-teki/repository_prisma/actions/runs/41996833453/job/127141964069
+  Set up job: success
+  Run actions/checkout@v5: success
+  Run actions/setup-node@v6: success
+  Ensure npm >= 11.5.1 (trusted publishing): success
+  Run npm ci: success
+  Run npm run build: success
+  Run npm publish --provenance --access public: success
+  Post Run actions/setup-node@v6: success
+  Post Run actions/checkout@v5: success
+  Complete job: success
+
+AC-A4 checks on the release log:
+  always-auth lines: 0
+  install-scripts/allowScripts lines: 0
+  publish	Set up job	2026-11-05T08:44:47.5248957Z Download action repository 'actions/setup-node@v6' (SHA:249970729cb0ef3589644e2896645e5dc5ba9c38)
+  publish	Run npm publish --provenance --access public	2026-11-05T08:45:05.9009078Z npm notice publish Signed provenance statement with source and build information from GitHub Actions
+  publish	Run npm publish --provenance --access public	2026-11-05T08:45:05.9009961Z npm notice publish Provenance statement published to transparency log: https://search.sigstore.dev/?logIndex=3692950121
+  publish	Run npm publish --provenance --access public	2026-11-05T08:45:07.9297399Z + repository_prisma@2.1.1
+
+$ npm view (prefer-online)
+{
+  "latest": "2.1.1"
+}
+{
+  "version": "2.1.1",
+  "dist.tarball": "https://registry.npmjs.org/repository_prisma/-/repository_prisma-2.1.1.tgz",
+  "dist.integrity": "sha512-FjXA3nqDtSCUluwYV+jzzeUUOG7/PxVY6FgxYT96oPSv10fFvG3TBeWN6FEeJ4j3VUYzcM+5ZaACgGHGcxGWDA==",
+  "dist.shasum": "34ace3f7a8abe7add13e0a84be2600adb2d3d423",
+  "gitHead": "f527c0ad1af9892a0545eb75c67b091821723519",
+  "peerDependencies": {
+    "@prisma/client": "^7.10.1",
+    "@prisma/adapter-better-sqlite3": "^7.10.1"
+  },
+  "engines": {
+    "node": "^20.19 || ^22.12 || >=24"
+  },
+  "dist.attestations": {
+    "url": "https://registry.npmjs.org/-/npm/v1/attestations/repository_prisma@2.1.1",
+    "provenance": {
+      "predicateType": "https://slsa.dev/provenance/v1"
+    }
+  }
+}
+# registry publish times: 2.1.0 2026-11-05T06:28:56.766Z | 2.1.1 2026-11-05T08:46:26.513Z | now 2026-11-05T08:47:48.812Z
+Note: raw registry showed latest=2.1.0 at 08:45:33/08:45:53/08:46:14Z and 2.1.1 from 08:46:34Z; npm view's cache caught up at 08:46:40Z (propagation).
+
+$ Release run log (full)
+publish	Set up job	﻿2026-11-05T08:44:47.1869441Z Current runner version: '2.338.2'
+publish	Set up job	2026-11-05T08:44:47.1892425Z ##[group]Runner Image Provisioner
+publish	Set up job	2026-11-05T08:44:47.1893236Z Hosted Compute Agent
+publish	Set up job	2026-11-05T08:44:47.1893746Z Version: 20261028.624
+publish	Set up job	2026-11-05T08:44:47.1894222Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
+publish	Set up job	2026-11-05T08:44:47.1894838Z Build Date: 2026-10-28T21:51:42Z
+publish	Set up job	2026-11-05T08:44:47.1895393Z Worker ID: {6bee5768-8c89-44ad-b526-b438c3da2066}
+publish	Set up job	2026-11-05T08:44:47.1895948Z Region: centralus
+publish	Set up job	2026-11-05T08:44:47.1896391Z Cloud: Azure
+publish	Set up job	2026-11-05T08:44:47.1896802Z ##[endgroup]
+publish	Set up job	2026-11-05T08:44:47.1897786Z ##[group]Operating System
+publish	Set up job	2026-11-05T08:44:47.1898353Z Ubuntu
+publish	Set up job	2026-11-05T08:44:47.1898946Z 26.04.1
+publish	Set up job	2026-11-05T08:44:47.1899379Z LTS
+publish	Set up job	2026-11-05T08:44:47.1899781Z ##[endgroup]
+publish	Set up job	2026-11-05T08:44:47.1900222Z ##[group]Runner Image
+publish	Set up job	2026-11-05T08:44:47.1901059Z Image: ubuntu-26.04
+publish	Set up job	2026-11-05T08:44:47.1901525Z Version: 20261101.186.1
+publish	Set up job	2026-11-05T08:44:47.1902343Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261101.186/images/ubuntu/Ubuntu2604-Readme.md
+publish	Set up job	2026-11-05T08:44:47.1903749Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261101.186
+publish	Set up job	2026-11-05T08:44:47.1904551Z ##[endgroup]
+publish	Set up job	2026-11-05T08:44:47.1905467Z ##[group]GITHUB_TOKEN Permissions
+publish	Set up job	2026-11-05T08:44:47.1907489Z Contents: read
+publish	Set up job	2026-11-05T08:44:47.1907945Z Metadata: read
+publish	Set up job	2026-11-05T08:44:47.1908436Z ##[endgroup]
+publish	Set up job	2026-11-05T08:44:47.1910258Z Secret source: Actions
+publish	Set up job	2026-11-05T08:44:47.1911650Z Cache mode: write
+publish	Set up job	2026-11-05T08:44:47.1912249Z Prepare workflow directory
+publish	Set up job	2026-11-05T08:44:47.2184382Z Prepare all required actions
+publish	Set up job	2026-11-05T08:44:47.2229286Z Getting action download info
+publish	Set up job	2026-11-05T08:44:47.4532209Z Download action repository 'actions/checkout@v5' (SHA:fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09)
+publish	Set up job	2026-11-05T08:44:47.5248957Z Download action repository 'actions/setup-node@v6' (SHA:249970729cb0ef3589644e2896645e5dc5ba9c38)
+publish	Set up job	2026-11-05T08:44:47.6834941Z Complete job name: publish
+publish	Run actions/checkout@v5	﻿2026-11-05T08:44:47.8657216Z ##[group]Run actions/checkout@v5
+publish	Run actions/checkout@v5	2026-11-05T08:44:47.8657975Z with:
+publish	Run actions/checkout@v5	2026-11-05T08:44:47.8658403Z   repository: ryan-zheng-teki/repository_prisma
+publish	Run actions/checkout@v5	2026-11-05T08:44:47.8661816Z   token: ***
+publish	Run actions/checkout@v5	2026-11-05T08:44:47.8662225Z   ssh-strict: true
+publish	Run actions/checkout@v5	2026-11-05T08:44:47.8662650Z   ssh-user: git
+publish	Run actions/checkout@v5	2026-11-05T08:44:47.8663070Z   persist-credentials: true
+publish	Run actions/checkout@v5	2026-11-05T08:44:47.8663553Z   clean: true
+publish	Run actions/checkout@v5	2026-11-05T08:44:47.8663948Z   sparse-checkout-cone-mode: true
+publish	Run actions/checkout@v5	2026-11-05T08:44:47.8664403Z   fetch-depth: 1
+publish	Run actions/checkout@v5	2026-11-05T08:44:47.8664799Z   fetch-tags: false
+publish	Run actions/checkout@v5	2026-11-05T08:44:47.8665197Z   show-progress: true
+publish	Run actions/checkout@v5	2026-11-05T08:44:47.8665580Z   lfs: false
+publish	Run actions/checkout@v5	2026-11-05T08:44:47.8665932Z   submodules: false
+publish	Run actions/checkout@v5	2026-11-05T08:44:47.8666351Z   set-safe-directory: true
+publish	Run actions/checkout@v5	2026-11-05T08:44:47.8666834Z   allow-unsafe-pr-checkout: false
+publish	Run actions/checkout@v5	2026-11-05T08:44:47.8667444Z ##[endgroup]
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1161951Z Syncing repository: ryan-zheng-teki/repository_prisma
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1164380Z ##[group]Getting Git version info
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1165222Z Working directory is '/home/runner/work/repository_prisma/repository_prisma'
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1166778Z [command]/usr/bin/git version
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1167651Z git version 2.56.0
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1169600Z ##[endgroup]
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1175858Z Temporarily overriding HOME='/home/runner/work/_temp/63174eda-fecd-494e-98e0-f4a043a74269' before making global git config changes
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1178255Z Adding repository directory to the temporary git global config as a safe directory
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1180523Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/repository_prisma/repository_prisma
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1238844Z Deleting the contents of '/home/runner/work/repository_prisma/repository_prisma'
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1245489Z ##[group]Initializing the repository
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1246797Z [command]/usr/bin/git init /home/runner/work/repository_prisma/repository_prisma
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1343699Z hint: Using 'master' as the name for the initial branch. This default branch name
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1345531Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1346962Z hint: to use in all of your new repositories, which will suppress this warning,
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1347946Z hint: call:
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1348750Z hint:
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1349596Z hint: 	git config --global init.defaultBranch <name>
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1350545Z hint:
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1351583Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1352877Z hint: 'development'. The just-created branch can be renamed via this command:
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1354022Z hint:
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1354632Z hint: 	git branch -m <name>
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1355255Z hint:
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1356002Z hint: Disable this message with "git config set advice.defaultBranchName false"
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1366392Z Initialized empty Git repository in /home/runner/work/repository_prisma/repository_prisma/.git/
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1383775Z [command]/usr/bin/git remote add origin https://github.com/ryan-zheng-teki/repository_prisma
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1414817Z ##[endgroup]
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1416140Z ##[group]Disabling automatic garbage collection
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1417326Z [command]/usr/bin/git config --local gc.auto 0
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1448074Z ##[endgroup]
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1449495Z ##[group]Setting up auth
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1452152Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1477016Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1882633Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.1915670Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.2103100Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.2129930Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.2324151Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.2381177Z ##[endgroup]
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.2382839Z ##[group]Fetching the repository
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.2389558Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +f527c0ad1af9892a0545eb75c67b091821723519:refs/tags/v2.1.1
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8352692Z From https://github.com/ryan-zheng-teki/repository_prisma
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8354845Z  * [new ref]         f527c0ad1af9892a0545eb75c67b091821723519 -> v2.1.1
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8359069Z ##[endgroup]
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8361285Z ##[group]Determining the checkout info
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8363428Z ##[endgroup]
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8364807Z [command]/usr/bin/git sparse-checkout disable
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8417885Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8443848Z ##[group]Checking out the ref
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8445524Z [command]/usr/bin/git checkout --progress --force refs/tags/v2.1.1
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8693100Z Note: switching to 'refs/tags/v2.1.1'.
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8694139Z 
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8694894Z You are in 'detached HEAD' state. You can look around, make experimental
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8696598Z changes and commit them, and you can discard any commits you make in this
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8698231Z state without impacting any branches by switching back to a branch.
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8699307Z 
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8700222Z If you want to create a new branch to retain commits you create, you may
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8701901Z do so (now or later) by using -c with the switch command. Example:
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8703065Z 
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8703533Z   git switch -c <new-branch-name>
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8704119Z 
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8704535Z Or undo this operation with:
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8705228Z 
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8705651Z   git switch -
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8706253Z 
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8707021Z Turn off this advice by setting config variable advice.detachedHead to false
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8708391Z 
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8708968Z HEAD is now at f527c0a chore(release): 2.1.1
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8712566Z ##[endgroup]
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8733914Z [command]/usr/bin/git log -1 --format=%H
+publish	Run actions/checkout@v5	2026-11-05T08:44:48.8752421Z f527c0ad1af9892a0545eb75c67b091821723519
+publish	Run actions/setup-node@v6	﻿2026-11-05T08:44:48.9104190Z ##[group]Run actions/setup-node@v6
+publish	Run actions/setup-node@v6	2026-11-05T08:44:48.9105209Z with:
+publish	Run actions/setup-node@v6	2026-11-05T08:44:48.9105988Z   node-version: 24
+publish	Run actions/setup-node@v6	2026-11-05T08:44:48.9106884Z   registry-url: https://registry.npmjs.org
+publish	Run actions/setup-node@v6	2026-11-05T08:44:48.9108013Z   check-latest: false
+publish	Run actions/setup-node@v6	2026-11-05T08:44:48.9115511Z   token: ***
+publish	Run actions/setup-node@v6	2026-11-05T08:44:48.9116374Z   package-manager-cache: true
+publish	Run actions/setup-node@v6	2026-11-05T08:44:48.9117326Z ##[endgroup]
+publish	Run actions/setup-node@v6	2026-11-05T08:44:49.0275636Z Found in cache @ /opt/hostedtoolcache/node/24.22.2/x64
+publish	Run actions/setup-node@v6	2026-11-05T08:44:49.0278429Z ##[group]Environment details
+publish	Run actions/setup-node@v6	2026-11-05T08:44:49.4155166Z node: v24.22.2
+publish	Run actions/setup-node@v6	2026-11-05T08:44:49.4155831Z npm: 11.19.1
+publish	Run actions/setup-node@v6	2026-11-05T08:44:49.4156211Z yarn: 1.22.22
+publish	Run actions/setup-node@v6	2026-11-05T08:44:49.4156897Z ##[endgroup]
+publish	Ensure npm >= 11.5.1 (trusted publishing)	﻿2026-11-05T08:44:49.4283609Z ##[group]Run npm --version
+publish	Ensure npm >= 11.5.1 (trusted publishing)	2026-11-05T08:44:49.4283981Z npm --version
+publish	Ensure npm >= 11.5.1 (trusted publishing)	2026-11-05T08:44:49.4284250Z npm i -g npm@^11.5.1
+publish	Ensure npm >= 11.5.1 (trusted publishing)	2026-11-05T08:44:49.4284498Z npm --version
+publish	Ensure npm >= 11.5.1 (trusted publishing)	2026-11-05T08:44:49.4323299Z shell: /usr/bin/bash -e {0}
+publish	Ensure npm >= 11.5.1 (trusted publishing)	2026-11-05T08:44:49.4323631Z env:
+publish	Ensure npm >= 11.5.1 (trusted publishing)	2026-11-05T08:44:49.4323944Z   NPM_CONFIG_USERCONFIG: /home/runner/work/_temp/.npmrc
+publish	Ensure npm >= 11.5.1 (trusted publishing)	2026-11-05T08:44:49.4324324Z   NODE_AUTH_TOKEN: XXXXX-XXXXX-XXXXX-XXXXX
+publish	Ensure npm >= 11.5.1 (trusted publishing)	2026-11-05T08:44:49.4324575Z ##[endgroup]
+publish	Ensure npm >= 11.5.1 (trusted publishing)	2026-11-05T08:44:49.4952631Z 11.19.1
+publish	Ensure npm >= 11.5.1 (trusted publishing)	2026-11-05T08:44:52.6234099Z 
+publish	Ensure npm >= 11.5.1 (trusted publishing)	2026-11-05T08:44:52.6235561Z changed 23 packages in 3s
+publish	Ensure npm >= 11.5.1 (trusted publishing)	2026-11-05T08:44:52.6236152Z 
+publish	Ensure npm >= 11.5.1 (trusted publishing)	2026-11-05T08:44:52.6236535Z 15 packages are looking for funding
+publish	Ensure npm >= 11.5.1 (trusted publishing)	2026-11-05T08:44:52.6236988Z   run `npm fund` for details
+publish	Ensure npm >= 11.5.1 (trusted publishing)	2026-11-05T08:44:52.7066043Z 11.21.2
+publish	Run npm ci	﻿2026-11-05T08:44:52.7137044Z ##[group]Run npm ci
+publish	Run npm ci	2026-11-05T08:44:52.7137337Z npm ci
+publish	Run npm ci	2026-11-05T08:44:52.7166413Z shell: /usr/bin/bash -e {0}
+publish	Run npm ci	2026-11-05T08:44:52.7166787Z env:
+publish	Run npm ci	2026-11-05T08:44:52.7167069Z   NPM_CONFIG_USERCONFIG: /home/runner/work/_temp/.npmrc
+publish	Run npm ci	2026-11-05T08:44:52.7167389Z   NODE_AUTH_TOKEN: XXXXX-XXXXX-XXXXX-XXXXX
+publish	Run npm ci	2026-11-05T08:44:52.7167693Z ##[endgroup]
+publish	Run npm ci	2026-11-05T08:44:53.6196674Z npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
+publish	Run npm ci	2026-11-05T08:44:57.6680136Z 
+publish	Run npm ci	2026-11-05T08:44:57.6681511Z > repository_prisma@2.1.1 prepare
+publish	Run npm ci	2026-11-05T08:44:57.6682030Z > prisma generate
+publish	Run npm ci	2026-11-05T08:44:57.6682154Z 
+publish	Run npm ci	2026-11-05T08:44:58.2825472Z Loaded Prisma config from prisma.config.ts.
+publish	Run npm ci	2026-11-05T08:44:58.2825978Z 
+publish	Run npm ci	2026-11-05T08:44:58.8130056Z Prisma schema loaded from prisma/schema.prisma.
+publish	Run npm ci	2026-11-05T08:44:58.9124046Z 
+publish	Run npm ci	2026-11-05T08:44:58.9125466Z ✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 46ms
+publish	Run npm ci	2026-11-05T08:44:58.9125952Z 
+publish	Run npm ci	2026-11-05T08:44:58.9126281Z ✔ Generated Prisma Client (7.10.1) to ./generated/prisma-client in 16ms
+publish	Run npm ci	2026-11-05T08:44:58.9126677Z 
+publish	Run npm ci	2026-11-05T08:44:58.9126946Z Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+publish	Run npm ci	2026-11-05T08:44:58.9127278Z 
+publish	Run npm ci	2026-11-05T08:44:58.9127286Z 
+publish	Run npm ci	2026-11-05T08:44:59.0141684Z 
+publish	Run npm ci	2026-11-05T08:44:59.0142720Z added 273 packages, and audited 274 packages in 6s
+publish	Run npm ci	2026-11-05T08:44:59.0143103Z 
+publish	Run npm ci	2026-11-05T08:44:59.0143335Z 47 packages are looking for funding
+publish	Run npm ci	2026-11-05T08:44:59.0144069Z   run `npm fund` for details
+publish	Run npm ci	2026-11-05T08:44:59.0151233Z 
+publish	Run npm ci	2026-11-05T08:44:59.0151957Z found 0 vulnerabilities
+publish	Run npm run build	﻿2026-11-05T08:44:59.0368385Z ##[group]Run npm run build
+publish	Run npm run build	2026-11-05T08:44:59.0368703Z npm run build
+publish	Run npm run build	2026-11-05T08:44:59.0399105Z shell: /usr/bin/bash -e {0}
+publish	Run npm run build	2026-11-05T08:44:59.0399621Z env:
+publish	Run npm run build	2026-11-05T08:44:59.0399908Z   NPM_CONFIG_USERCONFIG: /home/runner/work/_temp/.npmrc
+publish	Run npm run build	2026-11-05T08:44:59.0400224Z   NODE_AUTH_TOKEN: XXXXX-XXXXX-XXXXX-XXXXX
+publish	Run npm run build	2026-11-05T08:44:59.0400489Z ##[endgroup]
+publish	Run npm run build	2026-11-05T08:44:59.1152564Z 
+publish	Run npm run build	2026-11-05T08:44:59.1153260Z > repository_prisma@2.1.1 build
+publish	Run npm run build	2026-11-05T08:44:59.1153792Z > tsup
+publish	Run npm run build	2026-11-05T08:44:59.1154069Z 
+publish	Run npm run build	2026-11-05T08:44:59.3519668Z CLI Building entry: src/index.ts
+publish	Run npm run build	2026-11-05T08:44:59.3521129Z CLI Using tsconfig: tsconfig.json
+publish	Run npm run build	2026-11-05T08:44:59.3521883Z CLI tsup v8.5.1
+publish	Run npm run build	2026-11-05T08:44:59.3522705Z CLI Using tsup config: /home/runner/work/repository_prisma/repository_prisma/tsup.config.ts
+publish	Run npm run build	2026-11-05T08:44:59.3552487Z CLI Target: es2020
+publish	Run npm run build	2026-11-05T08:44:59.3562335Z CLI Cleaning output folder
+publish	Run npm run build	2026-11-05T08:44:59.3563684Z CJS Build start
+publish	Run npm run build	2026-11-05T08:44:59.3564473Z ESM Build start
+publish	Run npm run build	2026-11-05T08:44:59.3575557Z CJS You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+publish	Run npm run build	2026-11-05T08:44:59.3580882Z ESM You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+publish	Run npm run build	2026-11-05T08:44:59.3903453Z CJS dist/index.js     36.84 KB
+publish	Run npm run build	2026-11-05T08:44:59.3904086Z CJS dist/index.js.map 75.76 KB
+publish	Run npm run build	2026-11-05T08:44:59.3904593Z CJS ⚡️ Build success in 34ms
+publish	Run npm run build	2026-11-05T08:44:59.3905055Z ESM dist/index.mjs     33.87 KB
+publish	Run npm run build	2026-11-05T08:44:59.3905691Z ESM dist/index.mjs.map 73.68 KB
+publish	Run npm run build	2026-11-05T08:44:59.3906296Z ESM ⚡️ Build success in 34ms
+publish	Run npm run build	2026-11-05T08:44:59.5879814Z DTS Build start
+publish	Run npm run build	2026-11-05T08:45:00.8713609Z DTS ⚡️ Build success in 1283ms
+publish	Run npm run build	2026-11-05T08:45:00.8719114Z DTS dist/index.d.ts  12.21 KB
+publish	Run npm run build	2026-11-05T08:45:00.8733969Z DTS dist/index.d.mts 12.21 KB
+publish	Run npm publish --provenance --access public	﻿2026-11-05T08:45:00.9259028Z ##[group]Run npm publish --provenance --access public
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:00.9259539Z npm publish --provenance --access public
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:00.9290310Z shell: /usr/bin/bash -e {0}
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:00.9290878Z env:
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:00.9291241Z   NPM_CONFIG_USERCONFIG: /home/runner/work/_temp/.npmrc
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:00.9291717Z   NODE_AUTH_TOKEN: XXXXX-XXXXX-XXXXX-XXXXX
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:00.9292092Z ##[endgroup]
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:01.1069414Z 
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:01.1070421Z > repository_prisma@2.1.1 prepublishOnly
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:01.1071114Z > npm run build
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:01.1071309Z 
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:01.1812071Z 
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:01.1812929Z > repository_prisma@2.1.1 build
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:01.1813472Z > tsup
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:01.1813621Z 
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:01.4037742Z CLI Building entry: src/index.ts
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:01.4039088Z CLI Using tsconfig: tsconfig.json
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:01.4039886Z CLI tsup v8.5.1
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:01.4041506Z CLI Using tsup config: /home/runner/work/repository_prisma/repository_prisma/tsup.config.ts
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:01.4072292Z CLI Target: es2020
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:01.4092726Z CLI Cleaning output folder
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:01.4101376Z CJS Build start
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:01.4101998Z ESM Build start
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:01.4114149Z CJS You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:01.4119779Z ESM You have emitDecoratorMetadata enabled but @swc/core was not installed, skipping swc plugin
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:01.4505642Z ESM dist/index.mjs     33.87 KB
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:01.4506716Z ESM dist/index.mjs.map 73.68 KB
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:01.4507604Z ESM ⚡️ Build success in 40ms
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:01.4508316Z CJS dist/index.js     36.84 KB
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:01.4509152Z CJS dist/index.js.map 75.76 KB
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:01.4510337Z CJS ⚡️ Build success in 40ms
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:01.6412439Z DTS Build start
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.0553385Z DTS ⚡️ Build success in 1415ms
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.0561909Z DTS dist/index.d.ts  12.21 KB
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.0562803Z DTS dist/index.d.mts 12.21 KB
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.1166627Z 
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.1167322Z > repository_prisma@2.1.1 prepare
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.1167878Z > prisma generate
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.1168208Z 
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.6032210Z Loaded Prisma config from prisma.config.ts.
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.6032768Z 
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.6741247Z Prisma schema loaded from prisma/schema.prisma.
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.8013160Z ┌─────────────────────────────────────────────────────────┐
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.8013971Z │  Update available 7.10.1 -> 8.0.0-rc.30                 │
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.8014267Z 
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.8014680Z ✔ Generated Prisma Client (v7.10.1) to ./node_modules/@prisma/client in 58ms
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.8015111Z 
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.8015431Z ✔ Generated Prisma Client (7.10.1) to ./generated/prisma-client in 23ms
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.8015800Z 
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.8016165Z Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.8016459Z 
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.8016464Z 
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.8022403Z │                                                         │
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9487750Z │  This is a major update - please follow the guide at    │
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9488423Z │  https://pris.ly/d/major-version-upgrade                │
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9489030Z │                                                         │
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9489498Z │  Run the following to update                            │
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9490146Z │    npm i --save-dev prisma@latest                       │
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9490813Z │    npm i @prisma/client@latest                          │
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9491251Z └─────────────────────────────────────────────────────────┘
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9491863Z npm notice
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9492672Z npm notice 📦  repository_prisma@2.1.1
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9493201Z npm notice Tarball Contents
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9493730Z npm notice 7.0kB CHANGELOG.md
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9494298Z npm notice 27.0kB DESIGN.md
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9494711Z npm notice 24.2kB README.md
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9495047Z npm notice 12.5kB dist/index.d.mts
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9495449Z npm notice 12.5kB dist/index.d.ts
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9495845Z npm notice 37.7kB dist/index.js
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9496196Z npm notice 77.6kB dist/index.js.map
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9496661Z npm notice 34.7kB dist/index.mjs
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9497045Z npm notice 75.5kB dist/index.mjs.map
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9497446Z npm notice 1.8kB package.json
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9497772Z npm notice Tarball Details
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9498191Z npm notice name: repository_prisma
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9498561Z npm notice version: 2.1.1
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9498969Z npm notice filename: repository_prisma-2.1.1.tgz
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9499385Z npm notice package size: 75.6 kB
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9499666Z npm notice unpacked size: 310.4 kB
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9500016Z npm notice shasum: 34ace3f7a8abe7add13e0a84be2600adb2d3d423
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9500463Z npm notice integrity: sha512-FjXA3nqDtSCUl[...]aACgGHGcxGWDA==
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9500997Z npm notice total files: 10
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:03.9501252Z npm notice
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:05.0015578Z npm notice npm tokens that bypass 2FA are being restricted for account changes and direct publishing. Learn how to prepare: https://gh.io/npm-gat-bypass2fa-deprecation
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:05.1342125Z npm notice Publishing to https://registry.npmjs.org/ with tag latest and public access
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:05.9009078Z npm notice publish Signed provenance statement with source and build information from GitHub Actions
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:05.9009961Z npm notice publish Provenance statement published to transparency log: https://search.sigstore.dev/?logIndex=3692950121
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:07.9296820Z npm notice Your package is being processed and may take a few minutes to become available.
+publish	Run npm publish --provenance --access public	2026-11-05T08:45:07.9297399Z + repository_prisma@2.1.1
+publish	Post Run actions/setup-node@v6	﻿2026-11-05T08:45:07.9470240Z Post job cleanup.
+publish	Post Run actions/checkout@v5	﻿2026-11-05T08:45:08.0478787Z Post job cleanup.
+publish	Post Run actions/checkout@v5	2026-11-05T08:45:08.1098908Z [command]/usr/bin/git version
+publish	Post Run actions/checkout@v5	2026-11-05T08:45:08.1129769Z git version 2.56.0
+publish	Post Run actions/checkout@v5	2026-11-05T08:45:08.1154572Z Temporarily overriding HOME='/home/runner/work/_temp/568bda78-dc2f-4058-a6b3-83366510511b' before making global git config changes
+publish	Post Run actions/checkout@v5	2026-11-05T08:45:08.1155528Z Adding repository directory to the temporary git global config as a safe directory
+publish	Post Run actions/checkout@v5	2026-11-05T08:45:08.1158823Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/repository_prisma/repository_prisma
+publish	Post Run actions/checkout@v5	2026-11-05T08:45:08.1188800Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+publish	Post Run actions/checkout@v5	2026-11-05T08:45:08.1213788Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+publish	Post Run actions/checkout@v5	2026-11-05T08:45:08.1414464Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+publish	Post Run actions/checkout@v5	2026-11-05T08:45:08.1432989Z http.https://github.com/.extraheader
+publish	Post Run actions/checkout@v5	2026-11-05T08:45:08.1441436Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+publish	Post Run actions/checkout@v5	2026-11-05T08:45:08.1467516Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+publish	Post Run actions/checkout@v5	2026-11-05T08:45:08.1680379Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+publish	Post Run actions/checkout@v5	2026-11-05T08:45:08.1705085Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+publish	Complete job	﻿2026-11-05T08:45:08.2013683Z Cleaning up orphan processes
